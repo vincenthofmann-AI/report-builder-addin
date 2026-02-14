@@ -26,10 +26,14 @@ import {
   type DataSourceDef,
 } from "../services/geotab-mock";
 import type { CategoryDef } from "../services/categories";
+import type { InsightCategory, ReportTemplateDef } from "../services/report-templates";
 import { useGeotab } from "../services/geotab-context";
 import { useDataFetcher } from "../services/data-fetcher";
 import { CategorySelector } from "./CategorySelector";
 import { DataSourceSelector } from "./DataSourceSelector";
+import { InsightCategorySelector } from "./InsightCategorySelector";
+import { InsightSelector } from "./InsightSelector";
+import { ReportPreview } from "./ReportPreview";
 import { ReportOutline } from "./ReportOutline";
 import { FilterBar, type FilterRule } from "./FilterBar";
 import { ReportTable } from "./ReportTable";
@@ -59,6 +63,11 @@ export function ReportBuilder() {
   const dataSources = dataFetcher.getDataSources();
 
   // ----- State -----
+  // Insight-First flow state
+  const [insightCategory, setInsightCategory] = useState<InsightCategory | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<ReportTemplateDef | null>(null);
+
+  // Legacy flow state (for advanced custom reports)
   const [selectedCategory, setSelectedCategory] = useState<CategoryDef | null>(null);
   const [selectedSource, setSelectedSource] = useState<DataSourceDef | null>(null);
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
@@ -572,6 +581,25 @@ export function ReportBuilder() {
                   </div>
                 </div>
               </motion.div>
+            ) : selectedTemplate ? (
+              <motion.div
+                key="report-preview"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex-1 flex flex-col min-h-0"
+              >
+                <ReportPreview
+                  template={selectedTemplate}
+                  onBack={() => {
+                    setSelectedTemplate(null);
+                    setInsightCategory(null);
+                  }}
+                  onExport={handleExport}
+                  onSave={handleSave}
+                />
+              </motion.div>
             ) : (
               <motion.div
                 key="empty-state"
@@ -581,17 +609,17 @@ export function ReportBuilder() {
                 transition={{ duration: 0.2 }}
                 className="flex-1 overflow-auto"
               >
-                {!selectedCategory ? (
-                  <CategorySelector
-                    selectedCategory={selectedCategory}
-                    onSelectCategory={setSelectedCategory}
+                {!insightCategory ? (
+                  <InsightCategorySelector
+                    selectedCategory={insightCategory}
+                    onSelectCategory={setInsightCategory}
                   />
                 ) : (
-                  <DataSourceSelector
-                    category={selectedCategory}
-                    selectedSource={selectedSource}
-                    onSelectSource={handleSelectSource}
-                    onBack={() => setSelectedCategory(null)}
+                  <InsightSelector
+                    category={insightCategory}
+                    selectedTemplate={selectedTemplate}
+                    onSelectTemplate={setSelectedTemplate}
+                    onBack={() => setInsightCategory(null)}
                   />
                 )}
               </motion.div>
