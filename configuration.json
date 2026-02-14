@@ -1,0 +1,17 @@
+{
+  "name": "Report Builder",
+  "supportEmail": "support@geotab.com",
+  "version": "0.1.0",
+  "items": [{
+    "page": "reportBuilder",
+    "url": "reportBuilder.html",
+    "path": "ActivityLink",
+    "menuName": {
+      "en": "Report Builder",
+      "fr": "Générateur de Rapports",
+      "es": "Generador de Informes",
+      "de": "Berichtsgenerator"
+    }
+  }],
+  "isSigned": false
+}

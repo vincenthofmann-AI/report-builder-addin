@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Builder</title>
+    <style>
+    /* MyGeotab Report Builder Styles */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background-color: #f5f7fa; color: #2c3e50; line-height: 1.6; }
+    .report-builder-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    .rb-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 2px solid #e1e8ed; margin-bottom: 30px; }
+    .rb-header h1 { font-size: 28px; font-weight: 600; color: #1a1a1a; }
+    .rb-header-actions { display: flex; gap: 12px; }
+    .rb-steps { display: flex; justify-content: space-between; margin-bottom: 40px; padding: 0 20px; }
+    .step { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; opacity: 0.4; transition: opacity 0.3s ease; }
+    .step.active { opacity: 1; }
+    .step.completed { opacity: 0.8; }
+    .step-number { width: 40px; height: 40px; border-radius: 50%; background-color: #e1e8ed; color: #657786; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 16px; margin-bottom: 8px; transition: all 0.3s ease; }
+    .step.active .step-number { background-color: #0084ff; color: white; box-shadow: 0 2px 8px rgba(0, 132, 255, 0.3); }
+    .step.completed .step-number { background-color: #1da1f2; color: white; }
+    .step-label { font-size: 14px; font-weight: 500; color: #657786; text-align: center; }
+    .step.active .step-label { color: #0084ff; }
+    .rb-step { display: none; animation: fadeIn 0.3s ease; }
+    .rb-step.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .rb-step h2 { font-size: 24px; font-weight: 600; margin-bottom: 24px; color: #1a1a1a; }
+    .rb-step h3 { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #2c3e50; }
+    .data-source-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .data-source-card { background: white; border: 2px solid #e1e8ed; border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease; }
+    .data-source-card:hover { border-color: #0084ff; box-shadow: 0 4px 12px rgba(0, 132, 255, 0.1); transform: translateY(-2px); }
+    .data-source-card.selected { border-color: #0084ff; background-color: #f0f8ff; box-shadow: 0 4px 12px rgba(0, 132, 255, 0.2); }
+    .data-source-icon { font-size: 32px; margin-bottom: 12px; }
+    .data-source-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #1a1a1a; }
+    .data-source-card p { font-size: 14px; color: #657786; margin-bottom: 12px; }
+    .data-source-badge { display: inline-block; padding: 4px 12px; background-color: #e1e8ed; color: #657786; font-size: 12px; font-weight: 500; border-radius: 12px; }
+    .filter-builder { background: white; border-radius: 12px; padding: 24px; margin-bottom: 30px; }
+    .filter-section { margin-bottom: 32px; }
+    .filter-section:last-child { margin-bottom: 0; }
+    .filter-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .filter-group label { font-weight: 500; font-size: 14px; color: #2c3e50; }
+    .form-control { padding: 10px 14px; border: 1px solid #d1d9e0; border-radius: 6px; font-size: 14px; transition: border-color 0.2s ease; }
+    .form-control:focus { outline: none; border-color: #0084ff; box-shadow: 0 0 0 3px rgba(0, 132, 255, 0.1); }
+    #filtersList { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+    .filter-row { display: flex; gap: 12px; align-items: center; padding: 12px; background: #f5f7fa; border-radius: 8px; }
+    .filter-row select, .filter-row input { flex: 1; }
+    .filter-row button { flex-shrink: 0; }
+    .pattern-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .pattern-card { background: white; border: 2px solid #e1e8ed; border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease; position: relative; }
+    .pattern-card:hover { border-color: #0084ff; box-shadow: 0 4px 12px rgba(0, 132, 255, 0.1); transform: translateY(-2px); }
+    .pattern-card.selected { border-color: #0084ff; background-color: #f0f8ff; box-shadow: 0 4px 12px rgba(0, 132, 255, 0.2); }
+    .pattern-icon { font-size: 40px; margin-bottom: 12px; }
+    .pattern-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #1a1a1a; }
+    .pattern-card p { font-size: 14px; color: #657786; margin-bottom: 12px; line-height: 1.5; }
+    .pattern-badge { display: inline-block; padding: 4px 12px; background-color: #e1e8ed; color: #657786; font-size: 12px; font-weight: 500; border-radius: 12px; }
+    .report-summary { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+    .summary-content { display: flex; flex-direction: column; gap: 12px; }
+    .summary-item { display: flex; justify-content: space-between; padding: 12px; background: #f5f7fa; border-radius: 8px; }
+    .summary-label { font-weight: 600; color: #2c3e50; }
+    .summary-value { color: #657786; }
+    .data-preview { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+    .preview-container { min-height: 300px; display: flex; align-items: center; justify-content: center; }
+    .loading { color: #657786; font-size: 16px; }
+    .export-options { background: white; border-radius: 12px; padding: 24px; margin-bottom: 30px; }
+    .export-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .btn-export { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px 24px; background: white; border: 2px solid #e1e8ed; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+    .btn-export:hover { border-color: #0084ff; background-color: #f0f8ff; transform: translateY(-2px); }
+    .export-icon { font-size: 24px; }
+    .btn { padding: 12px 24px; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+    .btn-primary { background-color: #0084ff; color: white; }
+    .btn-primary:hover { background-color: #0073e6; box-shadow: 0 2px 8px rgba(0, 132, 255, 0.3); }
+    .btn-primary:disabled { background-color: #b8c2cc; cursor: not-allowed; box-shadow: none; }
+    .btn-secondary { background-color: white; color: #2c3e50; border: 1px solid #d1d9e0; }
+    .btn-secondary:hover { background-color: #f5f7fa; border-color: #b8c2cc; }
+    .step-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 30px; }
+    .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; }
+    .modal-content { background-color: white; padding: 32px; border-radius: 12px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; }
+    .close { position: absolute; right: 16px; top: 16px; font-size: 28px; font-weight: bold; color: #657786; cursor: pointer; }
+    .close:hover { color: #2c3e50; }
+    .modal h2 { margin-bottom: 24px; font-size: 24px; }
+    .modal .form-group { margin-bottom: 20px; }
+    .modal textarea { resize: vertical; font-family: inherit; }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+    @media (max-width: 768px) {
+        .rb-steps { flex-direction: column; gap: 16px; }
+        .step { flex-direction: row; justify-content: flex-start; gap: 12px; }
+        .data-source-grid, .pattern-grid { grid-template-columns: 1fr; }
+        .export-buttons { grid-template-columns: 1fr; }
+        .step-actions { flex-direction: column-reverse; }
+        .step-actions button { width: 100%; }
+    }
+    </style>
+</head>
+<body>
+    <div id="reportBuilder" class="report-builder-container">
+        <header class="rb-header">
+            <h1>Report Builder</h1>
+            <div class="rb-header-actions">
+                <button id="saveReportBtn" class="btn btn-secondary" style="display: none;">Save Report</button>
+                <button id="exportBtn" class="btn btn-primary" style="display: none;">Export Report</button>
+            </div>
+        </header>
+        <div class="rb-steps">
+            <div class="step active" data-step="1"><span class="step-number">1</span><span class="step-label">Data Source</span></div>
+            <div class="step" data-step="2"><span class="step-number">2</span><span class="step-label">Filters</span></div>
+            <div class="step" data-step="3"><span class="step-number">3</span><span class="step-label">Report Pattern</span></div>
+            <div class="step" data-step="4"><span class="step-number">4</span><span class="step-label">Preview & Export</span></div>
+        </div>
+        <section id="step1" class="rb-step active">
+            <h2>Select Data Source</h2>
+            <div id="dataSourceGrid" class="data-source-grid"></div>
+            <div class="step-actions"><button id="step1Next" class="btn btn-primary" disabled>Next: Configure Filters</button></div>
+        </section>
+        <section id="step2" class="rb-step">
+            <h2>Configure Filters</h2>
+            <div class="filter-builder">
+                <div class="filter-section">
+                    <h3>Date Range</h3>
+                    <div class="filter-group">
+                        <label for="datePreset">Quick Select:</label>
+                        <select id="datePreset" class="form-control">
+                            <option value="today">Today</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="this-week">This Week</option>
+                            <option value="last-week">Last Week</option>
+                            <option value="this-month">This Month</option>
+                            <option value="last-month">Last Month</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <div id="customDateRange" class="filter-group" style="display: none;">
+                        <label for="startDate">From:</label><input type="date" id="startDate" class="form-control">
+                        <label for="endDate">To:</label><input type="date" id="endDate" class="form-control">
+                    </div>
+                </div>
+                <div id="dynamicFilters" class="filter-section">
+                    <h3>Data Filters</h3>
+                    <div id="filtersList"></div>
+                    <button id="addFilterBtn" class="btn btn-secondary">+ Add Filter</button>
+                </div>
+                <div class="filter-section"><h3>Organization Groups</h3><div id="groupFilter"></div></div>
+            </div>
+            <div class="step-actions">
+                <button id="step2Back" class="btn btn-secondary">Back</button>
+                <button id="step2Next" class="btn btn-primary">Next: Choose Pattern</button>
+            </div>
+        </section>
+        <section id="step3" class="rb-step">
+            <h2>Choose Report Pattern</h2>
+            <div id="patternGrid" class="pattern-grid">
+                <div class="pattern-card" data-pattern="fleet-summary"><div class="pattern-icon">📊</div><h3>Fleet Summary Dashboard</h3><p>Overview metrics with vehicle count, status distribution, and alert summaries</p><span class="pattern-badge">Dashboard</span></div>
+                <div class="pattern-card" data-pattern="compliance"><div class="pattern-icon">✓</div><h3>Compliance Report</h3><p>Safety events, HOS violations, and regulatory compliance tracking</p><span class="pattern-badge">PDF/Excel</span></div>
+                <div class="pattern-card" data-pattern="operational"><div class="pattern-icon">⚡</div><h3>Operational Efficiency</h3><p>Fuel consumption, idle time, utilization, and route efficiency metrics</p><span class="pattern-badge">Dashboard</span></div>
+                <div class="pattern-card" data-pattern="data-table"><div class="pattern-icon">📋</div><h3>Data Table</h3><p>Simple filtered table with customizable columns</p><span class="pattern-badge">Excel/CSV</span></div>
+                <div class="pattern-card" data-pattern="custom" style="opacity: 0.6;"><div class="pattern-icon">🛠️</div><h3>Custom Builder</h3><p>Build your own report layout with drag-and-drop</p><span class="pattern-badge">Coming Soon</span></div>
+            </div>
+            <div class="step-actions">
+                <button id="step3Back" class="btn btn-secondary">Back</button>
+                <button id="step3Next" class="btn btn-primary" disabled>Next: Preview</button>
+            </div>
+        </section>
+        <section id="step4" class="rb-step">
+            <h2>Preview & Export</h2>
+            <div class="report-summary"><h3>Report Configuration</h3><div id="reportSummary" class="summary-content"></div></div>
+            <div class="data-preview"><h3>Data Preview</h3><div id="dataPreviewContainer" class="preview-container"><div class="loading">Loading preview...</div></div></div>
+            <div class="export-options">
+                <h3>Export Options</h3>
+                <div class="export-buttons">
+                    <button id="exportPdfBtn" class="btn btn-export"><span class="export-icon">📄</span> Export as PDF</button>
+                    <button id="exportExcelBtn" class="btn btn-export"><span class="export-icon">📊</span> Export as Excel</button>
+                    <button id="exportCsvBtn" class="btn btn-export"><span class="export-icon">📋</span> Export as CSV</button>
+                    <button id="emailReportBtn" class="btn btn-export"><span class="export-icon">📧</span> Email Report</button>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button id="step4Back" class="btn btn-secondary">Back</button>
+                <button id="step4Restart" class="btn btn-primary">Create New Report</button>
+            </div>
+        </section>
+        <div id="emailModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close">&times;</span><h2>Email Report</h2>
+                <form id="emailForm">
+                    <div class="form-group"><label for="emailRecipients">Recipients (comma-separated):</label><input type="text" id="emailRecipients" class="form-control" placeholder="email1@example.com, email2@example.com" required></div>
+                    <div class="form-group"><label for="emailSubject">Subject:</label><input type="text" id="emailSubject" class="form-control" value="MyGeotab Report" required></div>
+                    <div class="form-group"><label for="emailMessage">Message:</label><textarea id="emailMessage" class="form-control" rows="4" placeholder="Optional message..."></textarea></div>
+                    <div class="form-group"><label for="emailFormat">Attachment Format:</label><select id="emailFormat" class="form-control"><option value="pdf">PDF</option><option value="excel">Excel</option><option value="csv">CSV</option></select></div>
+                    <div class="modal-actions">
+                        <button type="button" id="cancelEmail" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Send Email</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    geotab.addin.reportBuilder = function() {
+        'use strict';
+        let api, state, currentStep = 1;
+        let reportConfig = { dataSource: null, filters: { dateRange: { preset: 'this-month' }, groups: [], customFilters: [] }, pattern: null, data: null };
+        const dataSources = [
+            { id: 'devices', name: 'Devices', icon: '🚗', description: 'Vehicle and asset information', typeName: 'Device', filters: ['groups', 'deviceType', 'status'] },
+            { id: 'trips', name: 'Trips', icon: '🛣️', description: 'Trip history and route data', typeName: 'Trip', filters: ['groups', 'device', 'dateRange'] },
+            { id: 'exceptions', name: 'Exceptions', icon: '⚠️', description: 'Alerts and exception events', typeName: 'ExceptionEvent', filters: ['groups', 'rule', 'severity', 'dateRange'] },
+            { id: 'fuel', name: 'Fuel Transactions', icon: '⛽', description: 'Fuel usage and transactions', typeName: 'FuelTransaction', filters: ['groups', 'device', 'dateRange'] },
+            { id: 'statusData', name: 'Status Data', icon: '📊', description: 'Diagnostic and sensor data', typeName: 'StatusData', filters: ['groups', 'device', 'diagnostic', 'dateRange'] },
+            { id: 'drivers', name: 'Drivers', icon: '👤', description: 'Driver information and assignments', typeName: 'User', filters: ['groups', 'isDriver'] }
+        ];
+
+        function initialize(freshApi, freshState, initializeCallback) {
+            api = freshApi;
+            state = freshState;
+            setupEventListeners();
+            renderDataSources();
+            initializeCallback();
+        }
+
+        function focus(freshApi, freshState) {
+            api = freshApi;
+            state = freshState;
+            const savedState = state.getState();
+            if (savedState && savedState.reportConfig) {
+                reportConfig = savedState.reportConfig;
+                restoreUIState();
+            }
+        }
+
+        function blur(freshApi, freshState) {
+            api = freshApi;
+            state = freshState;
+            state.setState({ reportConfig: reportConfig });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('step1Next').addEventListener('click', () => navigateToStep(2));
+            document.getElementById('step2Back').addEventListener('click', () => navigateToStep(1));
+            document.getElementById('step2Next').addEventListener('click', () => navigateToStep(3));
+            document.getElementById('step3Back').addEventListener('click', () => navigateToStep(2));
+            document.getElementById('step3Next').addEventListener('click', () => navigateToStep(4));
+            document.getElementById('step4Back').addEventListener('click', () => navigateToStep(3));
+            document.getElementById('step4Restart').addEventListener('click', resetBuilder);
+            document.getElementById('datePreset').addEventListener('change', handleDatePresetChange);
+            document.getElementById('addFilterBtn').addEventListener('click', addCustomFilter);
+            document.getElementById('exportPdfBtn').addEventListener('click', () => exportReport('pdf'));
+            document.getElementById('exportExcelBtn').addEventListener('click', () => exportReport('excel'));
+            document.getElementById('exportCsvBtn').addEventListener('click', () => exportReport('csv'));
+            document.getElementById('emailReportBtn').addEventListener('click', showEmailModal);
+            document.querySelector('.close').addEventListener('click', hideEmailModal);
+            document.getElementById('cancelEmail').addEventListener('click', hideEmailModal);
+            document.getElementById('emailForm').addEventListener('submit', handleEmailSubmit);
+        }
+
+        function renderDataSources() {
+            const grid = document.getElementById('dataSourceGrid');
+            grid.innerHTML = '';
+            dataSources.forEach(source => {
+                const card = document.createElement('div');
+                card.className = 'data-source-card';
+                card.dataset.sourceId = source.id;
+                card.innerHTML = `<div class="data-source-icon">${source.icon}</div><h3>${source.name}</h3><p>${source.description}</p><span class="data-source-badge">${source.typeName}</span>`;
+                card.addEventListener('click', () => selectDataSource(source));
+                grid.appendChild(card);
+            });
+        }
+
+        function selectDataSource(source) {
+            reportConfig.dataSource = source;
+            document.querySelectorAll('.data-source-card').forEach(card => card.classList.remove('selected'));
+            document.querySelector(`[data-source-id="${source.id}"]`).classList.add('selected');
+            document.getElementById('step1Next').disabled = false;
+        }
+
+        function navigateToStep(stepNumber) {
+            document.querySelectorAll('.rb-step').forEach(step => step.classList.remove('active'));
+            document.querySelectorAll('.step').forEach(step => step.classList.remove('active', 'completed'));
+            document.getElementById(`step${stepNumber}`).classList.add('active');
+            document.querySelector(`[data-step="${stepNumber}"]`).classList.add('active');
+            for (let i = 1; i < stepNumber; i++) {
+                document.querySelector(`[data-step="${i}"]`).classList.add('completed');
+            }
+            currentStep = stepNumber;
+            if (stepNumber === 2) renderFilters();
+            else if (stepNumber === 3) setupPatternSelection();
+            else if (stepNumber === 4) loadPreview();
+        }
+
+        function renderFilters() {
+            const filtersList = document.getElementById('filtersList');
+            filtersList.innerHTML = '';
+            if (!reportConfig.dataSource) return;
+            const availableFilters = reportConfig.dataSource.filters || [];
+            if (availableFilters.includes('groups')) renderGroupFilter();
+        }
+
+        function renderGroupFilter() {
+            const container = document.getElementById('groupFilter');
+            container.innerHTML = '<div class="loading">Loading groups...</div>';
+            api.call('Get', { typeName: 'Group' }, function(groups) {
+                container.innerHTML = `<select id="groupSelect" class="form-control" multiple size="6">${groups.map(group => `<option value="${group.id}">${group.name}</option>`).join('')}</select><p style="margin-top:8px;font-size:12px;color:#657786">Hold Ctrl/Cmd to select multiple groups</p>`;
+                document.getElementById('groupSelect').addEventListener('change', function(e) {
+                    const selected = Array.from(e.target.selectedOptions).map(opt => ({ id: opt.value, name: opt.textContent }));
+                    reportConfig.filters.groups = selected;
+                });
+            }, function(error) {
+                container.innerHTML = `<div class="error">Error loading groups: ${error.message}</div>`;
+            });
+        }
+
+        function handleDatePresetChange(e) {
+            const preset = e.target.value;
+            const customRange = document.getElementById('customDateRange');
+            if (preset === 'custom') {
+                customRange.style.display = 'block';
+            } else {
+                customRange.style.display = 'none';
+                reportConfig.filters.dateRange = { preset: preset };
+            }
+        }
+
+        function addCustomFilter() {
+            const filtersList = document.getElementById('filtersList');
+            const filterId = `filter_${Date.now()}`;
+            const filterRow = document.createElement('div');
+            filterRow.className = 'filter-row';
+            filterRow.id = filterId;
+            filterRow.innerHTML = `<select class="form-control filter-field"><option value="">Select field...</option><option value="name">Name</option><option value="status">Status</option><option value="type">Type</option></select><select class="form-control filter-operator"><option value="equals">Equals</option><option value="contains">Contains</option><option value="startsWith">Starts with</option></select><input type="text" class="form-control filter-value" placeholder="Value"><button class="btn btn-secondary" onclick="geotab.addin.reportBuilder.removeFilter('${filterId}')">Remove</button>`;
+            filtersList.appendChild(filterRow);
+        }
+
+        function removeFilter(filterId) {
+            const filterRow = document.getElementById(filterId);
+            if (filterRow) filterRow.remove();
+        }
+
+        function setupPatternSelection() {
+            document.querySelectorAll('.pattern-card').forEach(card => {
+                if (!card.querySelector('.pattern-badge').textContent.includes('Coming Soon')) {
+                    card.addEventListener('click', function() { selectPattern(this.dataset.pattern); });
+                }
+            });
+        }
+
+        function selectPattern(patternId) {
+            reportConfig.pattern = patternId;
+            document.querySelectorAll('.pattern-card').forEach(card => card.classList.remove('selected'));
+            document.querySelector(`[data-pattern="${patternId}"]`).classList.add('selected');
+            document.getElementById('step3Next').disabled = false;
+        }
+
+        function loadPreview() {
+            renderReportSummary();
+            const container = document.getElementById('dataPreviewContainer');
+            container.innerHTML = '<div class="loading">Loading data...</div>';
+            const query = { typeName: reportConfig.dataSource.typeName };
+            if (reportConfig.filters.dateRange.preset !== 'all') {
+                const dateRange = calculateDateRange(reportConfig.filters.dateRange.preset);
+                query.fromDate = dateRange.from;
+                query.toDate = dateRange.to;
+            }
+            api.call('Get', query, function(results) {
+                reportConfig.data = results;
+                renderDataPreview(results);
+            }, function(error) {
+                container.innerHTML = `<div class="error">Error loading data: ${error.message}</div>`;
+            });
+        }
+
+        function renderReportSummary() {
+            const summary = document.getElementById('reportSummary');
+            summary.innerHTML = `<div class="summary-item"><span class="summary-label">Data Source:</span><span class="summary-value">${reportConfig.dataSource.name}</span></div><div class="summary-item"><span class="summary-label">Date Range:</span><span class="summary-value">${reportConfig.filters.dateRange.preset}</span></div><div class="summary-item"><span class="summary-label">Report Pattern:</span><span class="summary-value">${formatPatternName(reportConfig.pattern)}</span></div>${reportConfig.filters.groups.length > 0 ? `<div class="summary-item"><span class="summary-label">Groups:</span><span class="summary-value">${reportConfig.filters.groups.map(g => g.name).join(', ')}</span></div>` : ''}`;
+        }
+
+        function renderDataPreview(data) {
+            const container = document.getElementById('dataPreviewContainer');
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="loading">No data found for selected filters</div>';
+                return;
+            }
+            const preview = data.slice(0, 10);
+            const keys = Object.keys(preview[0]).slice(0, 5);
+            let table = '<table style="width:100%;border-collapse:collapse"><thead><tr>';
+            keys.forEach(key => { table += `<th style="padding:8px;border:1px solid #e1e8ed;background:#f5f7fa;text-align:left">${key}</th>`; });
+            table += '</tr></thead><tbody>';
+            preview.forEach(row => {
+                table += '<tr>';
+                keys.forEach(key => {
+                    const value = row[key];
+                    const displayValue = typeof value === 'object' ? JSON.stringify(value) : value;
+                    table += `<td style="padding:8px;border:1px solid #e1e8ed">${displayValue || '-'}</td>`;
+                });
+                table += '</tr>';
+            });
+            table += '</tbody></table>';
+            table += `<p style="margin-top:12px;color:#657786;font-size:14px">Showing ${preview.length} of ${data.length} records</p>`;
+            container.innerHTML = table;
+        }
+
+        function calculateDateRange(preset) {
+            const now = new Date();
+            let from, to = now;
+            switch (preset) {
+                case 'today': from = new Date(now.setHours(0, 0, 0, 0)); break;
+                case 'yesterday': from = new Date(now.setDate(now.getDate() - 1)); from.setHours(0, 0, 0, 0); to = new Date(from); to.setHours(23, 59, 59, 999); break;
+                case 'this-week': from = new Date(now.setDate(now.getDate() - now.getDay())); from.setHours(0, 0, 0, 0); break;
+                case 'last-week': from = new Date(now.setDate(now.getDate() - now.getDay() - 7)); from.setHours(0, 0, 0, 0); to = new Date(from); to.setDate(to.getDate() + 6); to.setHours(23, 59, 59, 999); break;
+                case 'this-month': from = new Date(now.getFullYear(), now.getMonth(), 1); break;
+                case 'last-month': from = new Date(now.getFullYear(), now.getMonth() - 1, 1); to = new Date(now.getFullYear(), now.getMonth(), 0); to.setHours(23, 59, 59, 999); break;
+                default: from = new Date(now.getFullYear(), 0, 1);
+            }
+            return { from: from.toISOString(), to: to.toISOString() };
+        }
+
+        function formatPatternName(patternId) {
+            const names = { 'fleet-summary': 'Fleet Summary Dashboard', 'compliance': 'Compliance Report', 'operational': 'Operational Efficiency', 'data-table': 'Data Table' };
+            return names[patternId] || patternId;
+        }
+
+        function exportReport(format) {
+            if (!reportConfig.data) { alert('No data to export'); return; }
+            switch (format) {
+                case 'csv': exportToCsv(); break;
+                case 'excel': exportToExcel(); break;
+                case 'pdf': exportToPdf(); break;
+            }
+        }
+
+        function exportToCsv() {
+            const data = reportConfig.data;
+            if (!data || data.length === 0) return;
+            const headers = Object.keys(data[0]);
+            let csv = headers.join(',') + '\n';
+            data.forEach(row => {
+                const values = headers.map(header => {
+                    const value = row[header];
+                    return typeof value === 'string' ? `"${value}"` : value;
+                });
+                csv += values.join(',') + '\n';
+            });
+            downloadFile(csv, `report_${Date.now()}.csv`, 'text/csv');
+        }
+
+        function exportToExcel() { exportToCsv(); }
+        function exportToPdf() { window.print(); }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function showEmailModal() { document.getElementById('emailModal').style.display = 'flex'; }
+        function hideEmailModal() { document.getElementById('emailModal').style.display = 'none'; }
+
+        function handleEmailSubmit(e) {
+            e.preventDefault();
+            const recipients = document.getElementById('emailRecipients').value;
+            const subject = document.getElementById('emailSubject').value;
+            const message = document.getElementById('emailMessage').value;
+            const format = document.getElementById('emailFormat').value;
+            alert(`Email would be sent to: ${recipients}\nSubject: ${subject}\nFormat: ${format}`);
+            hideEmailModal();
+        }
+
+        function resetBuilder() {
+            reportConfig = { dataSource: null, filters: { dateRange: { preset: 'this-month' }, groups: [], customFilters: [] }, pattern: null, data: null };
+            navigateToStep(1);
+            document.getElementById('step1Next').disabled = true;
+            document.querySelectorAll('.data-source-card').forEach(card => card.classList.remove('selected'));
+            document.querySelectorAll('.pattern-card').forEach(card => card.classList.remove('selected'));
+        }
+
+        function restoreUIState() {
+            if (reportConfig.dataSource) {
+                const card = document.querySelector(`[data-source-id="${reportConfig.dataSource.id}"]`);
+                if (card) card.classList.add('selected');
+                document.getElementById('step1Next').disabled = false;
+            }
+        }
+
+        return { initialize: initialize, focus: focus, blur: blur, removeFilter: removeFilter };
+    }();
+    </script>
+</body>
+</html>

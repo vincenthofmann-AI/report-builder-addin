@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+.pnpm-debug.log*
+
+# Build outputs (we'll commit dist/ since it's the deployable)
+# Uncomment if you want to build on CI/CD instead:
+# dist/
+
+# Local development
+.DS_Store
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.swp
+node_modules

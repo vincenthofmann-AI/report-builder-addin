@@ -1,0 +1,26 @@
+{
+  "name": "MyGeotab Report Builder",
+  "supportEmail": "support@geotab.com",
+  "version": "0.1.0",
+  "items": [
+    {
+      "page": "reportBuilder",
+      "url": "https://[YOUR-SERVER]/report-builder/report-builder.html",
+      "path": "ActivityLink",
+      "menuName": {
+        "en": "Report Builder",
+        "fr": "Générateur de Rapports",
+        "es": "Generador de Informes",
+        "de": "Berichtsgenerator"
+      },
+      "icon": "https://[YOUR-SERVER]/report-builder/assets/icon.svg",
+      "version": "0.1.0"
+    }
+  ],
+  "files": {},
+  "isSigned": false,
+  "signature": "",
+  "key": "",
+  "enableViewSecurityId": false,
+  "securityIds": []
+}

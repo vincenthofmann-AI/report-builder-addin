@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Builder</title>
+    <style id="addin-styles"></style>
+</head>
+<body>
+    <!-- Main Container -->
+    <div id="reportBuilder" class="report-builder-container">
+
+        <!-- Header -->
+        <header class="rb-header">
+            <h1>Report Builder</h1>
+            <div class="rb-header-actions">
+                <button id="saveReportBtn" class="btn btn-secondary" style="display: none;">
+                    Save Report
+                </button>
+                <button id="exportBtn" class="btn btn-primary" style="display: none;">
+                    Export Report
+                </button>
+            </div>
+        </header>
+
+        <!-- Workflow Steps Indicator -->
+        <div class="rb-steps">
+            <div class="step active" data-step="1">
+                <span class="step-number">1</span>
+                <span class="step-label">Data Source</span>
+            </div>
+            <div class="step" data-step="2">
+                <span class="step-number">2</span>
+                <span class="step-label">Filters</span>
+            </div>
+            <div class="step" data-step="3">
+                <span class="step-number">3</span>
+                <span class="step-label">Report Pattern</span>
+            </div>
+            <div class="step" data-step="4">
+                <span class="step-number">4</span>
+                <span class="step-label">Preview & Export</span>
+            </div>
+        </div>
+
+        <!-- Step 1: Data Source Selection -->
+        <section id="step1" class="rb-step active">
+            <h2>Select Data Source</h2>
+            <div id="dataSourceGrid" class="data-source-grid">
+                <!-- Data source cards will be injected here -->
+            </div>
+            <div class="step-actions">
+                <button id="step1Next" class="btn btn-primary" disabled>Next: Configure Filters</button>
+            </div>
+        </section>
+
+        <!-- Step 2: Filter Configuration -->
+        <section id="step2" class="rb-step">
+            <h2>Configure Filters</h2>
+            <div class="filter-builder">
+                <!-- Common Filters -->
+                <div class="filter-section">
+                    <h3>Date Range</h3>
+                    <div class="filter-group">
+                        <label for="datePreset">Quick Select:</label>
+                        <select id="datePreset" class="form-control">
+                            <option value="today">Today</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="this-week">This Week</option>
+                            <option value="last-week">Last Week</option>
+                            <option value="this-month">This Month</option>
+                            <option value="last-month">Last Month</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <div id="customDateRange" class="filter-group" style="display: none;">
+                        <label for="startDate">From:</label>
+                        <input type="date" id="startDate" class="form-control">
+                        <label for="endDate">To:</label>
+                        <input type="date" id="endDate" class="form-control">
+                    </div>
+                </div>
+
+                <!-- Dynamic Filters (based on data source) -->
+                <div id="dynamicFilters" class="filter-section">
+                    <h3>Data Filters</h3>
+                    <div id="filtersList">
+                        <!-- Filters will be dynamically generated based on selected data source -->
+                    </div>
+                    <button id="addFilterBtn" class="btn btn-secondary">+ Add Filter</button>
+                </div>
+
+                <!-- Group Filter -->
+                <div class="filter-section">
+                    <h3>Organization Groups</h3>
+                    <div id="groupFilter">
+                        <!-- Group selector will be injected here -->
+                    </div>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button id="step2Back" class="btn btn-secondary">Back</button>
+                <button id="step2Next" class="btn btn-primary">Next: Choose Pattern</button>
+            </div>
+        </section>
+
+        <!-- Step 3: Report Pattern Selection -->
+        <section id="step3" class="rb-step">
+            <h2>Choose Report Pattern</h2>
+            <div id="patternGrid" class="pattern-grid">
+                <!-- Report pattern cards -->
+                <div class="pattern-card" data-pattern="fleet-summary">
+                    <div class="pattern-icon">📊</div>
+                    <h3>Fleet Summary Dashboard</h3>
+                    <p>Overview metrics with vehicle count, status distribution, and alert summaries</p>
+                    <span class="pattern-badge">Dashboard</span>
+                </div>
+                <div class="pattern-card" data-pattern="compliance">
+                    <div class="pattern-icon">✓</div>
+                    <h3>Compliance Report</h3>
+                    <p>Safety events, HOS violations, and regulatory compliance tracking</p>
+                    <span class="pattern-badge">PDF/Excel</span>
+                </div>
+                <div class="pattern-card" data-pattern="operational">
+                    <div class="pattern-icon">⚡</div>
+                    <h3>Operational Efficiency</h3>
+                    <p>Fuel consumption, idle time, utilization, and route efficiency metrics</p>
+                    <span class="pattern-badge">Dashboard</span>
+                </div>
+                <div class="pattern-card" data-pattern="data-table">
+                    <div class="pattern-icon">📋</div>
+                    <h3>Data Table</h3>
+                    <p>Simple filtered table with customizable columns</p>
+                    <span class="pattern-badge">Excel/CSV</span>
+                </div>
+                <div class="pattern-card" data-pattern="custom" style="opacity: 0.6;">
+                    <div class="pattern-icon">🛠️</div>
+                    <h3>Custom Builder</h3>
+                    <p>Build your own report layout with drag-and-drop</p>
+                    <span class="pattern-badge">Coming Soon</span>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button id="step3Back" class="btn btn-secondary">Back</button>
+                <button id="step3Next" class="btn btn-primary" disabled>Next: Preview</button>
+            </div>
+        </section>
+
+        <!-- Step 4: Preview & Export -->
+        <section id="step4" class="rb-step">
+            <h2>Preview & Export</h2>
+
+            <!-- Report Summary -->
+            <div class="report-summary">
+                <h3>Report Configuration</h3>
+                <div id="reportSummary" class="summary-content">
+                    <!-- Summary will be generated dynamically -->
+                </div>
+            </div>
+
+            <!-- Data Preview -->
+            <div class="data-preview">
+                <h3>Data Preview</h3>
+                <div id="dataPreviewContainer" class="preview-container">
+                    <div class="loading">Loading preview...</div>
+                </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="export-options">
+                <h3>Export Options</h3>
+                <div class="export-buttons">
+                    <button id="exportPdfBtn" class="btn btn-export">
+                        <span class="export-icon">📄</span>
+                        Export as PDF
+                    </button>
+                    <button id="exportExcelBtn" class="btn btn-export">
+                        <span class="export-icon">📊</span>
+                        Export as Excel
+                    </button>
+                    <button id="exportCsvBtn" class="btn btn-export">
+                        <span class="export-icon">📋</span>
+                        Export as CSV
+                    </button>
+                    <button id="emailReportBtn" class="btn btn-export">
+                        <span class="export-icon">📧</span>
+                        Email Report
+                    </button>
+                </div>
+            </div>
+
+            <div class="step-actions">
+                <button id="step4Back" class="btn btn-secondary">Back</button>
+                <button id="step4Restart" class="btn btn-primary">Create New Report</button>
+            </div>
+        </section>
+
+        <!-- Email Modal -->
+        <div id="emailModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Email Report</h2>
+                <form id="emailForm">
+                    <div class="form-group">
+                        <label for="emailRecipients">Recipients (comma-separated):</label>
+                        <input type="text" id="emailRecipients" class="form-control" placeholder="email1@example.com, email2@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emailSubject">Subject:</label>
+                        <input type="text" id="emailSubject" class="form-control" value="MyGeotab Report" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emailMessage">Message:</label>
+                        <textarea id="emailMessage" class="form-control" rows="4" placeholder="Optional message..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="emailFormat">Attachment Format:</label>
+                        <select id="emailFormat" class="form-control">
+                            <option value="pdf">PDF</option>
+                            <option value="excel">Excel</option>
+                            <option value="csv">CSV</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="cancelEmail" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Send Email</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script id="addin-script"></script>
+</body>
+</html>
