@@ -25,8 +25,11 @@ import {
 import {
   type DataSourceDef,
 } from "../services/geotab-mock";
+import type { CategoryDef } from "../services/categories";
 import { useGeotab } from "../services/geotab-context";
 import { useDataFetcher } from "../services/data-fetcher";
+import { CategorySelector } from "./CategorySelector";
+import { DataSourceSelector } from "./DataSourceSelector";
 import { ReportOutline } from "./ReportOutline";
 import { FilterBar, type FilterRule } from "./FilterBar";
 import { ReportTable } from "./ReportTable";
@@ -56,6 +59,7 @@ export function ReportBuilder() {
   const dataSources = dataFetcher.getDataSources();
 
   // ----- State -----
+  const [selectedCategory, setSelectedCategory] = useState<CategoryDef | null>(null);
   const [selectedSource, setSelectedSource] = useState<DataSourceDef | null>(null);
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
   const [filters, setFilters] = useState<FilterRule[]>([]);
@@ -575,9 +579,21 @@ export function ReportBuilder() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="flex-1"
+                className="flex-1 overflow-auto"
               >
-                <EmptyState onSelectSource={handleSelectSource} />
+                {!selectedCategory ? (
+                  <CategorySelector
+                    selectedCategory={selectedCategory}
+                    onSelectCategory={setSelectedCategory}
+                  />
+                ) : (
+                  <DataSourceSelector
+                    category={selectedCategory}
+                    selectedSource={selectedSource}
+                    onSelectSource={handleSelectSource}
+                    onBack={() => setSelectedCategory(null)}
+                  />
+                )}
               </motion.div>
             )}
           </AnimatePresence>

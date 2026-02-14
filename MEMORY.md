@@ -224,3 +224,102 @@ This follows established patterns from tools like Looker, Tableau, and Power BI.
 5. Integrate MyGeotab API into React components (check `src/` for existing API calls)
 6. Test in MyGeotab development environment
 7. Register add-in in MyGeotab admin panel
+
+### 2026-02-14: Progressive Disclosure & Zenith Design System Integration
+
+**Context**: User requested progressive disclosure with category-based organization and Zenith design system integration
+
+**Requirements**:
+1. Implement progressive disclosure: Category → Data Source → Columns/Filters
+2. Reorganize data sources into 5 categories: Activity, Events, Assets, Devices, Drivers
+3. Ensure Zenith design system usage
+4. Use real API data (already implemented)
+5. Enable common architectural pattern for future expansion
+
+**Implementation Completed**:
+
+1. **Created Category Structure** (`src/app/services/categories.ts`)
+   - 5 top-level categories align with MyGeotab domain model:
+     - **Activity**: Trip History (existing)
+     - **Events**: Driver Behavior, Engine Faults, Fuel Transactions, Maintenance (existing)
+     - **Assets**: Vehicles, Groups, Zones (placeholder for future)
+     - **Devices**: Status, Health, Diagnostics (placeholder for future)
+     - **Drivers**: Profiles, Assignments, HOS (placeholder for future)
+   - Helper functions: `getCategoryById`, `getAllDataSources`, `getDataSourceById`, `getCategoryForDataSource`
+
+2. **Built Progressive Disclosure UI**:
+   - **CategorySelector** (`src/app/components/CategorySelector.tsx`)
+     - Large card grid for 5 categories
+     - Visual indicators: icons, colors (Zenith color tokens), counts
+     - "Coming soon" state for empty categories (Assets, Devices, Drivers)
+     - Animation with framer-motion
+   - **DataSourceSelector** (`src/app/components/DataSourceSelector.tsx`)
+     - Radio-style list of data sources within selected category
+     - "Back to categories" navigation
+     - Column/filter metadata display
+     - Success confirmation message
+
+3. **Updated ReportBuilder** (`src/app/components/ReportBuilder.tsx`)
+   - Added `selectedCategory` state
+   - Replaced flat EmptyState with progressive disclosure:
+     - Step 1: Show `CategorySelector` when no category selected
+     - Step 2: Show `DataSourceSelector` when category selected but no source
+     - Step 3: Existing workflow (columns, filters, visualization)
+
+4. **Updated Data Fetcher** (`src/app/services/data-fetcher.ts`)
+   - Changed `getDataSources()` to use `getAllDataSources()` from categories
+   - Maintains backward compatibility with existing API integration
+
+5. **Zenith Design System Status**:
+   - Already using Zenith theme tokens via `zenith-adapter.ts`:
+     - `ZenithColors` (navy, green, blue, neutrals, semantic colors)
+     - `ZenithSpacing`, `ZenithTypography`, `ZenithBorderRadius`, `ZenithShadows`
+   - Components styled with Zenith color palette
+   - Ready for `@geotab/zenith` package when available (private npm registry)
+   - Currently using Radix UI primitives + Tailwind styled with Zenith tokens
+
+6. **Documentation**:
+   - Created `docs/PROGRESSIVE_DISCLOSURE_DESIGN.md`:
+     - Complete architecture design
+     - Category definitions with MyGeotab entity mappings
+     - UX flow diagrams
+     - Component migration map (shadcn/ui → Zenith)
+     - Implementation phases (1-4)
+     - Component usage examples
+
+**Technical Decisions**:
+
+1. **Hybrid Zenith Approach**: Use Zenith theme tokens + Radix UI primitives until `@geotab/zenith` package is accessible
+   - Reason: `@geotab/zenith` is private package requiring org-scoped npm registry
+   - Benefit: Quick implementation with Zenith visual consistency
+   - Migration path: Swap Radix components for Zenith when package available
+
+2. **Category First, Entity Later**: Implement category UI with existing 5 data sources (all in Activity/Events)
+   - Reason: Assets, Devices, Drivers categories require new MyGeotab entity integrations
+   - Benefit: Users see progressive disclosure UX immediately
+   - Expansion: Add new entities incrementally (Stop, Device, Driver, etc.)
+
+3. **Non-Breaking Changes**: Progressive disclosure adds UI layer without modifying data structures
+   - All existing data fetching, filtering, API integration unchanged
+   - Categories wrap existing `DataSourceDef[]` structure
+   - ReportOutline still uses flat `dataSources` list
+
+**Files Created**:
+- `src/app/services/categories.ts` - Category structure and helpers
+- `src/app/components/CategorySelector.tsx` - Category card grid
+- `src/app/components/DataSourceSelector.tsx` - Data source radio list
+- `docs/PROGRESSIVE_DISCLOSURE_DESIGN.md` - Architecture documentation
+
+**Files Modified**:
+- `src/app/components/ReportBuilder.tsx` - Integrated progressive disclosure
+- `src/app/services/data-fetcher.ts` - Use categories structure
+
+**Build Status**: ✅ Success (vite build completes with no errors)
+
+**Next Actions**:
+1. Test progressive disclosure flow in dev mode (`npm run dev`)
+2. Add Assets category data sources (Device, Group, Zone entities)
+3. Add Devices category data sources (StatusData, DeviceStatusInfo)
+4. Add Drivers category data sources (Driver, DriverChange)
+5. Migrate shadcn/ui components to Zenith (when package available)
+6. Deploy to GitHub Pages for MyGeotab testing

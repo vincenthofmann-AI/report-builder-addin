@@ -15,7 +15,6 @@
 
 import type { GeotabApi } from "./geotab-context";
 import {
-  dataSources,
   fetchData as fetchMockData,
   type GeotabTrip,
   type GeotabFuelTransaction,
@@ -23,6 +22,7 @@ import {
   type GeotabDriverBehavior,
   type GeotabMaintenanceRecord,
 } from "./geotab-mock";
+import { getAllDataSources } from "./categories";
 
 // Map data source IDs to MyGeotab entity type names
 const DATA_SOURCE_TO_ENTITY_TYPE: Record<string, string> = {
@@ -286,7 +286,7 @@ export class DataFetcher {
    * Get available data sources
    */
   getDataSources() {
-    return dataSources;
+    return getAllDataSources();
   }
 }
 
