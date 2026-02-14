@@ -22,8 +22,8 @@ export default defineConfig({
   base: './',
 
   build: {
-    // Geotab Add-In deployment: output a clean dist/ folder
-    outDir: 'dist',
+    // Geotab Add-In deployment: output to docs/ for GitHub Pages
+    outDir: 'docs',
     assetsDir: 'assets',
     // Inline small assets so the add-in has fewer files to serve
     assetsInlineLimit: 8192,

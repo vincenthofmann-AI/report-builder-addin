@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "build:addin": "vite build && echo 'Add-in bundle ready in dist/. Copy configuration.json into dist/ and deploy.'",
-    "dev": "vite"
+    "build:addin": "vite build && echo 'Add-in bundle ready in docs/. Commit and push to deploy via GitHub Pages.'",
+    "dev": "vite",
+    "deploy": "npm run build && git add docs/ && git commit -m 'Deploy: update GitHub Pages build' && git push"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
