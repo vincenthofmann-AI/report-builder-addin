@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import {
   Truck,
   PanelLeftClose,
@@ -23,11 +23,10 @@ import {
   Zap,
 } from "lucide-react";
 import {
-  dataSources,
-  fetchData,
   type DataSourceDef,
 } from "../services/geotab-mock";
 import { useGeotab } from "../services/geotab-context";
+import { useDataFetcher } from "../services/data-fetcher";
 import { ReportOutline } from "./ReportOutline";
 import { FilterBar, type FilterRule } from "./FilterBar";
 import { ReportTable } from "./ReportTable";
@@ -53,6 +52,8 @@ const iconMap: Record<string, React.ElementType> = {
 export function ReportBuilder() {
   // ----- Geotab Add-In context -----
   const { isLive, session } = useGeotab();
+  const dataFetcher = useDataFetcher();
+  const dataSources = dataFetcher.getDataSources();
 
   // ----- State -----
   const [selectedSource, setSelectedSource] = useState<DataSourceDef | null>(null);
@@ -73,12 +74,30 @@ export function ReportBuilder() {
     summarize: false,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [rawData, setRawData] = useState<any[]>([]);
 
-  // ----- Data -----
-  const rawData = useMemo(() => {
-    if (!selectedSource) return [];
-    return fetchData(selectedSource.id);
-  }, [selectedSource]);
+  // ----- Fetch data when source changes -----
+  useEffect(() => {
+    if (!selectedSource) {
+      setRawData([]);
+      return;
+    }
+
+    setIsLoading(true);
+
+    dataFetcher
+      .fetchDataSource(selectedSource.id)
+      .then((data) => {
+        setRawData(data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        toast.error(`Failed to load ${selectedSource.name} data`);
+        setRawData([]);
+        setIsLoading(false);
+      });
+  }, [selectedSource, dataFetcher]);
 
   const filteredData = useMemo(() => {
     if (!selectedSource) return [];
