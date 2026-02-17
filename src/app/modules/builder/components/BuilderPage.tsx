@@ -3,15 +3,18 @@
  * ======================
  *
  * Right-side page that displays report preview with layout switching.
- * Shows data in table or chart format based on user preference.
+ * Shows guided empty states (NO MOCK DATA) and real data when available.
  */
 
 import { FileX, Loader2, AlertCircle } from 'lucide-react';
-import type { LayoutView, ChartType, MyGeotabObjectType } from '../types/builder.types';
+import type { LayoutView, ChartType, MyGeotabObjectType, TimeRange } from '../types/builder.types';
+import { ReportPreviewEmpty } from './ReportPreviewEmpty';
+import { estimateQuerySize, getQuerySizeCategory } from '../utils/queryEstimator';
 
 interface BuilderPageProps {
   selectedObject: MyGeotabObjectType | null;
   selectedFields: string[];
+  timeRange: TimeRange;
   data: any[] | null;
   isLoading: boolean;
   error: string | null;
@@ -22,12 +25,17 @@ interface BuilderPageProps {
 export function BuilderPage({
   selectedObject,
   selectedFields,
+  timeRange,
   data,
   isLoading,
   error,
   layoutView,
   chartType,
 }: BuilderPageProps) {
+  // Estimate query size for progressive disclosure
+  const estimatedRows = estimateQuerySize(selectedObject, timeRange);
+  const sizeInfo = getQuerySizeCategory(estimatedRows);
+  const canAutoLoad = selectedObject !== null && selectedFields.length > 0 && sizeInfo.autoLoad;
   // Loading state
   if (isLoading) {
     return (
@@ -58,20 +66,36 @@ export function BuilderPage({
     );
   }
 
-  // Empty state (no data yet)
+  // Empty state (no data yet) - Show PREVIEW, not "no data" message
   if (!data || data.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center max-w-md">
-          <FileX className="w-12 h-12 text-[#cbd5e1] mx-auto mb-3" />
-          <p className="text-sm font-medium text-[#0f172a] mb-1">No data to display</p>
-          <p className="text-xs text-[#64748b]">
-            {selectedObject
-              ? 'Click "Generate Report" to load data'
-              : 'Select a data source to get started'}
-          </p>
+    // If no object or fields selected, show basic guidance
+    if (!selectedObject || selectedFields.length === 0) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center max-w-md">
+            <FileX className="w-12 h-12 text-[#cbd5e1] mx-auto mb-3" />
+            <p className="text-sm font-medium text-[#0f172a] mb-1">
+              {!selectedObject ? 'Select a Data Source' : 'Select Fields'}
+            </p>
+            <p className="text-xs text-[#64748b]">
+              {!selectedObject
+                ? 'Choose a MyGeotab object type to start building your report'
+                : 'Pick at least one field to preview your report structure'}
+            </p>
+          </div>
         </div>
-      </div>
+      );
+    }
+
+    // Show preview of what the report will contain (NO MOCK DATA)
+    return (
+      <ReportPreviewEmpty
+        objectType={selectedObject}
+        selectedFields={selectedFields}
+        timeRange={timeRange}
+        estimatedRows={estimatedRows}
+        canAutoLoad={canAutoLoad}
+      />
     );
   }
 

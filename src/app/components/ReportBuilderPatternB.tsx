@@ -169,6 +169,7 @@ export function ReportBuilderPatternB() {
                   <BuilderPage
                     selectedObject={builder.selectedObject}
                     selectedFields={builder.selectedFields}
+                    timeRange={builder.timeRange}
                     data={builder.data}
                     isLoading={builder.isLoading}
                     error={builder.error}

@@ -11,7 +11,7 @@
  * Designed to be composable - can be used anywhere in the app.
  */
 
-import { ChevronDown, ChevronRight, Play } from 'lucide-react';
+import { ChevronDown, ChevronRight, Play, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
 import { ObjectSelector } from './ObjectSelector';
 import { FieldPicker } from './FieldPicker';
@@ -24,6 +24,7 @@ import type {
   ChartType,
 } from '../types/builder.types';
 import type { VisualizationCapability } from '../../data-viz';
+import { estimateQuerySize, getQuerySizeCategory } from '../utils/queryEstimator';
 
 interface BuilderPanelProps {
   // Object selection
@@ -72,6 +73,13 @@ export function BuilderPanel({
   isLoading = false,
 }: BuilderPanelProps) {
   const [expandedSection, setExpandedSection] = useState<Section>('object');
+
+  // Calculate query size for progressive disclosure
+  const estimatedRows = estimateQuerySize(selectedObject, timeRange);
+  const sizeInfo = getQuerySizeCategory(estimatedRows);
+
+  // Only show Generate button for large queries
+  const showGenerateButton = canExecute && !sizeInfo.autoLoad;
 
   const toggleSection = (section: Section) => {
     setExpandedSection(expandedSection === section ? ('object' as Section) : section);
@@ -201,48 +209,70 @@ export function BuilderPanel({
         })}
       </div>
 
-      {/* Execute Button */}
+      {/* Execute Button - Only for large queries */}
       <div className="p-4 border-t border-[#e2e8f0]">
-        <button
-          onClick={onExecute}
-          disabled={!canExecute || isLoading}
-          className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-            canExecute && !isLoading
-              ? 'bg-[#003a63] text-white hover:bg-[#002949]'
-              : 'bg-[#e2e8f0] text-[#94a3b8] cursor-not-allowed'
-          }`}
-        >
-          {isLoading ? (
-            <>
-              <svg
-                className="animate-spin w-4 h-4"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-              Loading...
-            </>
-          ) : (
-            <>
-              <Play className="w-4 h-4" />
-              Generate Report
-            </>
-          )}
-        </button>
+        {showGenerateButton ? (
+          <>
+            {/* Large query warning */}
+            <div className="flex items-start gap-2 p-3 mb-3 bg-[#fef3c7] border border-[#fbbf24] rounded-lg">
+              <AlertTriangle className="w-4 h-4 text-[#f59e0b] shrink-0 mt-0.5" />
+              <div className="flex-1 text-xs text-[#92400e]">
+                <strong>Large query:</strong> {sizeInfo.message}
+              </div>
+            </div>
+
+            {/* Manual load button */}
+            <button
+              onClick={onExecute}
+              disabled={isLoading}
+              className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                !isLoading
+                  ? 'bg-[#003a63] text-white hover:bg-[#002949]'
+                  : 'bg-[#e2e8f0] text-[#94a3b8] cursor-not-allowed'
+              }`}
+            >
+              {isLoading ? (
+                <>
+                  <svg
+                    className="animate-spin w-4 h-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <Play className="w-4 h-4" />
+                  Load {estimatedRows.toLocaleString()} Records
+                </>
+              )}
+            </button>
+          </>
+        ) : (
+          /* Small query - auto-loads, show status */
+          <div className="text-center p-3 bg-[#f0f7ff] rounded-lg border border-[#bfdbfe]">
+            <p className="text-xs text-[#1e40af]">
+              {canExecute
+                ? '✓ Data loads automatically for small queries'
+                : 'Select object and fields to preview data'}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

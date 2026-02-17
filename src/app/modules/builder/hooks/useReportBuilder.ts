@@ -6,7 +6,7 @@
  * Makes the builder reusable across different contexts.
  */
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import type {
   ReportBuilderState,
   MyGeotabObjectType,
@@ -16,6 +16,7 @@ import type {
 } from '../types/builder.types';
 import { analyzeVisualizationCapability } from '../../data-viz';
 import { OBJECT_FIELDS } from '../types/objects.constants';
+import { estimateQuerySize, shouldAutoExecute } from '../utils/queryEstimator';
 
 /**
  * Initialize default time range (last 7 days)
@@ -182,7 +183,8 @@ export function useReportBuilder() {
   }, []);
 
   /**
-   * Execute query (placeholder - will integrate with MyGeotab API)
+   * Execute query (will integrate with MyGeotab API)
+   * For now, returns empty - NO MOCK DATA
    */
   const executeQuery = useCallback(async () => {
     if (!state.selectedObject || state.selectedFields.length === 0) {
@@ -201,19 +203,22 @@ export function useReportBuilder() {
 
     try {
       // TODO: Integrate with MyGeotab API
-      // For now, mock data
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Example API call:
+      // const results = await api.call('Get', {
+      //   typeName: state.selectedObject,
+      //   search: {
+      //     fromDate: state.timeRange.start,
+      //     toDate: state.timeRange.end,
+      //   },
+      // });
 
-      const mockData = Array.from({ length: 10 }, (_, i) => ({
-        id: `record-${i + 1}`,
-        ...Object.fromEntries(
-          state.selectedFields.map((field) => [field, `Sample ${field} ${i + 1}`])
-        ),
-      }));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
+      // For now, return empty array until MyGeotab API is integrated
+      // NO MOCK DATA - users will see the preview state
       setState((prev) => ({
         ...prev,
-        data: mockData,
+        data: [],
         isLoading: false,
       }));
     } catch (error) {
@@ -223,7 +228,30 @@ export function useReportBuilder() {
         isLoading: false,
       }));
     }
-  }, [state.selectedObject, state.selectedFields]);
+  }, [state.selectedObject, state.selectedFields, state.timeRange]);
+
+  /**
+   * Auto-execute query when conditions are met
+   */
+  useEffect(() => {
+    const estimatedRows = estimateQuerySize(state.selectedObject, state.timeRange);
+    const shouldAuto = shouldAutoExecute(estimatedRows);
+
+    // Auto-execute if:
+    // 1. Query is valid (object + fields selected)
+    // 2. Query is small enough (< 1000 rows estimated)
+    // 3. Not already loading
+    // 4. No data loaded yet
+    if (
+      state.selectedObject &&
+      state.selectedFields.length > 0 &&
+      shouldAuto &&
+      !state.isLoading &&
+      !state.data
+    ) {
+      executeQuery();
+    }
+  }, [state.selectedObject, state.selectedFields, state.timeRange, executeQuery, state.isLoading, state.data]);
 
   /**
    * Reset builder state
