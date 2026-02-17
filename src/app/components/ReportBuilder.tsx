@@ -29,12 +29,12 @@ import type { CategoryDef } from "../services/categories";
 import type { InsightCategory, ReportTemplateDef } from "../services/report-templates";
 import { useGeotab } from "../services/geotab-context";
 import { useDataFetcher } from "../services/data-fetcher";
-// Workspace Module - Template and insight discovery
-import { InsightCategorySelector, InsightSelector } from "../modules/workspace";
-// Builder Module - Data configuration
-import { CategorySelector, DataSourceSelector, FilterBar, ReportOutline, type FilterRule } from "../modules/builder";
-// View Module - Report display and visualization
-import { ChartView, ReportPreview, ReportTable, type ChartType } from "../modules/view";
+// Home Module - App landing state and template discovery (MYG Playbook: App Home)
+import { InsightCategorySelector, InsightSelector } from "../modules/home";
+// Configuration Module - Data configuration (MYG Playbook: Pattern B Collection)
+import { CategorySelector, DataSourceSelector, FilterBar, ReportOutline, type FilterRule } from "../modules/configuration";
+// Canvas Module - Report display (MYG Playbook: Report State visual treatment)
+import { ChartView, ReportPreview, ReportTable, type ChartType } from "../modules/canvas";
 import { toast } from "sonner";
 import {
   Tooltip,

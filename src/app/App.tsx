@@ -2,14 +2,14 @@
 // before MyGeotab checks for geotab.addin.reportBuilder on the window.
 import "./services/addin-lifecycle";
 
-import { ReportBuilder } from "./components/ReportBuilder";
+import { ReportBuilderPatternB } from "./components/ReportBuilderPatternB";
 import { GeotabProvider } from "./services/geotab-context";
 import { Toaster } from "sonner";
 
 export default function App() {
   return (
     <GeotabProvider>
-      <ReportBuilder />
+      <ReportBuilderPatternB />
       <Toaster position="bottom-right" richColors />
     </GeotabProvider>
   );
