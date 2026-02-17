@@ -12,8 +12,8 @@ import {
   SlidersHorizontal,
   X,
 } from "lucide-react";
-import { dataSources, type DataSourceDef } from "../services/geotab-mock";
-import { Checkbox } from "./ui/checkbox";
+import { dataSources, type DataSourceDef } from "../../services/geotab-mock";
+import { Checkbox } from "../../components/ui/checkbox";
 import { motion, AnimatePresence } from "motion/react";
 
 const iconMap: Record<string, React.ElementType> = {

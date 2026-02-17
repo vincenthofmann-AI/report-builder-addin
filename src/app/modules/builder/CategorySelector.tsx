@@ -17,9 +17,9 @@ import {
   Shield,
   ArrowRight,
 } from "lucide-react";
-import type { CategoryDef } from "../services/categories";
-import { categories } from "../services/categories";
-import { ZenithColors } from "../services/zenith-adapter";
+import type { CategoryDef } from "../../services/categories";
+import { categories } from "../../services/categories";
+import { ZenithColors } from "../../services/zenith-adapter";
 
 const iconMap: Record<string, React.ElementType> = {
   Truck,

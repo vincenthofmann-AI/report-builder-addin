@@ -29,11 +29,11 @@ import {
 import type {
   InsightCategory,
   ReportTemplateDef,
-} from "../services/report-templates";
+} from "../../services/report-templates";
 import {
   getTemplatesByCategory,
   getInsightCategoryById,
-} from "../services/report-templates";
+} from "../../services/report-templates";
 
 const chartIconMap = {
   bar: BarChart3,

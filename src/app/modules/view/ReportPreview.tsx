@@ -28,13 +28,13 @@ import {
   Filter,
   X,
 } from "lucide-react";
-import type { ReportTemplateDef } from "../services/report-templates";
+import type { ReportTemplateDef } from "../../services/report-templates";
 import type { FilterRule } from "./FilterBar";
 import { ReportTable } from "./ReportTable";
 import { ChartView } from "./ChartView";
 import { ReportActions } from "./ReportActions";
-import { useDataFetcher } from "../services/data-fetcher";
-import { getDataSourceById } from "../services/categories";
+import { useDataFetcher } from "../../services/data-fetcher";
+import { getDataSourceById } from "../../services/categories";
 import { toast } from "sonner";
 
 interface ReportPreviewProps {

@@ -18,7 +18,7 @@ import {
   Database,
   Check,
 } from "lucide-react";
-import type { DataSourceDef, CategoryDef } from "../services/categories";
+import type { DataSourceDef, CategoryDef } from "../../services/categories";
 
 const iconMap: Record<string, React.ElementType> = {
   MapPin,

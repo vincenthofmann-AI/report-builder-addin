@@ -29,15 +29,12 @@ import type { CategoryDef } from "../services/categories";
 import type { InsightCategory, ReportTemplateDef } from "../services/report-templates";
 import { useGeotab } from "../services/geotab-context";
 import { useDataFetcher } from "../services/data-fetcher";
-import { CategorySelector } from "./CategorySelector";
-import { DataSourceSelector } from "./DataSourceSelector";
-import { InsightCategorySelector } from "./InsightCategorySelector";
-import { InsightSelector } from "./InsightSelector";
-import { ReportPreview } from "./ReportPreview";
-import { ReportOutline } from "./ReportOutline";
-import { FilterBar, type FilterRule } from "./FilterBar";
-import { ReportTable } from "./ReportTable";
-import { ChartView, type ChartType } from "./ChartView";
+// Workspace Module - Template and insight discovery
+import { InsightCategorySelector, InsightSelector } from "../modules/workspace";
+// Builder Module - Data configuration
+import { CategorySelector, DataSourceSelector, FilterBar, ReportOutline, type FilterRule } from "../modules/builder";
+// View Module - Report display and visualization
+import { ChartView, ReportPreview, ReportTable, type ChartType } from "../modules/view";
 import { toast } from "sonner";
 import {
   Tooltip,

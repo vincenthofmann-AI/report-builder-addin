@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { X, Plus, Filter, Sparkles } from "lucide-react";
-import { type ColumnDef } from "../services/geotab-mock";
+import { type ColumnDef } from "../../services/geotab-mock";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "./ui/popover";
+} from "../../components/ui/popover";
 import { motion, AnimatePresence } from "motion/react";
 
 export interface FilterRule {

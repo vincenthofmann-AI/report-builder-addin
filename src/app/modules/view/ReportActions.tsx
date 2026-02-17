@@ -25,8 +25,8 @@ import {
   FileText,
   Printer,
 } from "lucide-react";
-import type { ReportTemplateDef } from "../services/report-templates";
-import { useReportingServices } from "../services/reporting-services";
+import type { ReportTemplateDef } from "../../services/report-templates";
+import { useReportingServices } from "../../services/reporting-services";
 import { toast } from "sonner";
 
 interface ReportActionsProps {

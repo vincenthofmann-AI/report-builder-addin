@@ -13,7 +13,7 @@ import {
   Area,
   AreaChart,
 } from "recharts";
-import { type ColumnDef } from "../services/geotab-mock";
+import { type ColumnDef } from "../../services/geotab-mock";
 import { BarChart3, SlidersHorizontal } from "lucide-react";
 import { motion } from "motion/react";
 

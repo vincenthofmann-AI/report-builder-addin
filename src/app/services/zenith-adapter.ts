@@ -1,34 +1,45 @@
 /**
- * @geotab/zenith Adapter / Shim Module
- * =====================================
+ * Zenith Design System Integration
+ * ==================================
  *
- * This module provides stub implementations for the @geotab/zenith package,
- * which is Geotab's internal design system and SDK integration library.
+ * This module integrates Geotab's Zenith design system (@geotab/zenith).
  *
- * INSTALLATION STATUS: @geotab/zenith returned 404 on npm — it is a
- * private/internal Geotab package requiring org-scoped registry access.
+ * Package: @geotab/zenith v3.5.0 (public npm package)
+ * Installation: pnpm add @geotab/zenith
+ * Styles: Imported in src/main.tsx via "@geotab/zenith/dist/index.css"
  *
- * SWAP INSTRUCTIONS:
- * ------------------
- * Once @geotab/zenith is accessible:
- *
- * 1. Install the real package:
- *    npm install @geotab/zenith --save
- *    (or configure .npmrc with the Geotab private registry)
- *
- * 2. Replace this file's exports with re-exports from the real package:
- *    export { ZenithTheme, ZenithProvider, ... } from '@geotab/zenith';
- *
- * 3. Remove the stub implementations below.
- *
- * 4. Update any component-specific mappings if the real API differs.
- *
- * PRIVATE REGISTRY SETUP (if needed):
- * ------------------------------------
- * Create a .npmrc file in the project root:
- *   @geotab:registry=https://npm.geotab.com/
- *   //npm.geotab.com/:_authToken=${GEOTAB_NPM_TOKEN}
+ * This adapter provides:
+ * 1. Re-exports of Zenith components (Button, Card, Table, etc.)
+ * 2. Custom theme tokens and utilities
+ * 3. MyGeotab API integration helpers
  */
+
+// ============================================================================
+// Zenith Component Re-Exports
+// ============================================================================
+
+export {
+  // Core components
+  Button,
+  Card,
+  Checkbox,
+  Dialog,
+  Dropdown,
+  Calendar,
+  DateRange,
+
+  // Layout components
+  Divider,
+
+  // Form components
+  type IButton,
+  type ICard,
+  type ICheckbox,
+  type IDialog,
+  type IDropdown,
+  type ICalendar,
+  type IDateRange,
+} from '@geotab/zenith';
 
 // ============================================================================
 // Theme Tokens — mirrors expected @geotab/zenith theme constants

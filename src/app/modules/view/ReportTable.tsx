@@ -9,7 +9,7 @@ import {
   ChevronsRight,
   Columns3,
 } from "lucide-react";
-import { type ColumnDef } from "../services/geotab-mock";
+import { type ColumnDef } from "../../services/geotab-mock";
 import { motion, AnimatePresence } from "motion/react";
 
 interface ReportTableProps {

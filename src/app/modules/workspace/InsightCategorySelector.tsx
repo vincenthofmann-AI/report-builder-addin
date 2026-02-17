@@ -19,9 +19,9 @@ import {
   Leaf,
   BarChart3,
 } from "lucide-react";
-import type { InsightCategory, InsightCategoryDef } from "../services/report-templates";
-import { insightCategories } from "../services/report-templates";
-import { ZenithColors } from "../services/zenith-adapter";
+import type { InsightCategory, InsightCategoryDef } from "../../services/report-templates";
+import { insightCategories } from "../../services/report-templates";
+import { ZenithColors } from "../../services/zenith-adapter";
 
 const iconMap: Record<string, React.ElementType> = {
   Shield,
