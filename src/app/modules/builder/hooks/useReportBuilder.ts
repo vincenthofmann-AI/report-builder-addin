@@ -6,7 +6,7 @@
  * Makes the builder reusable across different contexts.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import type {
   ReportBuilderState,
   MyGeotabObjectType,
@@ -14,6 +14,8 @@ import type {
   LayoutView,
   ChartType,
 } from '../types/builder.types';
+import { analyzeVisualizationCapability } from '../../data-viz';
+import { OBJECT_FIELDS } from '../types/objects.constants';
 
 /**
  * Initialize default time range (last 7 days)
@@ -51,6 +53,32 @@ export function useReportBuilder() {
   const [state, setState] = useState<ReportBuilderState>(initialState);
 
   /**
+   * Analyze visualization capability based on selected fields
+   * Updates automatically when fields change
+   */
+  const visualizationCapability = useMemo(() => {
+    if (!state.selectedObject || state.selectedFields.length === 0) {
+      return {
+        canShowChart: false,
+        canShowTable: true,
+        measures: [],
+        dimensions: [],
+        temporal: [],
+        recommendedChartType: null,
+        chartRecommendations: [],
+      };
+    }
+
+    // Get field definitions for selected fields
+    const objectFields = OBJECT_FIELDS[state.selectedObject] || [];
+    const selectedFieldDefs = objectFields.filter((f) =>
+      state.selectedFields.includes(f.name)
+    );
+
+    return analyzeVisualizationCapability(selectedFieldDefs);
+  }, [state.selectedObject, state.selectedFields]);
+
+  /**
    * Select an object type
    */
   const selectObject = useCallback((objectType: MyGeotabObjectType | null) => {
@@ -64,16 +92,53 @@ export function useReportBuilder() {
   }, []);
 
   /**
-   * Toggle field selection
+   * Toggle field selection with progressive disclosure
    */
-  const toggleField = useCallback((fieldName: string) => {
-    setState((prev) => ({
-      ...prev,
-      selectedFields: prev.selectedFields.includes(fieldName)
-        ? prev.selectedFields.filter((f) => f !== fieldName)
-        : [...prev.selectedFields, fieldName],
-    }));
-  }, []);
+  const toggleField = useCallback(
+    (fieldName: string) => {
+      setState((prev) => {
+        const newFields = prev.selectedFields.includes(fieldName)
+          ? prev.selectedFields.filter((f) => f !== fieldName)
+          : [...prev.selectedFields, fieldName];
+
+        // Get field definitions for new selection
+        const objectFields = OBJECT_FIELDS[prev.selectedObject || ''] || [];
+        const selectedFieldDefs = objectFields.filter((f) =>
+          newFields.includes(f.name)
+        );
+
+        // Analyze visualization capability
+        const capability = analyzeVisualizationCapability(selectedFieldDefs);
+
+        // Progressive disclosure logic
+        let newLayoutView = prev.layoutView;
+        let newChartType = prev.chartType;
+
+        // If chart view is active but no measurements available, switch to table
+        if (prev.layoutView === 'chart' && !capability.canShowChart) {
+          newLayoutView = 'table';
+          newChartType = undefined;
+        }
+
+        // If measurements just became available, suggest recommended chart type
+        if (
+          capability.canShowChart &&
+          !prev.chartType &&
+          capability.recommendedChartType
+        ) {
+          newChartType = capability.recommendedChartType;
+        }
+
+        return {
+          ...prev,
+          selectedFields: newFields,
+          layoutView: newLayoutView,
+          chartType: newChartType,
+        };
+      });
+    },
+    []
+  );
 
   /**
    * Set selected fields
@@ -194,6 +259,11 @@ export function useReportBuilder() {
     setChartType,
     layoutView: state.layoutView,
     chartType: state.chartType,
+
+    // Visualization capability (progressive disclosure)
+    visualizationCapability,
+    canShowChart: visualizationCapability.canShowChart,
+    recommendedChartType: visualizationCapability.recommendedChartType,
 
     // Query execution
     executeQuery,

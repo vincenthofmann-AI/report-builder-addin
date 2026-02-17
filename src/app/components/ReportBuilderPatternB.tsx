@@ -155,6 +155,7 @@ export function ReportBuilderPatternB() {
                     onTimeRangeChange={builder.setTimeRange}
                     layoutView={builder.layoutView}
                     chartType={builder.chartType}
+                    visualizationCapability={builder.visualizationCapability}
                     onLayoutChange={builder.setLayoutView}
                     onChartTypeChange={builder.setChartType}
                     canExecute={builder.canExecute}

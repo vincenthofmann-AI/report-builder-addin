@@ -23,6 +23,7 @@ import type {
   LayoutView,
   ChartType,
 } from '../types/builder.types';
+import type { VisualizationCapability } from '../../data-viz';
 
 interface BuilderPanelProps {
   // Object selection
@@ -43,6 +44,9 @@ interface BuilderPanelProps {
   onLayoutChange: (view: LayoutView) => void;
   onChartTypeChange: (type: ChartType) => void;
 
+  // Visualization capability
+  visualizationCapability: VisualizationCapability;
+
   // Actions
   canExecute: boolean;
   onExecute: () => void;
@@ -62,6 +66,7 @@ export function BuilderPanel({
   chartType,
   onLayoutChange,
   onChartTypeChange,
+  visualizationCapability,
   canExecute,
   onExecute,
   isLoading = false,
@@ -184,6 +189,7 @@ export function BuilderPanel({
                     <LayoutSwitcher
                       layoutView={layoutView}
                       chartType={chartType}
+                      visualizationCapability={visualizationCapability}
                       onLayoutChange={onLayoutChange}
                       onChartTypeChange={onChartTypeChange}
                     />
