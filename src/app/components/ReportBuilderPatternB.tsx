@@ -16,6 +16,7 @@ import { SavedReportsList } from "../modules/configuration";
 import { AppHeader } from "./AppHeader";
 import { StandardTabs, type TabId } from "./StandardTabs";
 import { motion, AnimatePresence } from "motion/react";
+import { useReportBuilder, BuilderPanel, BuilderPage } from "../modules/builder";
 
 export function ReportBuilderPatternB() {
   // Tab navigation state
@@ -26,6 +27,9 @@ export function ReportBuilderPatternB() {
 
   // Home module state
   const [selectedCategory, setSelectedCategory] = useState<InsightCategory | null>(null);
+
+  // Builder module (for Templates tab)
+  const builder = useReportBuilder();
 
   // Handlers
   const handleCreateNew = () => {
@@ -138,16 +142,38 @@ export function ReportBuilderPatternB() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.2 }}
-                className="p-6"
+                className="flex h-full"
               >
-                <h2 className="text-xl font-semibold text-[#0f172a] mb-4">
-                  Browse Templates
-                </h2>
-                <div className="bg-white rounded-lg border border-[#e2e8f0] p-6">
-                  <p className="text-sm text-[#64748b]">
-                    Template gallery will load here.
-                  </p>
-                  {/* Future: <TemplateGallery category={selectedCategory} /> */}
+                {/* Builder Panel */}
+                <div className="w-[360px] shrink-0">
+                  <BuilderPanel
+                    selectedObject={builder.selectedObject}
+                    onSelectObject={builder.selectObject}
+                    selectedFields={builder.selectedFields}
+                    onToggleField={builder.toggleField}
+                    timeRange={builder.timeRange}
+                    onTimeRangeChange={builder.setTimeRange}
+                    layoutView={builder.layoutView}
+                    chartType={builder.chartType}
+                    onLayoutChange={builder.setLayoutView}
+                    onChartTypeChange={builder.setChartType}
+                    canExecute={builder.canExecute}
+                    onExecute={builder.executeQuery}
+                    isLoading={builder.isLoading}
+                  />
+                </div>
+
+                {/* Builder Page */}
+                <div className="flex-1 bg-white">
+                  <BuilderPage
+                    selectedObject={builder.selectedObject}
+                    selectedFields={builder.selectedFields}
+                    data={builder.data}
+                    isLoading={builder.isLoading}
+                    error={builder.error}
+                    layoutView={builder.layoutView}
+                    chartType={builder.chartType}
+                  />
                 </div>
               </motion.div>
             )}
