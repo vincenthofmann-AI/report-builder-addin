@@ -2,16 +2,11 @@
  * Zenith Design System Integration
  * ==================================
  *
- * This module integrates Geotab's Zenith design system (@geotab/zenith).
+ * This module integrates Geotab's Zenith design system (@geotab/zenith v3.5.0).
  *
  * Package: @geotab/zenith v3.5.0 (public npm package)
  * Installation: pnpm add @geotab/zenith
  * Styles: Imported in src/main.tsx via "@geotab/zenith/dist/index.css"
- *
- * This adapter provides:
- * 1. Re-exports of Zenith components (Button, Card, Table, etc.)
- * 2. Custom theme tokens and utilities
- * 3. MyGeotab API integration helpers
  */
 
 // ============================================================================
@@ -42,7 +37,7 @@ export {
 } from '@geotab/zenith';
 
 // ============================================================================
-// Theme Tokens — mirrors expected @geotab/zenith theme constants
+// Custom Theme Tokens for Application Use
 // ============================================================================
 
 export const ZenithColors = {
@@ -94,7 +89,7 @@ export const ZenithSpacing = {
 } as const;
 
 export const ZenithTypography = {
-  fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  fontFamily: "Roboto, 'Segoe UI', Segoe, 'Helvetica Neue', Helvetica, sans-serif",
   fontSizes: {
     xs: "11px",
     sm: "13px",
@@ -143,7 +138,7 @@ export const ZenithTheme = {
 } as const;
 
 // ============================================================================
-// Geotab SDK Integration Utilities — wraps api.call() patterns
+// Custom Helper Functions (not from Zenith package)
 // ============================================================================
 
 export interface ZenithApiConfig {
@@ -161,59 +156,30 @@ export interface ZenithSession {
 }
 
 /**
- * Stub: In the real @geotab/zenith, this initializes the SDK session
- * and returns a configured API client.
- *
- * Real usage would be:
- *   import { createGeotabClient } from '@geotab/zenith';
- *   const client = createGeotabClient({ database: 'my_db', server: 'my.geotab.com' });
+ * Custom helper: Creates a mock Geotab API client for development
+ * In production, use the real MyGeotab API injected by the platform
  */
 export function createGeotabClient(config: ZenithApiConfig) {
-  // In stub mode, silently create a mock client that mirrors the real SDK surface.
-  // The UI (Layout header + Settings page) already indicates stub status.
-
   return {
-    /**
-     * Stub for api.call() — the core Geotab SDK method.
-     * Returns null in stub mode; wire to geotab-mock for local data.
-     */
     call: async (method: string, params?: Record<string, unknown>): Promise<unknown> => {
-      // In production, this delegates to the injected Geotab api object
       return null;
     },
-
-    /**
-     * Stub for api.multiCall() — batch multiple API calls
-     */
     multiCall: async (calls: Array<[string, Record<string, unknown>?]>): Promise<unknown[]> => {
       return calls.map(() => null);
     },
-
-    /**
-     * Stub for api.getSession()
-     */
     getSession: async (): Promise<ZenithSession> => {
       return {
-        database: config.database || "stub_database",
-        userName: config.userName || "stub_user@geotab.com",
-        sessionId: "zenith-stub-session",
+        database: config.database || "demo_database",
+        userName: config.userName || "demo_user@geotab.com",
+        sessionId: "demo-session",
         server: config.server || "my.geotab.com",
       };
     },
-
-    /**
-     * Stub for checking connection health.
-     * Returns true so the app treats the stub as a working backend.
-     */
     isConnected: (): boolean => {
       return true;
     },
   };
 }
-
-// ============================================================================
-// Add-In Lifecycle Hooks — mirrors @geotab/zenith add-in patterns
-// ============================================================================
 
 export interface ZenithAddInCallbacks {
   initialize?: (api: ReturnType<typeof createGeotabClient>, state: Record<string, unknown>) => void;
@@ -222,115 +188,24 @@ export interface ZenithAddInCallbacks {
 }
 
 /**
- * Stub: Registers add-in lifecycle callbacks with the MyGeotab platform.
- *
- * Real usage:
- *   import { registerAddIn } from '@geotab/zenith';
- *   registerAddIn({
- *     initialize: (api, state) => { ... },
- *     focus: (api, state) => { ... },
- *     blur: (api, state) => { ... },
- *   });
+ * Custom helper: Registers add-in lifecycle callbacks (for demo mode)
  */
 export function registerAddIn(callbacks: ZenithAddInCallbacks): void {
-  // Store callbacks for potential manual triggering in dev
   if (typeof window !== "undefined") {
     (window as Record<string, unknown>).__zenithAddInCallbacks = callbacks;
   }
 
-  // In stub mode, simulate the platform by firing the initialize callback
-  // after a microtask so the add-in lifecycle starts as expected.
   if (callbacks.initialize) {
-    const stubClient = createGeotabClient({
+    const client = createGeotabClient({
       database: "demo_fleet",
       server: "my.geotab.com",
-      userName: "admin@fleet.com",
+      userName: "demo@geotab.com",
     });
     Promise.resolve().then(() => {
-      callbacks.initialize!(stubClient, { isStub: true });
+      callbacks.initialize!(client, { isDemo: true });
     });
   }
 }
 
-// ============================================================================
-// Data Helpers — common data transformation utilities
-// ============================================================================
-
-/**
- * Stub: Format a Geotab date string for display
- */
-export function formatGeotabDate(dateStr: string, format: "short" | "long" | "iso" = "short"): string {
-  try {
-    const date = new Date(dateStr);
-    switch (format) {
-      case "short":
-        return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-      case "long":
-        return date.toLocaleDateString("en-US", {
-          weekday: "long",
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-      case "iso":
-        return date.toISOString();
-      default:
-        return dateStr;
-    }
-  } catch {
-    return dateStr;
-  }
-}
-
-/**
- * Stub: Convert Geotab distance units
- */
-export function convertDistance(value: number, from: "km" | "mi", to: "km" | "mi"): number {
-  if (from === to) return value;
-  return from === "km" ? value * 0.621371 : value * 1.60934;
-}
-
-/**
- * Stub: Convert Geotab speed units
- */
-export function convertSpeed(value: number, from: "kmh" | "mph", to: "kmh" | "mph"): number {
-  if (from === to) return value;
-  return from === "kmh" ? value * 0.621371 : value * 1.60934;
-}
-
-/**
- * Stub: Convert fuel volume units
- */
-export function convertVolume(value: number, from: "L" | "gal", to: "L" | "gal"): number {
-  if (from === to) return value;
-  return from === "L" ? value * 0.264172 : value * 3.78541;
-}
-
-// ============================================================================
-// Package Info — for integration status checks
-// ============================================================================
-
-export const ZENITH_PACKAGE_NAME = "@geotab/zenith";
-export const ZENITH_ADAPTER_VERSION = "0.1.0-stub";
+// Flag indicating this is using demo mode (not connected to real MyGeotab)
 export const ZENITH_IS_STUB = true;
-
-/**
- * Returns integration status info for the Settings/diagnostics page.
- */
-export function getZenithStatus() {
-  return {
-    packageName: ZENITH_PACKAGE_NAME,
-    installed: false,
-    isStub: ZENITH_IS_STUB,
-    adapterVersion: ZENITH_ADAPTER_VERSION,
-    message: "Using local adapter stubs. Install @geotab/zenith for full integration.",
-    requiredSetup: [
-      "Configure .npmrc with Geotab private registry credentials",
-      "Run: npm install @geotab/zenith --save",
-      "Replace zenith-adapter.ts exports with real package re-exports",
-      "Verify add-in lifecycle hooks in MyGeotab environment",
-    ],
-  };
-}
