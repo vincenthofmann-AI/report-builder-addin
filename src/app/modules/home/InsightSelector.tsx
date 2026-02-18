@@ -28,6 +28,7 @@ import {
   AlertCircle,
   Search,
   Star,
+  Wrench,
 } from "lucide-react";
 import type {
   InsightCategory,
@@ -51,6 +52,7 @@ interface InsightSelectorProps {
   selectedTemplate: ReportTemplateDef | null;
   onSelectTemplate: (template: ReportTemplateDef) => void;
   onBack: () => void;
+  onBuildCustom?: () => void;
 }
 
 export function InsightSelector({
@@ -58,6 +60,7 @@ export function InsightSelector({
   selectedTemplate,
   onSelectTemplate,
   onBack,
+  onBuildCustom,
 }: InsightSelectorProps) {
   const categoryDef = getInsightCategoryById(category);
   const templates = getTemplatesByCategory(category);
@@ -418,6 +421,38 @@ export function InsightSelector({
               })}
             </AnimatePresence>
           </div>
+        )}
+
+        {/* Build Custom Report CTA */}
+        {onBuildCustom && sortedTemplates.length > 0 && (
+          <motion.div
+            className="mt-6"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="bg-gradient-to-r from-[#f8fafc] to-[#eff6ff] rounded-xl border-2 border-dashed border-[#003a63]/20 p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#003a63]/10 flex items-center justify-center">
+                  <Wrench className="w-6 h-6 text-[#003a63]" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-[16px] text-[#003a63] mb-2" style={{ fontWeight: 600 }}>
+                    Can't find what you need?
+                  </h4>
+                  <p className="text-[14px] text-[#64748b] mb-4">
+                    Build a custom report from scratch with full control over data sources, columns, filters, and visualizations.
+                  </p>
+                  <button
+                    onClick={onBuildCustom}
+                    className="px-4 py-2 bg-[#003a63] text-white rounded-lg text-[14px] font-medium hover:bg-[#78be20] transition-colors flex items-center gap-2"
+                  >
+                    <Wrench className="w-4 h-4" />
+                    Build Custom Report
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         )}
 
         {/* Confirmation Message */}

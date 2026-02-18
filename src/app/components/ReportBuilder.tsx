@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import {
   type DataSourceDef,
+  dataSources,
 } from "../services/geotab-mock";
 import type { CategoryDef } from "../services/categories";
 import type { InsightCategory, ReportTemplateDef } from "../services/report-templates";
@@ -33,6 +34,8 @@ import { useDataFetcher } from "../services/data-fetcher";
 import { InsightCategorySelector, InsightSelector } from "../modules/home";
 // Configuration Module - Data configuration (MYG Playbook: Pattern B Collection)
 import { CategorySelector, DataSourceSelector, FilterBar, ReportOutline, type FilterRule } from "../modules/configuration";
+// Builder Module - Custom report wizard
+import { CustomBuilderWizard, type CustomReportConfig } from "../modules/builder/CustomBuilderWizard";
 // Canvas Module - Report display (MYG Playbook: Report State visual treatment)
 import { ChartView, ReportPreview, ReportTable, type ChartType } from "../modules/canvas";
 import { useToast } from "../services/ToastProvider";
@@ -60,6 +63,9 @@ export function ReportBuilder() {
   // Insight-First flow state
   const [insightCategory, setInsightCategory] = useState<InsightCategory | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<ReportTemplateDef | null>(null);
+
+  // Custom Builder Wizard state
+  const [showWizard, setShowWizard] = useState(false);
 
   // Legacy flow state (for advanced custom reports)
   const [selectedCategory, setSelectedCategory] = useState<CategoryDef | null>(null);
@@ -246,6 +252,34 @@ export function ReportBuilder() {
   const handleSave = () => {
     toast.success("Report saved", {
       description: `"${reportName}" has been saved.`,
+    });
+  };
+
+  const handleWizardComplete = (config: CustomReportConfig) => {
+    // Populate existing state from wizard config
+    const dataSource = dataSources.find((ds) => ds.id === config.dataSource);
+    if (dataSource) {
+      setSelectedSource(dataSource);
+      setSelectedColumns(config.selectedColumns);
+      setFilters(config.filters);
+      setReportName(config.reportName);
+
+      // Enable chart if visualization was configured
+      if (config.visualization) {
+        setChartEnabled(true);
+        setChartType(config.visualization.type);
+        setGroupByColumn(config.visualization.xAxis);
+        setAggregateColumn(config.visualization.yAxis);
+        setAggregateFn("sum"); // Default aggregate function
+      }
+    }
+
+    // Close wizard and return to report view
+    setShowWizard(false);
+    setInsightCategory(null);
+
+    toast.success("Custom report configured", {
+      description: `"${config.reportName}" is ready to view`,
     });
   };
 
@@ -594,6 +628,20 @@ export function ReportBuilder() {
                   onSave={handleSave}
                 />
               </motion.div>
+            ) : showWizard ? (
+              <motion.div
+                key="custom-wizard"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex-1 overflow-auto"
+              >
+                <CustomBuilderWizard
+                  onBack={() => setShowWizard(false)}
+                  onComplete={handleWizardComplete}
+                />
+              </motion.div>
             ) : (
               <motion.div
                 key="empty-state"
@@ -614,6 +662,7 @@ export function ReportBuilder() {
                     selectedTemplate={selectedTemplate}
                     onSelectTemplate={setSelectedTemplate}
                     onBack={() => setInsightCategory(null)}
+                    onBuildCustom={() => setShowWizard(true)}
                   />
                 )}
               </motion.div>
