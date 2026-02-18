@@ -4,12 +4,9 @@
  *
  * Toggle between table and chart views with chart type selector.
  * Applies progressive disclosure - disables chart if no measurements.
- *
- * ZENITH-ONLY: Uses @geotab/zenith Button, ToggleButton, and Alert components
  */
 
 import { Table, BarChart3, LineChart, PieChart, AreaChart, AlertCircle } from 'lucide-react';
-import { Button, Alert } from '../../../services/zenith-adapter';
 import type { LayoutView, ChartType } from '../types/builder.types';
 import type { VisualizationCapability } from '../../data-viz';
 
@@ -38,43 +35,51 @@ export function LayoutSwitcher({
   const { canShowChart, recommendedChartType, chartRecommendations } = visualizationCapability;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <div className="space-y-3">
       {/* View Toggle */}
-      <div style={{ display: 'flex', gap: '8px' }}>
-        <Button
-          variant={layoutView === 'table' ? 'primary' : 'secondary'}
-          size="medium"
-          icon={<Table />}
+      <div className="flex gap-2">
+        <button
           onClick={() => onLayoutChange('table')}
-          style={{ flex: 1 }}
+          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+            layoutView === 'table'
+              ? 'border-[#003a63] bg-[#f0f7ff] text-[#003a63]'
+              : 'border-[#e2e8f0] bg-white text-[#64748b] hover:border-[#cbd5e1]'
+          }`}
         >
+          <Table className="w-4 h-4" />
           Table
-        </Button>
+        </button>
 
-        <Button
-          variant={layoutView === 'chart' && canShowChart ? 'primary' : 'secondary'}
-          size="medium"
-          icon={<BarChart3 />}
+        <button
           onClick={() => canShowChart && onLayoutChange('chart')}
           disabled={!canShowChart}
-          style={{ flex: 1 }}
+          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+            layoutView === 'chart' && canShowChart
+              ? 'border-[#003a63] bg-[#f0f7ff] text-[#003a63]'
+              : !canShowChart
+              ? 'border-[#e2e8f0] bg-[#f8fafc] text-[#cbd5e1] cursor-not-allowed'
+              : 'border-[#e2e8f0] bg-white text-[#64748b] hover:border-[#cbd5e1]'
+          }`}
         >
+          <BarChart3 className="w-4 h-4" />
           Chart
-        </Button>
+        </button>
       </div>
 
       {/* Progressive Disclosure: Show warning if charts disabled */}
       {!canShowChart && (
-        <Alert
-          type="warning"
-          message="Charts require numeric measurements. Select fields like speed, distance, or temperature."
-        />
+        <div className="flex items-start gap-2 p-2 bg-[#fef3c7] border border-[#fbbf24] rounded-lg">
+          <AlertCircle className="w-4 h-4 text-[#f59e0b] shrink-0 mt-0.5" />
+          <p className="text-xs text-[#92400e]">
+            Charts require numeric measurements. Select fields like speed, distance, or temperature.
+          </p>
+        </div>
       )}
 
       {/* Chart Type Selector (only shown when chart view is active) */}
       {layoutView === 'chart' && canShowChart && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+          <div className="grid grid-cols-2 gap-2">
             {chartTypes.map((type) => {
               const isActive = chartType === type.value;
               const isRecommended = recommendedChartType === type.value;
@@ -85,30 +90,23 @@ export function LayoutSwitcher({
               );
 
               return (
-                <div key={type.value} style={{ position: 'relative' }}>
-                  <Button
-                    variant={isActive ? 'primary' : 'secondary'}
-                    size="medium"
-                    icon={<IconComponent />}
+                <div key={type.value} className="relative">
+                  <button
                     onClick={() => onChartTypeChange(type.value)}
-                    style={{ width: '100%', justifyContent: 'flex-start' }}
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                      isActive
+                        ? 'border-[#003a63] bg-[#f0f7ff] text-[#003a63]'
+                        : 'border-[#e2e8f0] bg-white text-[#64748b] hover:border-[#cbd5e1]'
+                    }`}
                   >
-                    <span style={{ flex: 1, textAlign: 'left' }}>{type.label}</span>
+                    <IconComponent className="w-3.5 h-3.5" />
+                    <span className="flex-1 text-left">{type.label}</span>
                     {recommendation && (
-                      <span style={{ fontSize: '12px', color: '#94a3b8' }}>{recommendation.score}</span>
+                      <span className="text-xs text-[#94a3b8]">{recommendation.score}</span>
                     )}
-                  </Button>
+                  </button>
                   {isRecommended && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '-4px',
-                      right: '-4px',
-                      width: '8px',
-                      height: '8px',
-                      background: '#10b981',
-                      borderRadius: '50%',
-                      border: '2px solid white'
-                    }} />
+                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#10b981] rounded-full border-2 border-white" />
                   )}
                 </div>
               );
@@ -117,8 +115,8 @@ export function LayoutSwitcher({
 
           {/* Show recommendation explanation for active chart type */}
           {chartType && chartRecommendations.length > 0 && (
-            <div style={{ marginTop: '8px', padding: '8px', background: '#f0f7ff', borderRadius: '8px' }}>
-              <p style={{ fontSize: '12px', color: '#003a63', margin: 0 }}>
+            <div className="mt-2 p-2 bg-[#f0f7ff] rounded-lg">
+              <p className="text-xs text-[#003a63]">
                 {chartRecommendations.find((rec) => rec.chartType === chartType)?.reason ||
                   'Chart type selected'}
               </p>
