@@ -467,3 +467,10 @@ export function getTopTemplates(n: number = 5): ReportTemplateDef[] {
     .sort((a, b) => (b.usageCount || 0) - (a.usageCount || 0))
     .slice(0, n);
 }
+
+/**
+ * Get all templates
+ */
+export function getAllTemplates(): ReportTemplateDef[] {
+  return reportTemplates;
+}

@@ -13,6 +13,7 @@
  * Replaces DataSourceSelector which showed raw data sources.
  */
 
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   ChevronLeft,
@@ -25,6 +26,8 @@ import {
   LineChart,
   PieChart,
   AlertCircle,
+  Search,
+  Star,
 } from "lucide-react";
 import type {
   InsightCategory,
@@ -33,7 +36,9 @@ import type {
 import {
   getTemplatesByCategory,
   getInsightCategoryById,
+  getAllTemplates,
 } from "../../services/report-templates";
+import { SearchInput } from "../../services/zenith-adapter";
 
 const chartIconMap = {
   bar: BarChart3,
@@ -56,6 +61,38 @@ export function InsightSelector({
 }: InsightSelectorProps) {
   const categoryDef = getInsightCategoryById(category);
   const templates = getTemplatesByCategory(category);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [recentlyUsed, setRecentlyUsed] = useState<string[]>([]);
+
+  // Load recently used templates from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("reportBuilder.recentTemplates");
+      if (stored) {
+        setRecentlyUsed(JSON.parse(stored));
+      }
+    } catch (error) {
+      console.warn("Failed to load recent templates:", error);
+    }
+  }, []);
+
+  // Save template to recently used when selected
+  const handleSelectTemplate = (template: ReportTemplateDef) => {
+    onSelectTemplate(template);
+
+    // Update recently used (max 5, most recent first)
+    const updated = [
+      template.id,
+      ...recentlyUsed.filter((id) => id !== template.id),
+    ].slice(0, 5);
+
+    setRecentlyUsed(updated);
+    try {
+      localStorage.setItem("reportBuilder.recentTemplates", JSON.stringify(updated));
+    } catch (error) {
+      console.warn("Failed to save recent templates:", error);
+    }
+  };
 
   if (!categoryDef) {
     return (
@@ -65,16 +102,42 @@ export function InsightSelector({
     );
   }
 
+  // Fuzzy search: match query against name, description, tags, insight question
+  const filteredTemplates = useMemo(() => {
+    if (!searchQuery.trim()) return templates;
+
+    const query = searchQuery.toLowerCase();
+    return templates.filter((template) => {
+      const searchText = [
+        template.name,
+        template.insightQuestion,
+        template.description || "",
+        ...(template.tags || []),
+      ].join(" ").toLowerCase();
+
+      return searchText.includes(query);
+    });
+  }, [templates, searchQuery]);
+
   // Sort templates by usage count (descending)
-  const sortedTemplates = [...templates].sort(
+  const sortedTemplates = [...filteredTemplates].sort(
     (a, b) => (b.usageCount || 0) - (a.usageCount || 0)
   );
+
+  // Get recently used templates that are in current category
+  const recentTemplates = useMemo(() => {
+    const allTemplates = getAllTemplates();
+    return recentlyUsed
+      .map((id) => allTemplates.find((t) => t.id === id))
+      .filter((t): t is ReportTemplateDef => t !== undefined && t.category === category)
+      .slice(0, 3);
+  }, [recentlyUsed, category]);
 
   return (
     <div className="flex-1 overflow-auto">
       <div className="max-w-4xl mx-auto p-6 lg:p-8">
         {/* Header with Back Button */}
-        <div className="mb-8">
+        <div className="mb-6">
           <button
             onClick={onBack}
             className="flex items-center gap-2 text-[14px] text-[#003a63] hover:text-[#78be20] mb-4 transition-colors group"
@@ -105,6 +168,71 @@ export function InsightSelector({
           </motion.div>
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
+            <SearchInput
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search templates..."
+              className="w-full pl-10"
+            />
+          </div>
+        </div>
+
+        {/* Recently Used Section */}
+        {!searchQuery && recentTemplates.length > 0 && (
+          <motion.div
+            className="mb-6"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h3 className="text-[13px] text-[#64748b] mb-3 flex items-center gap-2" style={{ fontWeight: 600 }}>
+              <Star className="w-4 h-4" />
+              Recently Used
+            </h3>
+            <div className="space-y-2">
+              {recentTemplates.map((template) => {
+                const isSelected = selectedTemplate?.id === template.id;
+                return (
+                  <button
+                    key={template.id}
+                    onClick={() => handleSelectTemplate(template)}
+                    className={`
+                      w-full p-3 rounded-lg border text-left transition-all flex items-center gap-3
+                      ${
+                        isSelected
+                          ? "border-[#003a63] bg-[#003a63]/[0.04]"
+                          : "border-[#e2e8f0] bg-white hover:border-[#003a63]/30"
+                      }
+                    `}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] text-[#1e293b] truncate" style={{ fontWeight: 600 }}>
+                        {template.name}
+                      </p>
+                      <p className="text-[12px] text-[#78be20] truncate" style={{ fontWeight: 500 }}>
+                        {template.insightQuestion}
+                      </p>
+                    </div>
+                    {isSelected && (
+                      <Check className="w-4 h-4 text-[#78be20] flex-shrink-0" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Search Results Count */}
+        {searchQuery && (
+          <div className="mb-4 text-[13px] text-[#64748b]">
+            Found {sortedTemplates.length} template{sortedTemplates.length !== 1 ? 's' : ''}
+          </div>
+        )}
+
         {/* Template List */}
         {sortedTemplates.length === 0 ? (
           <motion.div
@@ -132,7 +260,7 @@ export function InsightSelector({
                 return (
                   <motion.button
                     key={template.id}
-                    onClick={() => onSelectTemplate(template)}
+                    onClick={() => handleSelectTemplate(template)}
                     className={`
                       w-full p-5 rounded-xl border-2 text-left transition-all flex items-start gap-5
                       ${

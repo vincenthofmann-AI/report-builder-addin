@@ -35,12 +35,8 @@ import { InsightCategorySelector, InsightSelector } from "../modules/home";
 import { CategorySelector, DataSourceSelector, FilterBar, ReportOutline, type FilterRule } from "../modules/configuration";
 // Canvas Module - Report display (MYG Playbook: Report State visual treatment)
 import { ChartView, ReportPreview, ReportTable, type ChartType } from "../modules/canvas";
-import { toast } from "sonner";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "./ui/tooltip";
+import { useToast } from "../services/ToastProvider";
+import { Tooltip } from "../services/zenith-adapter";
 import { motion, AnimatePresence } from "motion/react";
 
 type AggregateFn = "sum" | "avg" | "count" | "min" | "max";
@@ -58,6 +54,7 @@ export function ReportBuilder() {
   const { isLive, session } = useGeotab();
   const dataFetcher = useDataFetcher();
   const dataSources = dataFetcher.getDataSources();
+  const toast = useToast();
 
   // ----- State -----
   // Insight-First flow state

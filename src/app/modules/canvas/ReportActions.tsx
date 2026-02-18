@@ -27,7 +27,8 @@ import {
 } from "lucide-react";
 import type { ReportTemplateDef } from "../../services/report-templates";
 import { useReportingServices } from "../../services/reporting-services";
-import { toast } from "sonner";
+import { useToast } from "../../services/ToastProvider";
+import { Button, ButtonType } from "../../services/zenith-adapter";
 
 interface ReportActionsProps {
   template: ReportTemplateDef;
@@ -43,6 +44,7 @@ export function ReportActions({
   selectedColumns,
 }: ReportActionsProps) {
   const reportingServices = useReportingServices();
+  const toast = useToast();
 
   // Dialog states
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -135,32 +137,29 @@ export function ReportActions({
     <>
       {/* Action Buttons */}
       <div className="flex items-center gap-2">
-        <button
+        <Button
+          type={ButtonType.Primary}
           onClick={() => setShowSaveDialog(true)}
-          className="px-3 py-2 rounded-lg bg-[#003a63] text-white hover:bg-[#002945] transition-colors flex items-center gap-2 text-[13px]"
-          style={{ fontWeight: 500 }}
         >
           <Save className="w-4 h-4" />
           Save
-        </button>
+        </Button>
 
-        <button
+        <Button
+          type={ButtonType.Secondary}
           onClick={() => setShowScheduleDialog(true)}
-          className="px-3 py-2 rounded-lg bg-white border border-[#e2e8f0] text-[#64748b] hover:bg-[#f8fafc] transition-colors flex items-center gap-2 text-[13px]"
-          style={{ fontWeight: 500 }}
         >
           <Calendar className="w-4 h-4" />
           Schedule
-        </button>
+        </Button>
 
-        <button
+        <Button
+          type={ButtonType.Secondary}
           onClick={() => setShowExportDialog(true)}
-          className="px-3 py-2 rounded-lg bg-white border border-[#e2e8f0] text-[#64748b] hover:bg-[#f8fafc] transition-colors flex items-center gap-2 text-[13px]"
-          style={{ fontWeight: 500 }}
         >
           <Download className="w-4 h-4" />
           Export
-        </button>
+        </Button>
       </div>
 
       {/* Save Dialog */}
@@ -389,12 +388,14 @@ function Dialog({ title, icon: Icon, children, onClose, onConfirm, confirmText }
               {title}
             </h3>
           </div>
-          <button
+          <Button
+            type={ButtonType.Tertiary}
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-[#f1f5f9] transition-colors"
+            className="!p-1"
+            ariaLabel="Close dialog"
           >
             <X className="w-5 h-5 text-[#64748b]" />
-          </button>
+          </Button>
         </div>
 
         {/* Content */}
@@ -404,21 +405,19 @@ function Dialog({ title, icon: Icon, children, onClose, onConfirm, confirmText }
 
         {/* Footer */}
         <div className="px-6 py-4 bg-[#f8fafc] border-t border-[#e2e8f0] flex items-center justify-end gap-3">
-          <button
+          <Button
+            type={ButtonType.Tertiary}
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-[13px] text-[#64748b] hover:bg-white transition-colors"
-            style={{ fontWeight: 500 }}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
+            type={ButtonType.Primary}
             onClick={onConfirm}
-            className="px-4 py-2 rounded-lg bg-[#003a63] text-white hover:bg-[#002945] transition-colors text-[13px] flex items-center gap-2"
-            style={{ fontWeight: 500 }}
           >
             <Check className="w-4 h-4" />
             {confirmText}
-          </button>
+          </Button>
         </div>
       </motion.div>
     </motion.div>

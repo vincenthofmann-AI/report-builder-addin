@@ -4,13 +4,14 @@ import "./services/addin-lifecycle";
 
 import { ReportBuilderPatternB } from "./components/ReportBuilderPatternB";
 import { GeotabProvider } from "./services/geotab-context";
-import { Toaster } from "sonner";
+import { ToastProvider } from "./services/ToastProvider";
 
 export default function App() {
   return (
     <GeotabProvider>
-      <ReportBuilderPatternB />
-      <Toaster position="bottom-right" richColors />
+      <ToastProvider>
+        <ReportBuilderPatternB />
+      </ToastProvider>
     </GeotabProvider>
   );
 }

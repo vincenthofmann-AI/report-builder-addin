@@ -1,11 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { X, Plus, Filter, Sparkles } from "lucide-react";
 import { type ColumnDef } from "../../services/geotab-mock";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../components/ui/popover";
+import { ControlledPopup } from "../../services/zenith-adapter";
 import { motion, AnimatePresence } from "motion/react";
 
 export interface FilterRule {
@@ -63,6 +59,8 @@ export function FilterBar({
 }: FilterBarProps) {
   const [addingFilter, setAddingFilter] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const addFilterButtonRef = useRef<HTMLButtonElement>(null);
+  const filterButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
   const filterableColumns = columns.filter((c) => c.filterable);
   const hasFilters = filters.length > 0;
@@ -115,30 +113,37 @@ export function FilterBar({
                 exit={{ opacity: 0, scale: 0.85 }}
                 transition={{ duration: 0.15 }}
               >
-                <Popover
-                  open={editingId === filter.id}
-                  onOpenChange={(open) => setEditingId(open ? filter.id : null)}
+                <button
+                  ref={(el) => {
+                    if (el) filterButtonRefs.current.set(filter.id, el);
+                    else filterButtonRefs.current.delete(filter.id);
+                  }}
+                  onClick={() => setEditingId(editingId === filter.id ? null : filter.id)}
+                  className="flex items-center gap-1 px-2 py-1 rounded-md bg-[#003a63]/[0.06] text-[#003a63] text-[12px] hover:bg-[#003a63]/[0.10] transition-all duration-150 group border border-transparent hover:border-[#003a63]/10"
+                  style={{ fontWeight: 450 }}
                 >
-                  <PopoverTrigger asChild>
-                    <button
-                      className="flex items-center gap-1 px-2 py-1 rounded-md bg-[#003a63]/[0.06] text-[#003a63] text-[12px] hover:bg-[#003a63]/[0.10] transition-all duration-150 group border border-transparent hover:border-[#003a63]/10"
-                      style={{ fontWeight: 450 }}
-                    >
-                      <span className="text-[#64748b]">{col.label}</span>
-                      <span className="text-[#94a3b8]">{opLabel}</span>
-                      <span style={{ fontWeight: 500 }}>
-                        {displayValue || "(empty)"}
-                      </span>
-                      <X
-                        className="w-3 h-3 ml-0.5 text-[#94a3b8] hover:text-[#dc2626] transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeFilter(filter.id);
-                        }}
-                      />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent align="start" className="w-72 p-3">
+                  <span className="text-[#64748b]">{col.label}</span>
+                  <span className="text-[#94a3b8]">{opLabel}</span>
+                  <span style={{ fontWeight: 500 }}>
+                    {displayValue || "(empty)"}
+                  </span>
+                  <X
+                    className="w-3 h-3 ml-0.5 text-[#94a3b8] hover:text-[#dc2626] transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeFilter(filter.id);
+                    }}
+                  />
+                </button>
+
+                {filterButtonRefs.current.get(filter.id) && editingId === filter.id && (
+                  <ControlledPopup
+                    triggerRef={{ current: filterButtonRefs.current.get(filter.id) || null }}
+                    isOpen={editingId === filter.id}
+                    onOpenChange={(open) => setEditingId(open ? filter.id : null)}
+                    alignment="bottom-left"
+                    className="w-72 p-3 bg-white rounded-lg shadow-lg border border-[#e2e8f0]"
+                  >
                     <FilterEditor
                       filter={filter}
                       columns={filterableColumns}
@@ -150,8 +155,8 @@ export function FilterBar({
                       }}
                       onCancel={() => setEditingId(null)}
                     />
-                  </PopoverContent>
-                </Popover>
+                  </ControlledPopup>
+                )}
               </motion.div>
             );
           })}
@@ -192,14 +197,23 @@ export function FilterBar({
         </AnimatePresence>
 
         {/* Add filter button */}
-        <Popover open={addingFilter} onOpenChange={setAddingFilter}>
-          <PopoverTrigger asChild>
-            <button className="flex items-center gap-1 px-2 py-1 rounded-md border border-dashed border-[#cbd5e1] text-[12px] text-[#64748b] hover:border-[#003a63]/30 hover:text-[#003a63] hover:bg-[#003a63]/[0.02] transition-all duration-150">
-              <Plus className="w-3 h-3" />
-              <span className="hidden sm:inline">Add filter</span>
-            </button>
-          </PopoverTrigger>
-          <PopoverContent align="start" className="w-72 p-3">
+        <button
+          ref={addFilterButtonRef}
+          onClick={() => setAddingFilter(!addingFilter)}
+          className="flex items-center gap-1 px-2 py-1 rounded-md border border-dashed border-[#cbd5e1] text-[12px] text-[#64748b] hover:border-[#003a63]/30 hover:text-[#003a63] hover:bg-[#003a63]/[0.02] transition-all duration-150"
+        >
+          <Plus className="w-3 h-3" />
+          <span className="hidden sm:inline">Add filter</span>
+        </button>
+
+        {addFilterButtonRef.current && (
+          <ControlledPopup
+            triggerRef={addFilterButtonRef}
+            isOpen={addingFilter}
+            onOpenChange={setAddingFilter}
+            alignment="bottom-left"
+            className="w-72 p-3 bg-white rounded-lg shadow-lg border border-[#e2e8f0]"
+          >
             <FilterEditor
               columns={filterableColumns}
               onSave={(newFilter) => {
@@ -208,8 +222,8 @@ export function FilterBar({
               }}
               onCancel={() => setAddingFilter(false)}
             />
-          </PopoverContent>
-        </Popover>
+          </ControlledPopup>
+        )}
       </div>
 
       {/* Right side: record count + clear */}

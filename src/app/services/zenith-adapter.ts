@@ -26,6 +26,11 @@ export {
   Tabs,
   Banner,
   Accordion,
+  Popup,
+  ControlledPopup,
+  Toast,
+  useToast,
+  Tooltip,
 
   // Layout components
   Divider,
@@ -39,6 +44,10 @@ export {
   type IDropdown,
   type ICalendar,
   type IDateRange,
+  type IPopup,
+  type IControlledPopup,
+  type IToast,
+  type IShowToast,
 } from '@geotab/zenith';
 
 // ============================================================================

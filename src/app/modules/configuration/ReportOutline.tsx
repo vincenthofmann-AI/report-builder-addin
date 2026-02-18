@@ -13,7 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { dataSources, type DataSourceDef } from "../../services/geotab-mock";
-import { Checkbox } from "../../components/ui/checkbox";
+import { Checkbox } from "../../services/zenith-adapter";
 import { motion, AnimatePresence } from "motion/react";
 
 const iconMap: Record<string, React.ElementType> = {
@@ -277,7 +277,7 @@ export function ReportOutline({
                           >
                             <Checkbox
                               checked={isChecked}
-                              onCheckedChange={() => onToggleColumn(col.key)}
+                              onChange={() => onToggleColumn(col.key)}
                               className="w-3.5 h-3.5"
                             />
                             <span

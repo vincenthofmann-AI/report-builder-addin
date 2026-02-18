@@ -35,7 +35,7 @@ import { ChartView } from "./ChartView";
 import { ReportActions } from "./ReportActions";
 import { useDataFetcher } from "../../services/data-fetcher";
 import { getDataSourceById } from "../../services/categories";
-import { toast } from "sonner";
+import { useToast } from "../../services/ToastProvider";
 
 interface ReportPreviewProps {
   template: ReportTemplateDef;
@@ -53,6 +53,7 @@ export function ReportPreview({
   onSchedule,
 }: ReportPreviewProps) {
   const dataFetcher = useDataFetcher();
+  const toast = useToast();
 
   // Get data source definition
   const dataSource = getDataSourceById(template.dataSource);
