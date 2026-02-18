@@ -25,15 +25,50 @@ export {
 
   // Layout components
   Divider,
+  PageLayout,
+  FormLayout,
+  FormGroup,
+  FormField,
+  GridLayout,
 
   // Form components
-  type IButton,
-  type ICard,
-  type ICheckbox,
-  type IDialog,
-  type IDropdown,
-  type ICalendar,
-  type IDateRange,
+  TextInput,
+  Textarea,
+  Select,
+  Radio,
+  RadioGroup,
+  SearchInput,
+  DateInput,
+  TimePicker,
+  ToggleButton,
+
+  // Navigation
+  Tabs,
+  TabBar,
+
+  // Feedback
+  Alert,
+  Banner,
+  Toast,
+  EmptyState,
+
+  // Data display
+  Table,
+
+  // Types (commented out - using Zenith's internal types)
+  // type IButton,
+  // type ICard,
+  // type ICheckbox,
+  // type IDialog,
+  // type IDropdown,
+  // type ICalendar,
+  // type IDateRange,
+  // type ITextInput,
+  // type ISelect,
+  // type IRadio,
+  // type IRadioGroup,
+  // type ITabs,
+  // type ITable,
 } from '@geotab/zenith';
 
 // ============================================================================

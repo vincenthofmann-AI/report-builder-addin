@@ -3,10 +3,13 @@
  * ============================
  *
  * Date range picker with common presets and custom range support.
+ *
+ * ZENITH-ONLY: Uses @geotab/zenith Button and DateInput components
  */
 
 import { useState } from 'react';
 import { Calendar as CalendarIcon } from 'lucide-react';
+import { Button, DateInput, Divider } from '../../../services/zenith-adapter';
 import type { TimeRange } from '../types/builder.types';
 import { TIME_RANGE_PRESETS } from '../types/objects.constants';
 
@@ -96,65 +99,54 @@ export function TimeRangeSelector({ timeRange, onTimeRangeChange }: TimeRangeSel
   };
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {/* Preset Buttons */}
-      <div className="grid grid-cols-2 gap-2">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
         {TIME_RANGE_PRESETS.map((preset) => {
           const isActive = timeRange.preset === preset.value;
           return (
-            <button
+            <Button
               key={preset.value}
+              variant={isActive ? 'primary' : 'secondary'}
+              size="medium"
               onClick={() => handlePresetChange(preset.value)}
-              className={`px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
-                isActive
-                  ? 'border-[#003a63] bg-[#f0f7ff] text-[#003a63]'
-                  : 'border-[#e2e8f0] bg-white text-[#64748b] hover:border-[#cbd5e1]'
-              }`}
             >
               {preset.label}
-            </button>
+            </Button>
           );
         })}
       </div>
 
       {/* Custom Date Inputs */}
       {showCustom && (
-        <div className="space-y-3 pt-2 border-t border-[#e2e8f0]">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingTop: '8px' }}>
+          <Divider />
           <div>
-            <label className="block text-xs font-medium text-[#64748b] mb-1.5">
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#64748b', marginBottom: '6px' }}>
               Start Date & Time
             </label>
-            <div className="relative">
-              <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8] pointer-events-none" />
-              <input
-                type="datetime-local"
-                value={formatDateTimeLocal(timeRange.start)}
-                onChange={(e) => handleCustomDateChange('start', e.target.value)}
-                className="w-full pl-10 pr-3 py-2 text-sm border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003a63] focus:border-transparent"
-              />
-            </div>
+            <DateInput
+              value={timeRange.start}
+              onChange={(date) => handleCustomDateChange('start', date.toISOString())}
+            />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#64748b] mb-1.5">
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#64748b', marginBottom: '6px' }}>
               End Date & Time
             </label>
-            <div className="relative">
-              <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8] pointer-events-none" />
-              <input
-                type="datetime-local"
-                value={formatDateTimeLocal(timeRange.end)}
-                onChange={(e) => handleCustomDateChange('end', e.target.value)}
-                className="w-full pl-10 pr-3 py-2 text-sm border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003a63] focus:border-transparent"
-              />
-            </div>
+            <DateInput
+              value={timeRange.end}
+              onChange={(date) => handleCustomDateChange('end', date.toISOString())}
+            />
           </div>
         </div>
       )}
 
       {/* Range Summary */}
-      <div className="pt-2 border-t border-[#e2e8f0]">
-        <div className="text-xs text-[#64748b]">
+      <div>
+        <Divider />
+        <div style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
           {timeRange.start.toLocaleDateString()} - {timeRange.end.toLocaleDateString()}
         </div>
       </div>

@@ -4,9 +4,12 @@
  *
  * Multi-select field picker for the selected MyGeotab object.
  * Shows available fields with type indicators and descriptions.
+ *
+ * ZENITH-ONLY: Uses @geotab/zenith Checkbox and FormGroup components
  */
 
 import { Type, Hash, Calendar, ToggleLeft } from 'lucide-react';
+import { Checkbox, FormGroup, Divider } from '../../../services/zenith-adapter';
 import type { MyGeotabObjectType } from '../types/builder.types';
 import { OBJECT_FIELDS } from '../types/objects.constants';
 
@@ -33,7 +36,7 @@ export function FieldPicker({
 
   if (fields.length === 0) {
     return (
-      <div className="text-center py-8 text-sm text-[#94a3b8]">
+      <div style={{ textAlign: 'center', padding: '32px 0', fontSize: '14px', color: '#94a3b8' }}>
         No fields available for this object type
       </div>
     );
@@ -43,92 +46,97 @@ export function FieldPicker({
   const optionalFields = fields.filter((f) => !f.required);
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {/* Required Fields */}
       {requiredFields.length > 0 && (
-        <div>
-          <div className="text-xs font-medium text-[#64748b] uppercase tracking-wide mb-2">
-            Required Fields
-          </div>
-          <div className="space-y-1">
+        <FormGroup label="Required Fields">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {requiredFields.map((field) => {
               const IconComponent = fieldTypeIcons[field.type];
               const isSelected = selectedFields.includes(field.name);
 
               return (
-                <label
+                <div
                   key={field.name}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#f8fafc] cursor-pointer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '8px',
+                    borderRadius: '8px',
+                    cursor: 'pointer'
+                  }}
                 >
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={isSelected}
                     onChange={() => onToggleField(field.name)}
-                    className="w-4 h-4 text-[#003a63] border-[#cbd5e1] rounded focus:ring-[#003a63] focus:ring-offset-0"
                   />
-                  <IconComponent className="w-3.5 h-3.5 text-[#94a3b8] shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-[#0f172a]">
+                  <IconComponent style={{ width: '14px', height: '14px', color: '#94a3b8', flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '14px', fontWeight: 500, color: '#0f172a' }}>
                       {field.label}
                     </div>
                     {field.description && (
-                      <div className="text-xs text-[#64748b] truncate">
+                      <div style={{ fontSize: '12px', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {field.description}
                       </div>
                     )}
                   </div>
-                  <div className="text-xs text-[#94a3b8] font-mono">{field.type}</div>
-                </label>
+                  <div style={{ fontSize: '12px', color: '#94a3b8', fontFamily: 'monospace' }}>{field.type}</div>
+                </div>
               );
             })}
           </div>
-        </div>
+        </FormGroup>
       )}
 
       {/* Optional Fields */}
       {optionalFields.length > 0 && (
-        <div>
-          <div className="text-xs font-medium text-[#64748b] uppercase tracking-wide mb-2">
-            Optional Fields
-          </div>
-          <div className="space-y-1">
+        <FormGroup label="Optional Fields">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {optionalFields.map((field) => {
               const IconComponent = fieldTypeIcons[field.type];
               const isSelected = selectedFields.includes(field.name);
 
               return (
-                <label
+                <div
                   key={field.name}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#f8fafc] cursor-pointer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '8px',
+                    borderRadius: '8px',
+                    cursor: 'pointer'
+                  }}
                 >
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={isSelected}
                     onChange={() => onToggleField(field.name)}
-                    className="w-4 h-4 text-[#003a63] border-[#cbd5e1] rounded focus:ring-[#003a63] focus:ring-offset-0"
                   />
-                  <IconComponent className="w-3.5 h-3.5 text-[#94a3b8] shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-[#0f172a]">
+                  <IconComponent style={{ width: '14px', height: '14px', color: '#94a3b8', flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '14px', fontWeight: 500, color: '#0f172a' }}>
                       {field.label}
                     </div>
                     {field.description && (
-                      <div className="text-xs text-[#64748b] truncate">
+                      <div style={{ fontSize: '12px', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {field.description}
                       </div>
                     )}
                   </div>
-                  <div className="text-xs text-[#94a3b8] font-mono">{field.type}</div>
-                </label>
+                  <div style={{ fontSize: '12px', color: '#94a3b8', fontFamily: 'monospace' }}>{field.type}</div>
+                </div>
               );
             })}
           </div>
-        </div>
+        </FormGroup>
       )}
 
       {/* Selection Summary */}
-      <div className="pt-2 border-t border-[#e2e8f0]">
-        <div className="text-xs text-[#64748b]">
+      <div>
+        <Divider />
+        <div style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
           {selectedFields.length} {selectedFields.length === 1 ? 'field' : 'fields'}{' '}
           selected
         </div>

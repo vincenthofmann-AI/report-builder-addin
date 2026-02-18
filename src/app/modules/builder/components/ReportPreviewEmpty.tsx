@@ -11,9 +11,12 @@
  * - Estimated row count
  * - Time range summary
  * - Next actions
+ *
+ * ZENITH-ONLY: Uses @geotab/zenith Card component
  */
 
 import { Table, Clock, FileText, TrendingUp } from 'lucide-react';
+import { Card } from '../../../services/zenith-adapter';
 import type { MyGeotabObjectType, TimeRange } from '../types/builder.types';
 import type { FieldDefinition } from '../types/builder.types';
 import { OBJECT_FIELDS } from '../types/objects.constants';
@@ -67,38 +70,50 @@ export function ReportPreviewEmpty({
   const fields = getSelectedFieldDefs(objectType, selectedFields);
 
   return (
-    <div className="flex items-center justify-center h-full p-6">
-      <div className="max-w-2xl w-full">
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '24px' }}>
+      <div style={{ maxWidth: '672px', width: '100%' }}>
         {/* Header */}
-        <div className="text-center mb-6">
-          <div className="w-16 h-16 rounded-full bg-[#f0f7ff] flex items-center justify-center mx-auto mb-4">
-            <Table className="w-8 h-8 text-[#003a63]" />
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            background: '#f0f7ff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 16px auto'
+          }}>
+            <Table style={{ width: '32px', height: '32px', color: '#003a63' }} />
           </div>
-          <h3 className="text-lg font-semibold text-[#0f172a] mb-2">
+          <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a', margin: '0 0 8px 0' }}>
             Preview Your {objectType} Report
           </h3>
-          <p className="text-sm text-[#64748b]">
+          <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
             Your report will show the following data
           </p>
         </div>
 
         {/* Table Structure Preview */}
-        <div className="bg-white rounded-lg border border-[#e2e8f0] overflow-hidden mb-6">
+        <Card style={{ marginBottom: '24px' }}>
           {/* Table Headers */}
-          <div className="bg-[#f8fafc] border-b border-[#e2e8f0]">
-            <div className="grid gap-px" style={{ gridTemplateColumns: `repeat(${fields.length}, 1fr)` }}>
-              {fields.map((field) => {
+          <div style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'grid', gap: '1px', gridTemplateColumns: `repeat(${fields.length}, 1fr)` }}>
+              {fields.map((field, index) => {
                 const typeInfo = formatFieldType(field.type);
                 return (
                   <div
                     key={field.name}
-                    className="px-4 py-3 border-r border-[#e2e8f0] last:border-r-0"
+                    style={{
+                      padding: '12px 16px',
+                      borderRight: index < fields.length - 1 ? '1px solid #e2e8f0' : 'none'
+                    }}
                   >
-                    <div className="font-medium text-xs text-[#0f172a]">
+                    <div style={{ fontWeight: 500, fontSize: '12px', color: '#0f172a' }}>
                       {field.label}
                     </div>
-                    <div className="text-xs text-[#94a3b8] mt-0.5 flex items-center gap-1">
-                      <span className="font-mono text-[10px]">{typeInfo.icon}</span>
+                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span style={{ fontFamily: 'monospace', fontSize: '10px' }}>{typeInfo.icon}</span>
                       {typeInfo.label}
                     </div>
                   </div>
@@ -108,9 +123,9 @@ export function ReportPreviewEmpty({
           </div>
 
           {/* Sample Row Structure (empty but formatted) */}
-          <div className="p-8 text-center">
-            <div className="inline-flex items-center gap-2 text-sm text-[#94a3b8]">
-              <FileText className="w-4 h-4" />
+          <div style={{ padding: '32px', textAlign: 'center' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#94a3b8' }}>
+              <FileText style={{ width: '16px', height: '16px' }} />
               <span>
                 {canAutoLoad
                   ? 'Data will load automatically'
@@ -118,45 +133,45 @@ export function ReportPreviewEmpty({
               </span>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Metadata Summary */}
-        <div className="grid grid-cols-2 gap-4">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
           {/* Time Range */}
-          <div className="bg-[#f8fafc] rounded-lg p-4 border border-[#e2e8f0]">
-            <div className="flex items-center gap-2 text-sm font-medium text-[#64748b] mb-2">
-              <Clock className="w-4 h-4" />
+          <Card>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 500, color: '#64748b', marginBottom: '8px' }}>
+              <Clock style={{ width: '16px', height: '16px' }} />
               Time Range
             </div>
-            <div className="text-sm text-[#0f172a]">
+            <div style={{ fontSize: '14px', color: '#0f172a' }}>
               {timeRange.start.toLocaleDateString()} -{' '}
               {timeRange.end.toLocaleDateString()}
             </div>
-            <div className="text-xs text-[#94a3b8] mt-1">
+            <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>
               {timeRange.preset === 'custom' ? 'Custom range' : timeRange.preset}
             </div>
-          </div>
+          </Card>
 
           {/* Estimated Results */}
-          <div className="bg-[#f8fafc] rounded-lg p-4 border border-[#e2e8f0]">
-            <div className="flex items-center gap-2 text-sm font-medium text-[#64748b] mb-2">
-              <TrendingUp className="w-4 h-4" />
+          <Card>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 500, color: '#64748b', marginBottom: '8px' }}>
+              <TrendingUp style={{ width: '16px', height: '16px' }} />
               Estimated Results
             </div>
-            <div className="text-sm text-[#0f172a]">
+            <div style={{ fontSize: '14px', color: '#0f172a' }}>
               {estimatedRows !== undefined
                 ? `~${estimatedRows.toLocaleString()} records`
                 : 'Calculating...'}
             </div>
-            <div className="text-xs text-[#94a3b8] mt-1">
+            <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>
               {fields.length} {fields.length === 1 ? 'column' : 'columns'} selected
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Guidance */}
-        <div className="mt-6 p-4 bg-[#f0f7ff] border border-[#bfdbfe] rounded-lg">
-          <p className="text-xs text-[#1e40af]">
+        <div style={{ marginTop: '24px', padding: '16px', background: '#f0f7ff', border: '1px solid #bfdbfe', borderRadius: '8px' }}>
+          <p style={{ fontSize: '12px', color: '#1e40af', margin: 0 }}>
             💡 <strong>Tip:</strong>{' '}
             {canAutoLoad
               ? 'Data loads automatically for queries under 1,000 records.'
