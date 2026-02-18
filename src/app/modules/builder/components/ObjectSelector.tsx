@@ -4,10 +4,15 @@
  *
  * Allows users to select a MyGeotab object type (Device, Trip, Event, etc.)
  * Organized by category with icons and descriptions.
+ *
+ * Uses Zenith components:
+ * - Tabs for category selection
+ * - Card for object options
  */
 
 import { useState } from 'react';
 import * as Icons from 'lucide-react';
+import { Tabs, Card } from '../../../services/zenith-adapter';
 import type { MyGeotabObjectType, ObjectCategory } from '../types/builder.types';
 import { MYGEOTAB_OBJECTS } from '../types/objects.constants';
 
@@ -33,30 +38,22 @@ export function ObjectSelector({ selectedObject, onSelectObject }: ObjectSelecto
     (obj) => obj.category === activeCategory
   );
 
+  const tabs = categories.map((category) => ({
+    id: category,
+    label: categoryLabels[category],
+  }));
+
   return (
-    <div className="space-y-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {/* Category Tabs */}
-      <div className="flex gap-2 border-b border-[#e2e8f0]">
-        {categories.map((category) => {
-          const isActive = activeCategory === category;
-          return (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-3 py-2 text-sm font-medium border-b-2 transition-colors ${
-                isActive
-                  ? 'border-[#003a63] text-[#003a63]'
-                  : 'border-transparent text-[#64748b] hover:text-[#0f172a]'
-              }`}
-            >
-              {categoryLabels[category]}
-            </button>
-          );
-        })}
-      </div>
+      <Tabs
+        tabs={tabs}
+        activeTabId={activeCategory}
+        onTabChange={(id) => setActiveCategory(id as ObjectCategory)}
+      />
 
       {/* Object Cards */}
-      <div className="grid gap-2">
+      <div style={{ display: 'grid', gap: '8px' }}>
         {filteredObjects.map((obj) => {
           const isSelected = selectedObject === obj.type;
           const IconComponent = Icons[obj.icon as keyof typeof Icons] as React.ElementType;
@@ -65,31 +62,44 @@ export function ObjectSelector({ selectedObject, onSelectObject }: ObjectSelecto
             <button
               key={obj.type}
               onClick={() => onSelectObject(obj.type)}
-              className={`flex items-start gap-3 p-3 rounded-lg border text-left transition-all ${
-                isSelected
-                  ? 'border-[#003a63] bg-[#f0f7ff] shadow-sm'
-                  : 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1]'
-              }`}
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px',
+                padding: '12px',
+                borderRadius: '8px',
+                border: isSelected ? '2px solid #003a63' : '1px solid #e2e8f0',
+                backgroundColor: isSelected ? '#f0f7ff' : 'white',
+                textAlign: 'left',
+                cursor: 'pointer',
+              }}
             >
               <div
-                className={`p-2 rounded-lg ${
-                  isSelected ? 'bg-[#003a63] text-white' : 'bg-[#f8fafc] text-[#64748b]'
-                }`}
+                style={{
+                  padding: '8px',
+                  borderRadius: '8px',
+                  backgroundColor: isSelected ? '#003a63' : '#f8fafc',
+                  color: isSelected ? 'white' : '#64748b',
+                }}
               >
-                <IconComponent className="w-4 h-4" />
+                <IconComponent style={{ width: '16px', height: '16px' }} />
               </div>
-              <div className="flex-1 min-w-0">
+              <div style={{ flex: '1', minWidth: 0 }}>
                 <div
-                  className={`text-sm font-medium ${
-                    isSelected ? 'text-[#003a63]' : 'text-[#0f172a]'
-                  }`}
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: isSelected ? '#003a63' : '#0f172a',
+                  }}
                 >
                   {obj.label}
                 </div>
-                <div className="text-xs text-[#64748b] mt-1">{obj.description}</div>
+                <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+                  {obj.description}
+                </div>
               </div>
               {isSelected && (
-                <Icons.Check className="w-4 h-4 text-[#003a63] shrink-0 mt-1" />
+                <Icons.Check style={{ width: '16px', height: '16px', color: '#003a63', flexShrink: 0, marginTop: '4px' }} />
               )}
             </button>
           );

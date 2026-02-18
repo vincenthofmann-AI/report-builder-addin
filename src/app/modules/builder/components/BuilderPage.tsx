@@ -4,9 +4,14 @@
  *
  * Right-side page that displays report preview with layout switching.
  * Shows guided empty states (NO MOCK DATA) and real data when available.
+ *
+ * Uses Zenith components:
+ * - Banner for errors
+ * - HTML table with zen-table class for data display
  */
 
 import { FileX, Loader2, AlertCircle } from 'lucide-react';
+import { Banner } from '../../../services/zenith-adapter';
 import type { LayoutView, ChartType, MyGeotabObjectType, TimeRange } from '../types/builder.types';
 import { ReportPreviewEmpty } from './ReportPreviewEmpty';
 import { estimateQuerySize, getQuerySizeCategory } from '../utils/queryEstimator';

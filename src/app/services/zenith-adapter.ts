@@ -16,17 +16,22 @@
 export {
   // Core components
   Button,
+  ButtonType,
   Card,
   Checkbox,
   Dialog,
   Dropdown,
   Calendar,
   DateRange,
+  Tabs,
+  Banner,
+  Accordion,
 
   // Layout components
   Divider,
 
   // Form components
+  SearchInput,
   type IButton,
   type ICard,
   type ICheckbox,
