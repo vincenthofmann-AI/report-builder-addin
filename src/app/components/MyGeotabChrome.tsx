@@ -13,23 +13,30 @@
  */
 
 import { useState } from "react";
-import { Menu, X, BarChart3, Home, Settings, HelpCircle } from "lucide-react";
+import { Menu, X, BarChart3, Home, Settings, HelpCircle, Map } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 interface MyGeotabChromeProps {
   children: React.ReactNode;
   title?: string;
+  activeView?: "home" | "map" | "reports" | "settings" | "help";
+  onViewChange?: (view: "home" | "map" | "reports" | "settings" | "help") => void;
 }
 
-export function MyGeotabChrome({ children, title = "Reports" }: MyGeotabChromeProps) {
+export function MyGeotabChrome({
+  children,
+  title = "Reports",
+  activeView = "reports",
+  onViewChange,
+}: MyGeotabChromeProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [activeNav, setActiveNav] = useState("reports");
 
   const navItems = [
-    { id: "home", label: "Home", icon: Home },
-    { id: "reports", label: "Reports", icon: BarChart3 },
-    { id: "settings", label: "Settings", icon: Settings },
-    { id: "help", label: "Help", icon: HelpCircle },
+    { id: "home" as const, label: "Home", icon: Home },
+    { id: "map" as const, label: "Map", icon: Map },
+    { id: "reports" as const, label: "Reports", icon: BarChart3 },
+    { id: "settings" as const, label: "Settings", icon: Settings },
+    { id: "help" as const, label: "Help", icon: HelpCircle },
   ];
 
   return (
@@ -63,12 +70,12 @@ export function MyGeotabChrome({ children, title = "Reports" }: MyGeotabChromePr
             <nav className="flex-1 p-4 space-y-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = activeNav === item.id;
+                const isActive = activeView === item.id;
 
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setActiveNav(item.id)}
+                    onClick={() => onViewChange?.(item.id)}
                     className={`
                       w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all
                       ${
