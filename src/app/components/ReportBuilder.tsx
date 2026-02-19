@@ -300,34 +300,25 @@ export function ReportBuilder() {
 
   return (
     <div
-      className="flex flex-col h-screen bg-[#f0f4f8]"
+      className="flex flex-col h-full bg-[#f0f4f8]"
       style={{ fontFamily: "var(--font-family)" }}
     >
       {/* ========== TOOLBAR ========== */}
-      <header className="bg-[#003a63] text-white shrink-0 z-10">
+      <header className="bg-white border-b border-[#e2e8f0] shrink-0 z-10">
         <div className="flex items-center h-12 px-3 lg:px-4 gap-3">
-          {/* Left: Toggle + Branding */}
+          {/* Left: Toggle for Report Outline */}
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setOutlineOpen(!outlineOpen)}
-              className="p-1.5 rounded-md hover:bg-white/10 transition-colors"
+              className="p-1.5 rounded-md hover:bg-[#f0f4f8] transition-colors"
               title={outlineOpen ? "Close outline" : "Open outline"}
             >
               {outlineOpen ? (
-                <PanelLeftClose className="w-4 h-4 text-white/70" />
+                <PanelLeftClose className="w-4 h-4 text-[#003a63]/70" />
               ) : (
-                <PanelLeftOpen className="w-4 h-4 text-white/70" />
+                <PanelLeftOpen className="w-4 h-4 text-[#003a63]/70" />
               )}
             </button>
-            <div className="flex items-center gap-1.5">
-              <Truck className="w-4.5 h-4.5 text-[#78be20]" />
-              <span
-                className="text-[14px] text-white/90 hidden sm:inline"
-                style={{ fontWeight: 600 }}
-              >
-                Report Builder
-              </span>
-            </div>
           </div>
 
           {/* Center: Report name + workflow breadcrumb */}
@@ -342,31 +333,31 @@ export function ReportBuilder() {
                     if (e.key === "Enter") handleSaveName();
                     if (e.key === "Escape") setEditingName(false);
                   }}
-                  className="px-2 py-0.5 rounded bg-white/15 text-white text-[13px] border border-white/20 focus:outline-none focus:border-white/40 w-48"
+                  className="px-2 py-0.5 rounded bg-[#f0f4f8] text-[#003a63] text-[13px] border border-[#cbd5e1] focus:outline-none focus:border-[#003a63]/40 w-48"
                   autoFocus
                 />
                 <button
                   onClick={handleSaveName}
-                  className="p-1 rounded hover:bg-white/10"
+                  className="p-1 rounded hover:bg-[#f0f4f8]"
                 >
                   <Check className="w-3.5 h-3.5 text-[#78be20]" />
                 </button>
                 <button
                   onClick={() => setEditingName(false)}
-                  className="p-1 rounded hover:bg-white/10"
+                  className="p-1 rounded hover:bg-[#f0f4f8]"
                 >
-                  <X className="w-3.5 h-3.5 text-white/50" />
+                  <X className="w-3.5 h-3.5 text-[#64748b]" />
                 </button>
               </div>
             ) : (
               <button
                 onClick={handleStartEditName}
-                className="flex items-center gap-1.5 px-2 py-0.5 rounded hover:bg-white/10 transition-colors max-w-xs truncate group"
+                className="flex items-center gap-1.5 px-2 py-0.5 rounded hover:bg-[#f0f4f8] transition-colors max-w-xs truncate group"
               >
-                <span className="text-[13px] text-white/90 truncate" style={{ fontWeight: 500 }}>
+                <span className="text-[13px] text-[#003a63] truncate" style={{ fontWeight: 500 }}>
                   {reportName}
                 </span>
-                <Pencil className="w-3 h-3 text-white/30 group-hover:text-white/60 shrink-0" />
+                <Pencil className="w-3 h-3 text-[#94a3b8] group-hover:text-[#003a63] shrink-0" />
               </button>
             )}
 
@@ -380,13 +371,13 @@ export function ReportBuilder() {
                   className="hidden lg:flex items-center gap-1 text-[11px]"
                 >
                   <WorkflowDot active={currentStep >= 0} label={selectedSource.name} />
-                  <ArrowRight className="w-2.5 h-2.5 text-white/20" />
+                  <ArrowRight className="w-2.5 h-2.5 text-[#cbd5e1]" />
                   <WorkflowDot active={currentStep >= 1} label={`${selectedColumns.length} cols`} />
-                  <ArrowRight className="w-2.5 h-2.5 text-white/20" />
+                  <ArrowRight className="w-2.5 h-2.5 text-[#cbd5e1]" />
                   <WorkflowDot active={currentStep >= 2} label={filters.length > 0 ? `${filters.length} filters` : "Filters"} />
                   {chartEnabled && (
                     <>
-                      <ArrowRight className="w-2.5 h-2.5 text-white/20" />
+                      <ArrowRight className="w-2.5 h-2.5 text-[#cbd5e1]" />
                       <WorkflowDot active label="Chart" />
                     </>
                   )}
@@ -413,7 +404,7 @@ export function ReportBuilder() {
                         className={`p-1.5 rounded-md transition-all duration-200 ${
                           chartEnabled
                             ? "bg-[#78be20]/20 text-[#78be20] shadow-[inset_0_0_0_1px_rgba(120,190,32,0.3)]"
-                            : "text-white/50 hover:text-white/80 hover:bg-white/10"
+                            : "text-[#64748b] hover:text-[#003a63] hover:bg-[#f0f4f8]"
                         }`}
                       >
                         <BarChart3 className="w-4 h-4" />
@@ -434,7 +425,7 @@ export function ReportBuilder() {
                         transition={{ duration: 0.2 }}
                         className="overflow-hidden"
                       >
-                        <div className="flex items-center ml-1 gap-0.5 bg-white/10 rounded-md p-0.5">
+                        <div className="flex items-center ml-1 gap-0.5 bg-[#f0f4f8] rounded-md p-0.5">
                           {chartOptions.map((opt) => (
                             <Tooltip key={opt.type}>
                               <TooltipTrigger asChild>
@@ -442,8 +433,8 @@ export function ReportBuilder() {
                                   onClick={() => setChartType(opt.type)}
                                   className={`p-1 rounded transition-all duration-150 ${
                                     chartType === opt.type
-                                      ? "bg-white/20 text-white shadow-sm"
-                                      : "text-white/40 hover:text-white/70"
+                                      ? "bg-white text-[#003a63] shadow-sm"
+                                      : "text-[#94a3b8] hover:text-[#003a63]"
                                   }`}
                                 >
                                   <opt.icon className="w-3.5 h-3.5" />
@@ -460,14 +451,14 @@ export function ReportBuilder() {
               )}
             </AnimatePresence>
 
-            <div className="w-px h-5 bg-white/15 mx-1 hidden sm:block" />
+            <div className="w-px h-5 bg-[#e2e8f0] mx-1 hidden sm:block" />
 
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   onClick={handleSave}
                   disabled={!selectedSource}
-                  className="p-1.5 rounded-md text-white/50 hover:text-white/80 hover:bg-white/10 transition-colors disabled:opacity-30 disabled:pointer-events-none"
+                  className="p-1.5 rounded-md text-[#64748b] hover:text-[#003a63] hover:bg-[#f0f4f8] transition-colors disabled:opacity-30 disabled:pointer-events-none"
                 >
                   <Save className="w-4 h-4" />
                 </button>
@@ -480,7 +471,7 @@ export function ReportBuilder() {
                 <button
                   onClick={handleExport}
                   disabled={!selectedSource || filteredData.length === 0}
-                  className="p-1.5 rounded-md text-white/50 hover:text-white/80 hover:bg-white/10 transition-colors disabled:opacity-30 disabled:pointer-events-none"
+                  className="p-1.5 rounded-md text-[#64748b] hover:text-[#003a63] hover:bg-[#f0f4f8] transition-colors disabled:opacity-30 disabled:pointer-events-none"
                 >
                   <Download className="w-4 h-4" />
                 </button>
@@ -491,9 +482,9 @@ export function ReportBuilder() {
             {/* Connection indicator */}
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="hidden md:flex items-center gap-1.5 ml-1 pl-2 border-l border-white/15 cursor-default">
+                <div className="hidden md:flex items-center gap-1.5 ml-1 pl-2 border-l border-[#e2e8f0] cursor-default">
                   <div className={`w-1.5 h-1.5 rounded-full ${isLive ? "bg-[#78be20]" : "bg-amber-400 animate-pulse"}`} />
-                  <span className="text-[11px] text-white/40">
+                  <span className="text-[11px] text-[#94a3b8]">
                     {isLive ? "Live" : "Demo"}
                   </span>
                 </div>
@@ -680,8 +671,8 @@ function WorkflowDot({ active, label }: { active: boolean; label: string }) {
     <span
       className={`px-1.5 py-0.5 rounded transition-all duration-200 ${
         active
-          ? "bg-white/15 text-white/80"
-          : "text-white/30"
+          ? "bg-[#f0f4f8] text-[#003a63]"
+          : "text-[#94a3b8]"
       }`}
       style={{ fontWeight: active ? 500 : 400 }}
     >
