@@ -52,7 +52,7 @@ export function FieldPillV2({
 
   return (
     <div
-      ref={drag}
+      ref={drag as unknown as React.Ref<HTMLDivElement>}
       className={`field-pill-v2 ${
         field.type === "measure" ? "field-pill-v2--measure" : "field-pill-v2--dimension"
       } ${isDragging ? "field-pill-v2--dragging" : ""}`}

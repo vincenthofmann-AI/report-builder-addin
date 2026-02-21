@@ -3,7 +3,6 @@
  * Displays 5 insight categories as large cards
  */
 
-import { Card } from "@geotab/zenith";
 import { INSIGHT_CATEGORIES, type InsightCategory } from "../data/templates";
 import "./insight-category-selector.css";
 

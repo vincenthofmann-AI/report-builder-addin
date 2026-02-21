@@ -82,7 +82,7 @@ export function InsightSelector({
     <div className="insight-selector">
       {/* Header */}
       <div className="insight-selector__header">
-        <Button variant="tertiary" size="small" onClick={onBack}>
+        <Button size="small" onClick={onBack}>
           ← Back to Categories
         </Button>
         <h1 className="insight-selector__title">
@@ -95,7 +95,7 @@ export function InsightSelector({
       <div className="insight-selector__search">
         <SearchInput
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(value) => setSearchQuery(value)}
           placeholder="Search templates..."
         />
       </div>

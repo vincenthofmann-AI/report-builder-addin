@@ -134,8 +134,8 @@ function generateTrips(): GeotabTrip[] {
     const idlingDuration = Math.round(Math.random() * 30);
     trips.push({
       id: `trip-${i + 1}`,
-      device: devices[deviceIdx].name,
-      driver: drivers[driverIdx],
+      device: devices[deviceIdx]!.name,
+      driver: drivers[driverIdx]!,
       start: randomDate(new Date("2026-01-01"), new Date("2026-02-14")),
       stop: randomDate(new Date("2026-01-01"), new Date("2026-02-14")),
       distance,
@@ -156,13 +156,13 @@ function generateFuelTransactions(): GeotabFuelTransaction[] {
     const deviceIdx = i % devices.length;
     transactions.push({
       id: `fuel-${i + 1}`,
-      device: devices[deviceIdx].name,
-      driver: drivers[i % drivers.length],
+      device: devices[deviceIdx]!.name,
+      driver: drivers[i % drivers.length]!,
       dateTime: randomDate(new Date("2026-01-01"), new Date("2026-02-14")),
       volume: Math.round((Math.random() * 150 + 30) * 10) / 10,
       cost: Math.round((Math.random() * 250 + 40) * 100) / 100,
       odometer: Math.round(Math.random() * 100000 + 20000),
-      location: locations[i % locations.length],
+      location: locations[i % locations.length]!,
     });
   }
   return transactions.sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
@@ -173,8 +173,8 @@ function generateDriverBehavior(): GeotabDriverBehavior[] {
   for (let i = 0; i < 40; i++) {
     records.push({
       id: `db-${i + 1}`,
-      device: devices[i % devices.length].name,
-      driver: drivers[i % drivers.length],
+      device: devices[i % devices.length]!.name,
+      driver: drivers[i % drivers.length]!,
       date: randomDate(new Date("2026-01-01"), new Date("2026-02-14")),
       harshBraking: Math.floor(Math.random() * 8),
       harshAcceleration: Math.floor(Math.random() * 6),
@@ -194,14 +194,14 @@ function generateMaintenance(): GeotabMaintenanceRecord[] {
   for (let i = 0; i < 35; i++) {
     records.push({
       id: `maint-${i + 1}`,
-      device: devices[i % devices.length].name,
+      device: devices[i % devices.length]!.name,
       dateTime: randomDate(new Date("2025-10-01"), new Date("2026-02-14")),
-      type: types[i % types.length],
-      description: `${types[i % types.length]} for ${devices[i % devices.length].name}`,
+      type: types[i % types.length]!,
+      description: `${types[i % types.length]} for ${devices[i % devices.length]!.name}`,
       cost: Math.round((Math.random() * 500 + 50) * 100) / 100,
       odometer: Math.round(Math.random() * 100000 + 20000),
-      provider: providers[i % providers.length],
-      status: statuses[Math.floor(Math.random() * statuses.length)],
+      provider: providers[i % providers.length]!,
+      status: statuses[Math.floor(Math.random() * statuses.length)]!,
     });
   }
   return records.sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
@@ -222,16 +222,16 @@ function generateFaults(): GeotabFault[] {
   const statuses: GeotabFault["status"][] = ["Active", "Resolved", "Pending"];
   const faults: GeotabFault[] = [];
   for (let i = 0; i < 30; i++) {
-    const fault = faultCodes[i % faultCodes.length];
+    const fault = faultCodes[i % faultCodes.length]!;
     faults.push({
       id: `fault-${i + 1}`,
-      device: devices[i % devices.length].name,
+      device: devices[i % devices.length]!.name,
       dateTime: randomDate(new Date("2026-01-01"), new Date("2026-02-14")),
       code: fault.code,
       description: fault.description,
-      severity: severities[Math.floor(Math.random() * severities.length)],
+      severity: severities[Math.floor(Math.random() * severities.length)]!,
       source: fault.source,
-      status: statuses[Math.floor(Math.random() * statuses.length)],
+      status: statuses[Math.floor(Math.random() * statuses.length)]!,
     });
   }
   return faults.sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());

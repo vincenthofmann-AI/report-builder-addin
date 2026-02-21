@@ -192,7 +192,7 @@ export function GeotabProvider({ children }: { children: ReactNode }) {
     window.addEventListener(GEOTAB_BLUR_EVENT, handleBlur);
 
     // Check if lifecycle already fired before React mounted (race condition)
-    const win = window as Record<string, unknown>;
+    const win = window as unknown as Record<string, unknown>;
     if (win.__geotabAddinApi && !initialized) {
       handleInit(
         new CustomEvent(GEOTAB_INIT_EVENT, {

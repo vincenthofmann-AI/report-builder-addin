@@ -11,8 +11,11 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 // Fix Leaflet default marker icon issue with Vite
+// @ts-ignore - Vite handles image imports
 import iconUrl from "leaflet/dist/images/marker-icon.png";
+// @ts-ignore - Vite handles image imports
 import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
+// @ts-ignore - Vite handles image imports
 import shadowUrl from "leaflet/dist/images/marker-shadow.png";
 
 // Configure default marker icons

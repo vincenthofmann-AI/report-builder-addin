@@ -33,7 +33,7 @@ export function FieldPill({ field, onRemove, aggregation }: FieldPillProps) {
 
   return (
     <div
-      ref={drag}
+      ref={drag as unknown as React.Ref<HTMLDivElement>}
       className={`field-pill ${field.type === "measure" ? "field-pill--measure" : "field-pill--dimension"} ${
         isDragging ? "field-pill--dragging" : ""
       }`}

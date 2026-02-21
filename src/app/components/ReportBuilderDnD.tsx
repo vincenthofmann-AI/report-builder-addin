@@ -8,14 +8,15 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { FieldPill, type Field } from "./dnd/FieldPill";
 import { DropZone } from "./dnd/DropZone";
+import { type Aggregation } from "./dnd/FieldPillV2";
 import { ReportTable } from "../modules/canvas/ReportTable";
 import { useDataFetcher } from "../services/data-fetcher";
-import type { DataSourceDef, ColumnDef } from "../services/geotab-mock";
+import type { DataSourceDef } from "../services/geotab-mock";
 import "./report-builder-dnd.css";
 
 interface DroppedField {
   field: Field;
-  aggregation?: string;
+  aggregation?: Aggregation;
 }
 
 export function ReportBuilderDnD() {

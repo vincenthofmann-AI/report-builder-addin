@@ -17,7 +17,7 @@
  * (and 15 more)
  */
 
-import type { ChartType } from "../components/ChartView";
+import type { ChartType } from "../modules/canvas/ChartView";
 
 /**
  * Date Range Configuration

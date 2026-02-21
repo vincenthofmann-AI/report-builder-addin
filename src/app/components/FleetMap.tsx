@@ -18,7 +18,6 @@
 import { useState, useCallback } from "react";
 import {
   Search,
-  MapPin,
   Navigation,
   Play,
   Pause,
@@ -235,7 +234,7 @@ export function FleetMap() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
                 <SearchInput
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(value) => setSearchQuery(value)}
                   placeholder="Search vehicles or drivers..."
                   className="w-full pl-10"
                 />
@@ -289,7 +288,6 @@ export function FleetMap() {
                 <div className="space-y-1">
                   {filteredVehicles.map((vehicle) => {
                     const config = statusConfig[vehicle.status];
-                    const Icon = config.icon;
                     const isSelected = selectedVehicles.has(vehicle.id);
 
                     return (

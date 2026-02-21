@@ -43,7 +43,7 @@ export function DropZone({
 
   return (
     <div
-      ref={drop}
+      ref={drop as unknown as React.Ref<HTMLDivElement>}
       className={`drop-zone ${isOver && canDrop ? "drop-zone--hover" : ""} ${
         !canDrop && isOver ? "drop-zone--invalid" : ""
       }`}

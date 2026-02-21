@@ -29,7 +29,7 @@ import {
   X,
 } from "lucide-react";
 import type { ReportTemplateDef } from "../../services/report-templates";
-import type { FilterRule } from "./FilterBar";
+import type { FilterRule } from "../configuration/FilterBar";
 import { ReportTable } from "./ReportTable";
 import { ChartView } from "./ChartView";
 import { ReportActions } from "./ReportActions";

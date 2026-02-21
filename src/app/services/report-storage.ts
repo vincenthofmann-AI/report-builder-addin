@@ -170,8 +170,8 @@ export async function loadReportById(
       return null;
     }
 
-    const report = JSON.parse(results[0].data) as SavedReport;
-    report.id = results[0].id || report.id;
+    const report = JSON.parse(results[0]!.data) as SavedReport;
+    report.id = results[0]!.id || report.id;
     return report;
   } catch (error) {
     console.error("Failed to load report by ID:", error);

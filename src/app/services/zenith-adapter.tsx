@@ -208,7 +208,7 @@ export interface ZenithAddInCallbacks {
  */
 export function registerAddIn(callbacks: ZenithAddInCallbacks): void {
   if (typeof window !== "undefined") {
-    (window as Record<string, unknown>).__zenithAddInCallbacks = callbacks;
+    (window as unknown as Record<string, unknown>).__zenithAddInCallbacks = callbacks;
   }
 
   if (callbacks.initialize) {
