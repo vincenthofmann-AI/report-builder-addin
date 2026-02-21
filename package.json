@@ -7,7 +7,12 @@
     "build": "vite build",
     "build:addin": "vite build && echo 'Add-in bundle ready in docs/. Commit and push to deploy via GitHub Pages.'",
     "dev": "vite",
-    "deploy": "npm run build && git add docs/ && git commit -m 'Deploy: update GitHub Pages build' && git push"
+    "deploy": "npm run build && git add docs/ && git commit -m 'Deploy: update GitHub Pages build' && git push",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@geotab/zenith": "^3.5.0",
@@ -26,9 +31,19 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.1.12",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "4.7.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/ui": "^4.0.18",
+    "jsdom": "^28.1.0",
     "tailwindcss": "4.1.12",
-    "vite": "6.3.5"
+    "typescript": "^5.9.3",
+    "vite": "6.3.5",
+    "vitest": "^4.0.18"
   },
   "peerDependencies": {
     "react": "18.3.1",
