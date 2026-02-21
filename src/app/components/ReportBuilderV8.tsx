@@ -153,41 +153,29 @@ export function ReportBuilderV8() {
     }));
   };
 
-  // Run Query
-  const runQuery = (preview = false) => {
+  // Run full query
+  const runQuery = () => {
     if (!query.dataSource) {
-      console.log("No data source selected");
       return;
     }
 
-    console.log("Running query for:", query.dataSource.id);
     setIsLoading(true);
-    setIsPreview(preview);
+    setIsPreview(false);
     const startTime = performance.now();
 
     dataFetcher
       .fetchDataSource(query.dataSource.id)
       .then((data) => {
-        console.log("Fetched data:", data.length, "rows");
         const endTime = performance.now();
-        // Apply filters
         let filteredData = applyFilters(data);
-        console.log("After filters:", filteredData.length, "rows");
 
-        // Apply grouping and aggregation if configured
         if (query.groupBy.length > 0 || query.metrics.length > 0) {
           filteredData = applyGrouping(filteredData);
-          console.log("After grouping:", filteredData.length, "rows");
         }
 
-        // Limit for preview
-        if (preview) {
-          filteredData = filteredData.slice(0, PREVIEW_ROWS);
-        } else {
-          filteredData = filteredData.slice(0, query.limit);
-        }
+        // Full query: Up to limit
+        filteredData = filteredData.slice(0, query.limit);
 
-        console.log("Final data:", filteredData.length, "rows", filteredData);
         setRawData(filteredData);
         setLastRunTime(Math.round(endTime - startTime));
         setIsLoading(false);
@@ -198,6 +186,38 @@ export function ReportBuilderV8() {
         setIsLoading(false);
       });
   };
+
+  // Auto-load preview when data source changes (Salesforce pattern)
+  useEffect(() => {
+    if (!query.dataSource || rawData.length > 0) return;
+
+    setIsLoading(true);
+    setIsPreview(true);
+    const startTime = performance.now();
+
+    dataFetcher
+      .fetchDataSource(query.dataSource.id)
+      .then((data) => {
+        const endTime = performance.now();
+        let filteredData = applyFilters(data);
+
+        if (query.groupBy.length > 0 || query.metrics.length > 0) {
+          filteredData = applyGrouping(filteredData);
+        }
+
+        // Preview: First 10 rows
+        filteredData = filteredData.slice(0, PREVIEW_ROWS);
+
+        setRawData(filteredData);
+        setLastRunTime(Math.round(endTime - startTime));
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching preview:", error);
+        setRawData([]);
+        setIsLoading(false);
+      });
+  }, [query.dataSource]);
 
   // Apply filters to data
   const applyFilters = (data: any[]) => {
@@ -415,11 +435,11 @@ export function ReportBuilderV8() {
           {!isLive && isReady && <span className="rb8__badge rb8__badge--demo">Demo</span>}
         </div>
         <div className="rb8__header-controls">
-          <Button variant="secondary" onClick={() => runQuery(true)} disabled={!query.dataSource || isLoading}>
-            👁️ Preview ({PREVIEW_ROWS} rows)
-          </Button>
-          <Button variant="primary" onClick={() => runQuery(false)} disabled={!query.dataSource || isLoading}>
-            {isLoading ? "⟳ Running..." : "⚡ Run Query"}
+          {isPreview && entities.length > 0 && (
+            <span className="rb8__preview-badge">Preview ({entities.length} rows)</span>
+          )}
+          <Button variant="primary" onClick={runQuery} disabled={!query.dataSource || isLoading}>
+            {isLoading ? "⟳ Running..." : isPreview ? "⚡ Run Full Query" : "✓ Refresh"}
           </Button>
           {lastRunTime !== null && !isLoading && (
             <span className="rb8__run-time">{lastRunTime}ms</span>
@@ -703,11 +723,10 @@ export function ReportBuilderV8() {
         {/* Panel 3: Results */}
         <aside className="rb8__results">
           <div className="rb8__results-header">
-            <h2 className="rb8__results-title">Results</h2>
+            <h2 className="rb8__results-title">{isPreview ? "Preview" : "Results"}</h2>
             {entities.length > 0 && (
               <span className="rb8__results-count">
                 {entities.length.toLocaleString()} rows
-                {isPreview && " (preview)"}
               </span>
             )}
           </div>
@@ -724,11 +743,13 @@ export function ReportBuilderV8() {
 
               return (!tableConfig || entities.length === 0) ? (
                 <div className="rb8__empty">
-                  <div className="rb8__empty-title">No results</div>
+                  <div className="rb8__empty-title">
+                    {!query.dataSource ? "No data source selected" : "Loading preview..."}
+                  </div>
                   <div className="rb8__empty-subtitle">
                     {!query.dataSource
-                      ? "Select a data source to get started"
-                      : "Click \"Run Query\" to see data"}
+                      ? "Select a data source to see a preview"
+                      : "Preview will load automatically"}
                   </div>
                 </div>
               ) : (
