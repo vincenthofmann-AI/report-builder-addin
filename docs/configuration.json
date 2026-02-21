@@ -1,17 +1,21 @@
 {
   "name": "Report Builder",
-  "supportEmail": "support@geotab.com",
-  "version": "2.0.0",
-  "items": [{
-    "page": "reportBuilder",
-    "url": "https://vincenthofmann-ai.github.io/report-builder-addin/index.html?v=2.0.0",
-    "path": "ActivityLink",
-    "menuName": {
-      "en": "Report Builder",
-      "fr": "Générateur de Rapports",
-      "es": "Generador de Informes",
-      "de": "Berichtsgenerator"
+  "supportEmail": "support@your-company.com",
+  "version": "1.0.0",
+  "items": [
+    {
+      "url": "index.html",
+      "path": "ActivityLink/",
+      "menuName": {
+        "en": "Report Builder",
+        "fr": "Constructeur de rapports",
+        "es": "Constructor de informes",
+        "de": "Berichtsgenerator"
+      },
+      "icon": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='2' width='24' height='28' rx='3' fill='%23003a63'/%3E%3Crect x='8' y='18' width='4' height='8' rx='1' fill='%2378be20'/%3E%3Crect x='14' y='14' width='4' height='12' rx='1' fill='%2378be20' opacity='.7'/%3E%3Crect x='20' y='10' width='4' height='16' rx='1' fill='%2378be20' opacity='.4'/%3E%3Crect x='8' y='6' width='16' height='2' rx='1' fill='%23fff' opacity='.3'/%3E%3C/svg%3E"
     }
-  }],
-  "isSigned": false
+  ],
+  "isSigned": false,
+  "signature": "",
+  "files": {}
 }

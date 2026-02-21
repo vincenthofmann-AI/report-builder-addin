@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   BarChart,
   Bar,
@@ -16,6 +17,7 @@ import {
 import { type ColumnDef } from "../../services/geotab-mock";
 import { BarChart3, SlidersHorizontal } from "lucide-react";
 import { motion } from "motion/react";
+import { DrillDownPopup } from "./DrillDownPopup";
 
 const CHART_COLORS = [
   "#003a63",
@@ -67,6 +69,34 @@ export function ChartView({
   aggregateColumn,
   aggregateFn,
 }: ChartViewProps) {
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    groupName: string;
+    filteredData: Record<string, unknown>[];
+  }>({
+    isOpen: false,
+    groupName: "",
+    filteredData: [],
+  });
+
+  const handleChartClick = (groupName: string) => {
+    // Filter data to show only records matching the clicked group
+    const filtered = data.filter((row) => {
+      const groupVal = String(row[groupByColumn!] || "Unknown");
+      return groupVal === groupName || (groupVal.length > 18 && groupVal.startsWith(groupName.replace("...", "")));
+    });
+
+    setDrillDown({
+      isOpen: true,
+      groupName,
+      filteredData: filtered,
+    });
+  };
+
+  const closeDrillDown = () => {
+    setDrillDown({ isOpen: false, groupName: "", filteredData: [] });
+  };
+
   if (!groupByColumn || !aggregateColumn || data.length === 0) {
     return (
       <motion.div
