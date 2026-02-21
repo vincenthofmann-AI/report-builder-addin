@@ -75,7 +75,7 @@ export function ReportBuilderV8() {
   const dataSources = dataFetcher.getDataSources() || [];
 
   // Query State
-  const [query, setQuery] = useState<ReportQuery>({
+  const [query, setQuery] = useState<ReportQuery>(() => ({
     dataSource: dataSources.length > 0 ? dataSources[0] : null,
     selectedFields: [],
     timeFilter: null,
@@ -84,7 +84,7 @@ export function ReportBuilderV8() {
     metrics: [],
     chartType: "table",
     limit: 50,
-  });
+  }));
 
   // Data State
   const [rawData, setRawData] = useState<any[]>([]);
@@ -485,7 +485,7 @@ export function ReportBuilderV8() {
                       className="rb8__select"
                     >
                       <option value="">No time filter</option>
-                      {timeColumns.map((col) => (
+                      {(timeColumns || []).map((col) => (
                         <option key={col.key} value={col.key}>
                           {col.label}
                         </option>
@@ -538,7 +538,7 @@ export function ReportBuilderV8() {
                       className="rb8__select"
                     >
                       <option value="">No grouping</option>
-                      {groupableFields.map((col) => (
+                      {(groupableFields || []).map((col) => (
                         <option key={col.key} value={col.key}>
                           {col.label}
                         </option>
@@ -609,7 +609,7 @@ export function ReportBuilderV8() {
                         }}
                         className="rb8__select rb8__select--small"
                       >
-                        {aggregatableFields.map((f) => (
+                        {(aggregatableFields || []).map((f) => (
                           <option key={f.key} value={f.key}>
                             {f.label}
                           </option>
