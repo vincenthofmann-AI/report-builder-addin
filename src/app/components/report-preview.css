@@ -1,0 +1,134 @@
+.report-preview {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+/* Title Bar (Figma Pattern) */
+.report-preview__title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: #fafafa;
+  border-bottom: 1px solid #e0e0e0;
+  gap: 16px;
+}
+
+.report-preview__title-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.report-preview__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.report-preview__badge {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #1a73e8;
+  background: #e8f0fe;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.report-preview__usage {
+  font-size: 13px;
+  color: #5f6368;
+}
+
+.report-preview__title-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Tabs */
+.report-preview__tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0 16px;
+  background-color: #fafafa;
+}
+
+.report-preview__tab {
+  position: relative;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #5f6368;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.report-preview__tab:hover {
+  color: #1a1a1a;
+  background-color: #f5f5f5;
+}
+
+.report-preview__tab--active {
+  color: #1976d2;
+  border-bottom-color: #1976d2;
+  background-color: #fff;
+}
+
+/* Content Area */
+.report-preview__content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.report-preview__table {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.report-preview__chart {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.report-preview__empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 32px;
+}
+
+.report-preview__empty-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.report-preview__empty-subtitle {
+  font-size: 14px;
+  color: #5f6368;
+}
