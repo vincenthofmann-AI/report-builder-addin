@@ -4,7 +4,7 @@
  * Version: 8.0.1
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Table,
   type IListColumn,
