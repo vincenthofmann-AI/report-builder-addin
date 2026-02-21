@@ -94,6 +94,11 @@ export function ReportBuilderV8() {
   // Field search
   const [fieldSearch, setFieldSearch] = useState("");
 
+  // Save modal
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [reportName, setReportName] = useState("");
+  const [savedReports, setSavedReports] = useState<Array<{ id: string; name: string; query: ReportQuery }>>([]);
+
   // Available fields from selected data source
   const availableFields = useMemo(() => {
     if (!query.dataSource) return [];
@@ -185,6 +190,49 @@ export function ReportBuilderV8() {
         setRawData([]);
         setIsLoading(false);
       });
+  };
+
+  // Load saved reports on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('geotab-saved-reports');
+    if (saved) {
+      try {
+        setSavedReports(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to load saved reports:', e);
+      }
+    }
+  }, []);
+
+  // Save report
+  const saveReport = () => {
+    if (!reportName.trim()) return;
+
+    const newReport = {
+      id: `report-${Date.now()}`,
+      name: reportName.trim(),
+      query: { ...query },
+    };
+
+    const updated = [...savedReports, newReport];
+    setSavedReports(updated);
+    localStorage.setItem('geotab-saved-reports', JSON.stringify(updated));
+
+    setShowSaveModal(false);
+    setReportName("");
+  };
+
+  // Load report
+  const loadReport = (savedQuery: ReportQuery) => {
+    setQuery(savedQuery);
+    setRawData([]);
+  };
+
+  // Delete report
+  const deleteReport = (id: string) => {
+    const updated = savedReports.filter(r => r.id !== id);
+    setSavedReports(updated);
+    localStorage.setItem('geotab-saved-reports', JSON.stringify(updated));
   };
 
   // Auto-load preview when data source changes (Salesforce pattern)
@@ -313,52 +361,32 @@ export function ReportBuilderV8() {
 
   // Build table columns
   const tableColumns: IListColumn<ReportRow>[] = useMemo(() => {
-    console.log("=== TABLE COLUMNS BUILDING ===");
-    console.log("query.dataSource:", query.dataSource?.name);
-    console.log("rawData.length:", rawData.length);
-
-    if (!query.dataSource) {
-      console.log("No data source, returning []");
-      return [];
-    }
+    if (!query.dataSource) return [];
 
     // Show selected fields, or all if none selected
     const fieldsToShow = query.selectedFields.length > 0
       ? query.selectedFields
       : query.dataSource.columns.map((c) => c.key);
 
-    console.log("fieldsToShow:", fieldsToShow);
-    console.log("query.selectedFields:", query.selectedFields);
-    console.log("query.groupBy:", query.groupBy);
-    console.log("query.metrics:", query.metrics);
-
     // If grouping, show group fields + metrics
     const columnsToShow = query.groupBy.length > 0 || query.metrics.length > 0
       ? [...query.groupBy, ...query.metrics.map((m) => m.label)]
       : fieldsToShow;
 
-    console.log("columnsToShow:", columnsToShow);
-    console.log("query.dataSource.columns:", query.dataSource.columns);
+    const withMetrics = query.dataSource.columns
+      .filter((col) => columnsToShow.includes(col.key) || columnsToShow.includes(col.label))
+      .concat(
+        query.metrics.map((m) => ({
+          key: m.label,
+          label: m.label,
+          type: "number",
+          filterable: false,
+          sortable: true,
+          aggregatable: false,
+        }))
+      );
 
-    const filtered = query.dataSource.columns
-      .filter((col) => columnsToShow.includes(col.key) || columnsToShow.includes(col.label));
-
-    console.log("Filtered columns:", filtered.length, filtered);
-
-    const withMetrics = filtered.concat(
-      query.metrics.map((m) => ({
-        key: m.label,
-        label: m.label,
-        type: "number",
-        filterable: false,
-        sortable: true,
-        aggregatable: false,
-      }))
-    );
-
-    console.log("With metrics:", withMetrics.length);
-
-    const tableColumns = withMetrics.map((col) => {
+    return withMetrics.map((col) => {
       // Sanitize column ID - Zenith doesn't handle special characters well
       const sanitizedId = (col.key || col.label).replace(/[^a-zA-Z0-9_]/g, '_');
 
@@ -393,25 +421,12 @@ export function ReportBuilderV8() {
         },
       };
     });
-
-    console.log("Final tableColumns:", tableColumns.length, tableColumns);
-    console.log("=== END TABLE COLUMNS ===");
-
-    return tableColumns;
   }, [query, rawData]);
 
   const tableConfig: ITable<ReportRow> | null = useMemo(() => {
-    console.log("=== TABLE CONFIG ===");
-    console.log("tableColumns.length:", tableColumns.length);
-    console.log("entities.length:", entities.length);
-    console.log("isLoading:", isLoading);
+    if (tableColumns.length === 0) return null;
 
-    if (tableColumns.length === 0) {
-      console.log("tableColumns is empty, returning null");
-      return null;
-    }
-
-    const config = {
+    return {
       entities,
       columns: tableColumns,
       isLoading,
@@ -423,11 +438,6 @@ export function ReportBuilderV8() {
       },
       height: "100%",
     };
-
-    console.log("tableConfig created:", config);
-    console.log("=== END TABLE CONFIG ===");
-
-    return config;
   }, [entities, tableColumns, isLoading]);
 
   return (
@@ -443,6 +453,9 @@ export function ReportBuilderV8() {
           {isPreview && entities.length > 0 && (
             <span className="rb8__preview-badge">Preview ({entities.length} rows)</span>
           )}
+          <Button variant="secondary" onClick={() => setShowSaveModal(true)} disabled={!query.dataSource}>
+            💾 Save Report
+          </Button>
           <Button variant="primary" onClick={runQuery} disabled={!query.dataSource || isLoading}>
             {isLoading ? "⟳ Running..." : isPreview ? "⚡ Run Full Query" : "✓ Refresh"}
           </Button>
@@ -456,6 +469,40 @@ export function ReportBuilderV8() {
       <div className="rb8__body">
         {/* Panel 1: Data Source & Fields */}
         <aside className="rb8__sidebar">
+          {/* Saved Reports */}
+          {savedReports.length > 0 && (
+            <>
+              <div className="rb8__section">
+                <div className="rb8__section-header">
+                  <span className="rb8__section-icon">📑</span>
+                  <span className="rb8__section-title">Saved Reports</span>
+                  <span className="rb8__section-count">{savedReports.length}</span>
+                </div>
+                <div className="rb8__saved-reports">
+                  {savedReports.map((saved) => (
+                    <div key={saved.id} className="rb8__saved-report">
+                      <button
+                        className="rb8__saved-report-name"
+                        onClick={() => loadReport(saved.query)}
+                        title={`Load ${saved.name}`}
+                      >
+                        {saved.name}
+                      </button>
+                      <button
+                        className="rb8__saved-report-delete"
+                        onClick={() => deleteReport(saved.id)}
+                        title="Delete"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <Divider />
+            </>
+          )}
+
           <div className="rb8__section">
             <div className="rb8__section-header">
               <span className="rb8__section-icon">📊</span>
@@ -737,37 +784,66 @@ export function ReportBuilderV8() {
           </div>
 
           <div className="rb8__results-content">
-            {(() => {
-              console.log("=== RENDER CONDITION ===");
-              console.log("tableConfig:", tableConfig);
-              console.log("entities.length:", entities.length);
-              console.log("!tableConfig:", !tableConfig);
-              console.log("entities.length === 0:", entities.length === 0);
-              console.log("Should show empty?:", !tableConfig || entities.length === 0);
-              console.log("=== END RENDER CONDITION ===");
-
-              return (!tableConfig || entities.length === 0) ? (
-                <div className="rb8__empty">
-                  <div className="rb8__empty-title">
-                    {!query.dataSource ? "No data source selected" : "Loading preview..."}
-                  </div>
-                  <div className="rb8__empty-subtitle">
-                    {!query.dataSource
-                      ? "Select a data source to see a preview"
-                      : "Preview will load automatically"}
-                  </div>
+            {!tableConfig || entities.length === 0 ? (
+              <div className="rb8__empty">
+                <div className="rb8__empty-title">
+                  {!query.dataSource ? "No data source selected" : isLoading ? "Loading..." : "No results"}
                 </div>
-              ) : (
-                <Card style={{ height: "100%", padding: 0, overflow: "hidden" }}>
-                  <Table {...tableConfig}>
-                    <Table.Pagination rowsPerPage={50} />
-                  </Table>
-                </Card>
-              );
-            })()}
+                <div className="rb8__empty-subtitle">
+                  {!query.dataSource
+                    ? "Select a data source to see a preview"
+                    : isLoading
+                      ? "Fetching data..."
+                      : "No data available"}
+                </div>
+              </div>
+            ) : (
+              <Card style={{ height: "100%", padding: 0, overflow: "hidden" }}>
+                <Table key={`table-${entities.length}`} {...tableConfig}>
+                  <Table.Pagination rowsPerPage={50} />
+                </Table>
+              </Card>
+            )}
           </div>
         </aside>
       </div>
+
+      {/* Save Modal */}
+      {showSaveModal && (
+        <div className="rb8__modal-overlay" onClick={() => setShowSaveModal(false)}>
+          <div className="rb8__modal" onClick={(e) => e.stopPropagation()}>
+            <div className="rb8__modal-header">
+              <h2>Save Report</h2>
+              <button className="rb8__modal-close" onClick={() => setShowSaveModal(false)}>
+                ×
+              </button>
+            </div>
+            <div className="rb8__modal-body">
+              <label className="rb8__modal-label">Report Name</label>
+              <input
+                type="text"
+                className="rb8__modal-input"
+                value={reportName}
+                onChange={(e) => setReportName(e.target.value)}
+                placeholder="e.g., Monthly Fleet Summary"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') saveReport();
+                  if (e.key === 'Escape') setShowSaveModal(false);
+                }}
+              />
+            </div>
+            <div className="rb8__modal-footer">
+              <Button variant="secondary" onClick={() => setShowSaveModal(false)}>
+                Cancel
+              </Button>
+              <Button variant="primary" onClick={saveReport} disabled={!reportName.trim()}>
+                Save
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

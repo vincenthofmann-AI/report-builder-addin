@@ -1,10 +1,10 @@
 {
   "name": "Report Builder",
   "supportEmail": "support@geotab.com",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "items": [{
     "page": "reportBuilder",
-    "url": "https://vincenthofmann-ai.github.io/report-builder-addin/index.html?v=1.0.2",
+    "url": "https://vincenthofmann-ai.github.io/report-builder-addin/index.html?v=1.0.3",
     "path": "ActivityLink",
     "menuName": {
       "en": "Report Builder",
