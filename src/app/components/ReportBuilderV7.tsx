@@ -589,9 +589,12 @@ export function ReportBuilderV7() {
   const tableColumns: IListColumn<ReportRow>[] = useMemo(() => {
     if (!selectedSource) return [];
 
-    return selectedSource.columns
-      .filter((col) => selectedColumns.includes(col.key))
-      .map((col) => ({
+    // Show all columns if none are specifically selected, otherwise filter to selected
+    const columnsToShow = selectedColumns.length > 0
+      ? selectedSource.columns.filter((col) => selectedColumns.includes(col.key))
+      : selectedSource.columns;
+
+    return columnsToShow.map((col) => ({
         id: col.key,
         title: col.label,
         sortable: true,
@@ -886,11 +889,15 @@ export function ReportBuilderV7() {
             </div>
 
             <div className="ga__output-content">
-              {selectedColumns.length === 0 ? (
+              {!selectedSource || entities.length === 0 ? (
                 <div className="ga__empty">
-                  <div className="ga__empty-title">No data configured</div>
+                  <div className="ga__empty-title">
+                    {!selectedSource ? "No data source selected" : "No data available"}
+                  </div>
                   <div className="ga__empty-subtitle">
-                    Drag dimensions and metrics to build your report
+                    {!selectedSource
+                      ? "Select a data source from the left panel to get started"
+                      : "Click 'Run Report' to load data"}
                   </div>
                 </div>
               ) : (
