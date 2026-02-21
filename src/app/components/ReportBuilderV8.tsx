@@ -293,68 +293,100 @@ export function ReportBuilderV8() {
 
   // Build table columns
   const tableColumns: IListColumn<ReportRow>[] = useMemo(() => {
-    if (!query.dataSource) return [];
+    console.log("=== TABLE COLUMNS BUILDING ===");
+    console.log("query.dataSource:", query.dataSource?.name);
+    console.log("rawData.length:", rawData.length);
+
+    if (!query.dataSource) {
+      console.log("No data source, returning []");
+      return [];
+    }
 
     // Show selected fields, or all if none selected
     const fieldsToShow = query.selectedFields.length > 0
       ? query.selectedFields
       : query.dataSource.columns.map((c) => c.key);
 
+    console.log("fieldsToShow:", fieldsToShow);
+    console.log("query.selectedFields:", query.selectedFields);
+    console.log("query.groupBy:", query.groupBy);
+    console.log("query.metrics:", query.metrics);
+
     // If grouping, show group fields + metrics
     const columnsToShow = query.groupBy.length > 0 || query.metrics.length > 0
       ? [...query.groupBy, ...query.metrics.map((m) => m.label)]
       : fieldsToShow;
 
-    console.log("Building columns for fields:", columnsToShow);
+    console.log("columnsToShow:", columnsToShow);
+    console.log("query.dataSource.columns:", query.dataSource.columns);
 
-    return query.dataSource.columns
-      .filter((col) => columnsToShow.includes(col.key) || columnsToShow.includes(col.label))
-      .concat(
-        query.metrics.map((m) => ({
-          key: m.label,
-          label: m.label,
-          type: "number",
-          filterable: false,
-          sortable: true,
-          aggregatable: false,
-        }))
-      )
-      .map((col) => ({
-        id: col.key || col.label,
-        title: col.label,
+    const filtered = query.dataSource.columns
+      .filter((col) => columnsToShow.includes(col.key) || columnsToShow.includes(col.label));
+
+    console.log("Filtered columns:", filtered.length, filtered);
+
+    const withMetrics = filtered.concat(
+      query.metrics.map((m) => ({
+        key: m.label,
+        label: m.label,
+        type: "number",
+        filterable: false,
         sortable: true,
-        visible: true,
-        render: (entity: ReportRow) => {
-          const value = entity[col.key] || entity[col.label];
-          if (value == null || value === "") return "—";
+        aggregatable: false,
+      }))
+    );
 
-          if (col.type === "date") {
-            try {
-              return new Date(String(value)).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              });
-            } catch {
-              return String(value);
-            }
-          }
+    console.log("With metrics:", withMetrics.length);
 
-          if (col.type === "number") {
-            return Number(value).toLocaleString("en-US", {
-              maximumFractionDigits: 1,
+    const tableColumns = withMetrics.map((col) => ({
+      id: col.key || col.label,
+      title: col.label,
+      sortable: true,
+      visible: true,
+      render: (entity: ReportRow) => {
+        const value = entity[col.key] || entity[col.label];
+        if (value == null || value === "") return "—";
+
+        if (col.type === "date") {
+          try {
+            return new Date(String(value)).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
             });
+          } catch {
+            return String(value);
           }
+        }
 
-          return String(value);
-        },
-      }));
+        if (col.type === "number") {
+          return Number(value).toLocaleString("en-US", {
+            maximumFractionDigits: 1,
+          });
+        }
+
+        return String(value);
+      },
+    }));
+
+    console.log("Final tableColumns:", tableColumns.length, tableColumns);
+    console.log("=== END TABLE COLUMNS ===");
+
+    return tableColumns;
   }, [query, rawData]);
 
   const tableConfig: ITable<ReportRow> | null = useMemo(() => {
-    if (tableColumns.length === 0) return null;
+    console.log("=== TABLE CONFIG ===");
+    console.log("tableColumns.length:", tableColumns.length);
+    console.log("entities.length:", entities.length);
+    console.log("isLoading:", isLoading);
 
-    return {
+    if (tableColumns.length === 0) {
+      console.log("tableColumns is empty, returning null");
+      return null;
+    }
+
+    const config = {
       entities,
       columns: tableColumns,
       isLoading,
@@ -366,6 +398,11 @@ export function ReportBuilderV8() {
       },
       height: "100%",
     };
+
+    console.log("tableConfig created:", config);
+    console.log("=== END TABLE CONFIG ===");
+
+    return config;
   }, [entities, tableColumns, isLoading]);
 
   return (
@@ -676,22 +713,32 @@ export function ReportBuilderV8() {
           </div>
 
           <div className="rb8__results-content">
-            {!tableConfig || entities.length === 0 ? (
-              <div className="rb8__empty">
-                <div className="rb8__empty-title">No results</div>
-                <div className="rb8__empty-subtitle">
-                  {!query.dataSource
-                    ? "Select a data source to get started"
-                    : "Click \"Run Query\" to see data"}
+            {(() => {
+              console.log("=== RENDER CONDITION ===");
+              console.log("tableConfig:", tableConfig);
+              console.log("entities.length:", entities.length);
+              console.log("!tableConfig:", !tableConfig);
+              console.log("entities.length === 0:", entities.length === 0);
+              console.log("Should show empty?:", !tableConfig || entities.length === 0);
+              console.log("=== END RENDER CONDITION ===");
+
+              return (!tableConfig || entities.length === 0) ? (
+                <div className="rb8__empty">
+                  <div className="rb8__empty-title">No results</div>
+                  <div className="rb8__empty-subtitle">
+                    {!query.dataSource
+                      ? "Select a data source to get started"
+                      : "Click \"Run Query\" to see data"}
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <Card style={{ height: "100%", padding: 0, overflow: "hidden" }}>
-                <Table {...tableConfig}>
-                  <Table.Pagination rowsPerPage={50} />
-                </Table>
-              </Card>
-            )}
+              ) : (
+                <Card style={{ height: "100%", padding: 0, overflow: "hidden" }}>
+                  <Table {...tableConfig}>
+                    <Table.Pagination rowsPerPage={50} />
+                  </Table>
+                </Card>
+              );
+            })()}
           </div>
         </aside>
       </div>
