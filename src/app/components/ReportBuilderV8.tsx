@@ -358,36 +358,41 @@ export function ReportBuilderV8() {
 
     console.log("With metrics:", withMetrics.length);
 
-    const tableColumns = withMetrics.map((col) => ({
-      id: col.key || col.label,
-      title: col.label,
-      sortable: true,
-      visible: true,
-      render: (entity: ReportRow) => {
-        const value = entity[col.key] || entity[col.label];
-        if (value == null || value === "") return "—";
+    const tableColumns = withMetrics.map((col) => {
+      // Sanitize column ID - Zenith doesn't handle special characters well
+      const sanitizedId = (col.key || col.label).replace(/[^a-zA-Z0-9_]/g, '_');
 
-        if (col.type === "date") {
-          try {
-            return new Date(String(value)).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            });
-          } catch {
-            return String(value);
+      return {
+        id: sanitizedId,
+        title: col.label,
+        sortable: true,
+        visible: true,
+        render: (entity: ReportRow) => {
+          const value = entity[col.key] || entity[col.label];
+          if (value == null || value === "") return "—";
+
+          if (col.type === "date") {
+            try {
+              return new Date(String(value)).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              });
+            } catch {
+              return String(value);
+            }
           }
-        }
 
-        if (col.type === "number") {
-          return Number(value).toLocaleString("en-US", {
-            maximumFractionDigits: 1,
-          });
-        }
+          if (col.type === "number") {
+            return Number(value).toLocaleString("en-US", {
+              maximumFractionDigits: 1,
+            });
+          }
 
-        return String(value);
-      },
-    }));
+          return String(value);
+        },
+      };
+    });
 
     console.log("Final tableColumns:", tableColumns.length, tableColumns);
     console.log("=== END TABLE COLUMNS ===");
