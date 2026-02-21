@@ -17,6 +17,9 @@ import {
   Button,
   SearchInput,
   Divider,
+  Modal,
+  TextInput,
+  Alert,
 } from "@geotab/zenith";
 import {
   BarChart,
@@ -33,10 +36,21 @@ import {
 import { useGeotab } from "../services/geotab-context";
 import { useDataFetcher } from "../services/data-fetcher";
 import type { DataSourceDef } from "../services/geotab-mock";
+import {
+  saveReportToMyGeotab,
+  updateReportInMyGeotab,
+  loadReportsFromMyGeotab,
+  deleteReportFromMyGeotab,
+  saveReportToLocalStorage,
+  loadReportsFromLocalStorage,
+  deleteReportFromLocalStorage,
+  updateReportInLocalStorage,
+  type SavedReport,
+} from "../services/report-storage";
 import "./report-builder-v9.css";
 
-// Query Model
-interface ReportQuery {
+// Query Model (exported for report-storage.ts)
+export interface ReportQuery {
   dataSource: DataSourceDef | null;
   columns: ColumnConfig[];
   timeFilter: TimeFilter | null;
@@ -188,6 +202,32 @@ export function ReportBuilderV9() {
     groupBy: false,
     metrics: false,
   });
+
+  // Report Storage State
+  const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
+  const [currentReportId, setCurrentReportId] = useState<string | null>(null);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [reportName, setReportName] = useState("");
+  const [reportDescription, setReportDescription] = useState("");
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Load saved reports on mount
+  useEffect(() => {
+    const loadSavedReports = async () => {
+      if (isLive && api) {
+        // Load from MyGeotab
+        const reports = await loadReportsFromMyGeotab(api);
+        setSavedReports(reports);
+      } else if (isReady) {
+        // Load from localStorage in demo mode
+        const reports = loadReportsFromLocalStorage();
+        setSavedReports(reports);
+      }
+    };
+
+    loadSavedReports();
+  }, [api, isLive, isReady]);
 
   // Auto-load preview on data source change
   useEffect(() => {
@@ -380,17 +420,150 @@ export function ReportBuilderV9() {
     });
   }, [entities, query.groupBy, query.metrics]);
 
+  // Report Management Handlers
+  const handleSaveReport = async () => {
+    if (!reportName.trim()) {
+      setSaveError("Report name is required");
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      const reportData = {
+        name: reportName.trim(),
+        description: reportDescription.trim() || undefined,
+        query,
+      };
+
+      if (currentReportId) {
+        // Update existing report
+        const existingReport = savedReports.find(r => r.id === currentReportId);
+        if (!existingReport) {
+          throw new Error("Report not found");
+        }
+
+        const updatedReport: SavedReport = {
+          ...existingReport,
+          ...reportData,
+        };
+
+        if (isLive && api) {
+          await updateReportInMyGeotab(api, updatedReport);
+        } else {
+          updateReportInLocalStorage(updatedReport);
+        }
+
+        setSavedReports(prev => prev.map(r => r.id === currentReportId ? updatedReport : r));
+      } else {
+        // Save new report
+        let savedReport: SavedReport;
+        if (isLive && api) {
+          savedReport = await saveReportToMyGeotab(api, reportData);
+        } else {
+          savedReport = saveReportToLocalStorage(reportData);
+        }
+
+        setSavedReports(prev => [savedReport, ...prev]);
+        setCurrentReportId(savedReport.id);
+      }
+
+      setIsSaveModalOpen(false);
+      setReportName("");
+      setReportDescription("");
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Failed to save report");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleLoadReport = (report: SavedReport) => {
+    setQuery(report.query);
+    setCurrentReportId(report.id);
+    setReportName(report.name);
+    setReportDescription(report.description || "");
+    setRawData([]);
+  };
+
+  const handleDeleteReport = async (reportId: string) => {
+    if (!confirm("Are you sure you want to delete this report?")) {
+      return;
+    }
+
+    try {
+      if (isLive && api) {
+        await deleteReportFromMyGeotab(api, reportId);
+      } else {
+        deleteReportFromLocalStorage(reportId);
+      }
+
+      setSavedReports(prev => prev.filter(r => r.id !== reportId));
+
+      if (currentReportId === reportId) {
+        setCurrentReportId(null);
+        setReportName("");
+        setReportDescription("");
+      }
+    } catch (error) {
+      console.error("Failed to delete report:", error);
+      alert("Failed to delete report. Please try again.");
+    }
+  };
+
+  const handleNewReport = () => {
+    if (currentReportId && confirm("Start a new report? Unsaved changes will be lost.")) {
+      setQuery({
+        dataSource: dataSources.length > 0 ? dataSources[0] : null,
+        columns: [],
+        timeFilter: null,
+        filters: [],
+        groupBy: [],
+        metrics: [],
+        chartType: "table",
+        limit: 100,
+      });
+      setCurrentReportId(null);
+      setReportName("");
+      setReportDescription("");
+      setRawData([]);
+    } else if (!currentReportId) {
+      // Already on new report, just clear
+      setQuery({
+        dataSource: dataSources.length > 0 ? dataSources[0] : null,
+        columns: [],
+        timeFilter: null,
+        filters: [],
+        groupBy: [],
+        metrics: [],
+        chartType: "table",
+        limit: 100,
+      });
+      setRawData([]);
+    }
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="rb9">
         {/* Header */}
         <div className="rb9__header">
           <div className="rb9__header-left">
-            <h1 className="rb9__title">Fleet Reports</h1>
+            <h1 className="rb9__title">
+              {currentReportId ? reportName || "Fleet Reports" : "Fleet Reports"}
+            </h1>
             {isLive && <span className="rb9__badge rb9__badge--live">Live</span>}
             {!isLive && isReady && <span className="rb9__badge rb9__badge--demo">Demo</span>}
+            {currentReportId && <span className="rb9__badge" style={{ backgroundColor: "#e3f2fd", color: "#1976d2" }}>Saved</span>}
           </div>
-          <div className="rb9__header-right">
+          <div className="rb9__header-right" style={{ display: "flex", gap: "12px" }}>
+            <Button variant="secondary" onClick={handleNewReport}>
+              📄 New
+            </Button>
+            <Button variant="secondary" onClick={() => setIsSaveModalOpen(true)} disabled={!query.dataSource}>
+              💾 Save
+            </Button>
             <Button variant="primary" onClick={runQuery} disabled={!query.dataSource || isLoading}>
               {isLoading ? "⟳ Running..." : "⚡ Run Query"}
             </Button>
@@ -401,6 +574,44 @@ export function ReportBuilderV9() {
         <div className="rb9__body">
           {/* Left: Query Builder */}
           <aside className="rb9__sidebar">
+            {/* Saved Reports */}
+            {savedReports.length > 0 && (
+              <>
+                <div className="rb9__section">
+                  <div className="rb9__section-header">
+                    <span className="rb9__section-title">📁 My Reports</span>
+                  </div>
+                  <div className="rb9__saved-reports">
+                    {savedReports.slice(0, 5).map((report) => (
+                      <div
+                        key={report.id}
+                        className={`rb9__saved-report ${currentReportId === report.id ? "rb9__saved-report--active" : ""}`}
+                      >
+                        <button
+                          className="rb9__saved-report-load"
+                          onClick={() => handleLoadReport(report)}
+                          title={report.description || report.name}
+                        >
+                          <span className="rb9__saved-report-name">{report.name}</span>
+                          <span className="rb9__saved-report-date">
+                            {new Date(report.modifiedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                          </span>
+                        </button>
+                        <button
+                          className="rb9__saved-report-delete"
+                          onClick={() => handleDeleteReport(report.id)}
+                          title="Delete report"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <Divider />
+              </>
+            )}
+
             {/* Data Source */}
             <div className="rb9__section">
               <div className="rb9__section-header">
@@ -658,6 +869,94 @@ export function ReportBuilderV9() {
             </div>
           </aside>
         </div>
+
+        {/* Save Modal */}
+        {isSaveModalOpen && (
+          <Modal
+            title={currentReportId ? "Update Report" : "Save Report"}
+            onClose={() => {
+              setIsSaveModalOpen(false);
+              setSaveError(null);
+            }}
+            footer={
+              <>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setIsSaveModalOpen(false);
+                    setSaveError(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleSaveReport}
+                  disabled={isSaving || !reportName.trim()}
+                >
+                  {isSaving ? "Saving..." : currentReportId ? "Update" : "Save"}
+                </Button>
+              </>
+            }
+          >
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              {saveError && (
+                <Alert variant="error" title="Error">
+                  {saveError}
+                </Alert>
+              )}
+
+              <div>
+                <label htmlFor="report-name" style={{ display: "block", marginBottom: "8px", fontWeight: 600 }}>
+                  Report Name *
+                </label>
+                <TextInput
+                  id="report-name"
+                  value={reportName}
+                  onChange={(e) => setReportName(e.target.value)}
+                  placeholder="e.g., Fleet Distance Summary"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label htmlFor="report-description" style={{ display: "block", marginBottom: "8px", fontWeight: 600 }}>
+                  Description (optional)
+                </label>
+                <textarea
+                  id="report-description"
+                  value={reportDescription}
+                  onChange={(e) => setReportDescription(e.target.value)}
+                  placeholder="Brief description of what this report shows..."
+                  rows={3}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    fontSize: "14px",
+                    fontFamily: "inherit",
+                    color: "#1a1a1a",
+                    backgroundColor: "#fff",
+                    border: "1px solid #d0d0d0",
+                    borderRadius: "6px",
+                    outline: "none",
+                    resize: "vertical",
+                  }}
+                />
+              </div>
+
+              <div style={{ padding: "12px", backgroundColor: "#f5f5f5", borderRadius: "6px", fontSize: "13px" }}>
+                <strong>Report Configuration:</strong>
+                <ul style={{ margin: "8px 0 0 0", paddingLeft: "20px" }}>
+                  <li>Data Source: {query.dataSource?.name || "None"}</li>
+                  <li>Columns: {query.columns.length > 0 ? query.columns.map(c => c.label).join(", ") : "All"}</li>
+                  {query.groupBy.length > 0 && <li>Group By: {query.groupBy.join(", ")}</li>}
+                  {query.metrics.length > 0 && <li>Metrics: {query.metrics.map(m => m.label).join(", ")}</li>}
+                  <li>Chart: {query.chartType}</li>
+                </ul>
+              </div>
+            </div>
+          </Modal>
+        )}
       </div>
     </DndProvider>
   );
