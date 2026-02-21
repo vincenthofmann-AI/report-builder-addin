@@ -1,0 +1,385 @@
+/**
+ * Report Builder V5 - Three-Panel NotebookLM-Style Interface
+ * Sources → Query → Output
+ */
+
+.rb5 {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #fafafa;
+}
+
+/* Header */
+.rb5__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+  height: 60px;
+  flex-shrink: 0;
+}
+
+.rb5__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.rb5__badge {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rb5__badge--live {
+  color: #34c759;
+  background-color: rgba(52, 199, 89, 0.1);
+}
+
+.rb5__badge--demo {
+  color: #8e8e93;
+  background-color: #f2f2f7;
+}
+
+/* Three-Panel Body */
+.rb5__body {
+  display: grid;
+  grid-template-columns: 280px 1fr 400px;
+  gap: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Panel 1: Sources (Left) */
+.rb5__sources {
+  background-color: #ffffff;
+  border-right: 1px solid #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.rb5__sources-header {
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid #f2f2f7;
+}
+
+.rb5__sources-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 4px 0;
+}
+
+.rb5__sources-subtitle {
+  font-size: 13px;
+  color: #8e8e93;
+  margin: 0;
+}
+
+.rb5__resources {
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rb5__resource {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 150ms ease;
+}
+
+.rb5__resource:hover {
+  background-color: #f2f2f7;
+}
+
+.rb5__resource--active {
+  background-color: #e3f2fd;
+}
+
+.rb5__resource-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.rb5__resource-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.rb5__resource-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 2px;
+}
+
+.rb5__resource-desc {
+  font-size: 12px;
+  color: #8e8e93;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Panel 2: Query Builder (Center) */
+.rb5__query {
+  background-color: #ffffff;
+  border-right: 1px solid #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.rb5__query-content {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rb5__query-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rb5__query-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.rb5__query-resource {
+  font-size: 14px;
+  font-weight: 500;
+  color: #8e8e93;
+  padding: 6px 12px;
+  background-color: #f2f2f7;
+  border-radius: 6px;
+}
+
+/* AI Mode */
+.rb5__ai-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rb5__chat-input {
+  display: flex;
+  gap: 12px;
+}
+
+.rb5__chat-input > div {
+  flex: 1;
+}
+
+.rb5__generated-query {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border: 1px solid #e5e5e5;
+}
+
+.rb5__generated-query-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8e8e93;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rb5__generated-query-code {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  color: #1a1a1a;
+  background-color: #ffffff;
+  padding: 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 0;
+}
+
+.rb5__ai-tips {
+  padding: 16px;
+  background-color: #f0f9ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+}
+
+.rb5__ai-tips-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e40af;
+  margin-bottom: 8px;
+}
+
+.rb5__ai-tips-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  color: #3b82f6;
+}
+
+.rb5__ai-tips-list li {
+  margin-bottom: 4px;
+}
+
+/* Manual Mode */
+.rb5__manual-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rb5__field-selector {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+}
+
+.rb5__field-selector-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+}
+
+.rb5__field-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.rb5__field-item input {
+  cursor: pointer;
+}
+
+.rb5__field-item label {
+  font-size: 13px;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.rb5__error {
+  padding: 12px 16px;
+  background-color: #fee;
+  border: 1px solid #fcc;
+  border-radius: 6px;
+  color: #c00;
+  font-size: 13px;
+}
+
+/* Panel 3: Output (Right) */
+.rb5__output {
+  background-color: #fafafa;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rb5__output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 20px 16px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.rb5__output-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.rb5__output-count {
+  font-size: 13px;
+  color: #8e8e93;
+  font-weight: 500;
+}
+
+.rb5__output-content {
+  flex: 1;
+  padding: 16px;
+  overflow: hidden;
+}
+
+/* Empty States */
+.rb5__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.rb5__empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.rb5__empty-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.rb5__empty-subtitle {
+  font-size: 14px;
+  color: #8e8e93;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .rb5__body {
+    grid-template-columns: 240px 1fr 360px;
+  }
+}
+
+@media (max-width: 900px) {
+  .rb5__body {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  .rb5__sources {
+    border-right: none;
+    border-bottom: 1px solid #e5e5e5;
+    max-height: 200px;
+  }
+
+  .rb5__output {
+    border-top: 1px solid #e5e5e5;
+  }
+}
