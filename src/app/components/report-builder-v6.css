@@ -1,0 +1,389 @@
+/**
+ * Report Builder V6 - Google Analytics 4 Professional Style
+ * Enterprise-grade, clean, minimal
+ */
+
+.ga {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f8f9fa;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Header */
+.ga__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 56px;
+  background-color: #fff;
+  border-bottom: 1px solid #dadce0;
+  flex-shrink: 0;
+}
+
+.ga__header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ga__title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #202124;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.ga__badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ga__badge--live {
+  color: #137333;
+  background-color: #e6f4ea;
+}
+
+.ga__badge--demo {
+  color: #5f6368;
+  background-color: #f1f3f4;
+}
+
+/* Three-Panel Body */
+.ga__body {
+  display: grid;
+  grid-template-columns: 280px 360px 1fr;
+  gap: 0;
+  flex: 1;
+  overflow: hidden;
+  background-color: #f8f9fa;
+}
+
+/* Common Panel Styles */
+.ga__panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #dadce0;
+  background-color: #fff;
+}
+
+.ga__panel-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #202124;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Panel 1: Variables */
+.ga__variables {
+  background-color: #fff;
+  border-right: 1px solid #dadce0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.ga__section {
+  padding: 16px 20px;
+}
+
+.ga__section-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  color: #5f6368;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ga__section-count {
+  font-size: 11px;
+  color: #80868b;
+  font-weight: 400;
+}
+
+.ga__section-search {
+  margin-bottom: 12px;
+}
+
+.ga__select {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #202124;
+  background-color: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+
+.ga__select:hover {
+  border-color: #80868b;
+}
+
+.ga__select:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 1px #1a73e8;
+}
+
+.ga__field-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Draggable Fields */
+.ga-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  cursor: grab;
+  user-select: none;
+  transition: all 120ms;
+}
+
+.ga-field:hover {
+  background-color: #f8f9fa;
+  border-color: #80868b;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.1);
+}
+
+.ga-field:active {
+  cursor: grabbing;
+}
+
+.ga-field--dragging {
+  opacity: 0.4;
+}
+
+.ga-field__indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.ga-field--dimension .ga-field__indicator {
+  background-color: #4285f4;
+}
+
+.ga-field--metric .ga-field__indicator {
+  background-color: #ea4335;
+}
+
+.ga-field__name {
+  font-size: 13px;
+  color: #202124;
+  font-weight: 400;
+  flex: 1;
+}
+
+/* Panel 2: Report Settings */
+.ga__settings {
+  background-color: #fff;
+  border-right: 1px solid #dadce0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.ga__settings-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Drop Zones */
+.ga-drop-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ga-drop-zone__label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ga-drop-zone__area {
+  min-height: 48px;
+  padding: 8px;
+  background-color: #f8f9fa;
+  border: 2px dashed #dadce0;
+  border-radius: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  transition: all 150ms;
+}
+
+.ga-drop-zone__area--active {
+  background-color: #e8f0fe;
+  border-color: #4285f4;
+  border-style: solid;
+}
+
+.ga-drop-zone__area--invalid {
+  background-color: #fce8e6;
+  border-color: #ea4335;
+}
+
+.ga-drop-zone__placeholder {
+  font-size: 13px;
+  color: #80868b;
+  font-style: italic;
+}
+
+/* Dropped Fields */
+.ga-dropped-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 8px;
+  background-color: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 16px;
+  font-size: 13px;
+}
+
+.ga-dropped-field__indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ga-dropped-field--dimension .ga-dropped-field__indicator {
+  background-color: #4285f4;
+}
+
+.ga-dropped-field--metric .ga-dropped-field__indicator {
+  background-color: #ea4335;
+}
+
+.ga-dropped-field__name {
+  color: #202124;
+  font-weight: 400;
+}
+
+.ga-dropped-field__agg {
+  font-size: 11px;
+  color: #5f6368;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.ga-dropped-field__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  color: #5f6368;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 120ms;
+}
+
+.ga-dropped-field__remove:hover {
+  background-color: #f8f9fa;
+  color: #202124;
+}
+
+/* Panel 3: Output */
+.ga__output {
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ga__output .ga__panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ga__output-count {
+  font-size: 12px;
+  color: #5f6368;
+  font-weight: 400;
+}
+
+.ga__output-content {
+  flex: 1;
+  padding: 16px;
+  overflow: hidden;
+}
+
+/* Empty State */
+.ga__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.ga__empty-title {
+  font-size: 16px;
+  font-weight: 400;
+  color: #5f6368;
+  margin-bottom: 8px;
+}
+
+.ga__empty-subtitle {
+  font-size: 14px;
+  color: #80868b;
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+  .ga__body {
+    grid-template-columns: 260px 320px 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .ga__body {
+    grid-template-columns: 240px 1fr;
+  }
+
+  .ga__settings {
+    display: none;
+  }
+}
