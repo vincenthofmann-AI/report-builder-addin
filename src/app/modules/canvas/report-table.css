@@ -1,0 +1,330 @@
+/**
+ * Apple Report Table Styles
+ * Jony Ive Level: Content first, no vertical borders, data hero, tabular precision
+ */
+
+/* Container */
+.apple-table-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.apple-table-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Table Base - No borders, only horizontal dividers */
+.apple-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-body);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Header */
+.apple-table__head {
+  border-bottom: var(--hairline) solid var(--gray-200);
+}
+
+.apple-table__cell--header {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  color: var(--gray-600);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Number columns - Right aligned */
+.apple-table__cell--number {
+  text-align: right;
+}
+
+/* Sort button - Invisible until hover */
+.apple-table__sort {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  position: relative;
+  transition-property: color;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--spring-medium);
+}
+
+.apple-table__sort:hover {
+  color: var(--black);
+}
+
+.apple-table__sort--active {
+  color: var(--black);
+}
+
+/* Sort indicator - Position, not icon */
+.apple-table__sort--active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -12px;
+  height: 2px;
+  background-color: var(--blue);
+  border-radius: var(--radius-full);
+}
+
+.apple-table__sort--desc::after {
+  background-color: var(--gray-600);
+}
+
+/* Body */
+.apple-table__body {
+}
+
+.apple-table__row {
+  border-bottom: var(--hairline) solid var(--gray-100);
+  transition-property: background-color;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--spring-medium);
+}
+
+.apple-table__row:last-child {
+  border-bottom: none;
+}
+
+.apple-table__row:hover {
+  background-color: var(--gray-50);
+}
+
+/* Cells */
+.apple-table__cell {
+  padding: var(--space-3) var(--space-4);
+  color: var(--black);
+  white-space: nowrap;
+}
+
+/* Row numbers - Subtle, invisible until hover */
+.apple-table__cell--row-num {
+  font-size: var(--text-small);
+  color: var(--gray-400);
+  transition-property: color;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--spring-medium);
+}
+
+.apple-table__row:hover .apple-table__cell--row-num {
+  color: var(--gray-600);
+}
+
+/* Badges - Minimal, no heavy colors */
+.apple-table__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-sm);
+}
+
+.apple-table__badge--red {
+  background-color: rgba(255, 59, 48, 0.1);
+  color: var(--red);
+}
+
+.apple-table__badge--orange {
+  background-color: rgba(255, 149, 0, 0.1);
+  color: var(--orange);
+}
+
+.apple-table__badge--yellow {
+  background-color: rgba(255, 204, 0, 0.1);
+  color: #d97706;
+}
+
+.apple-table__badge--blue {
+  background-color: rgba(0, 122, 255, 0.1);
+  color: var(--blue);
+}
+
+.apple-table__badge--green {
+  background-color: rgba(52, 199, 89, 0.1);
+  color: var(--green);
+}
+
+.apple-table__badge--gray {
+  background-color: var(--gray-100);
+  color: var(--gray-600);
+}
+
+/* Footer - Summary row */
+.apple-table__footer {
+  border-top: var(--hairline) solid var(--gray-200);
+  background-color: var(--gray-50);
+}
+
+.apple-table__footer .apple-table__cell {
+  font-size: var(--text-small);
+  color: var(--gray-900);
+}
+
+.apple-table__summary-value {
+  font-weight: var(--weight-medium);
+  color: var(--black);
+}
+
+.apple-table__summary-label {
+  font-weight: var(--weight-regular);
+  color: var(--gray-600);
+  margin-left: 2px;
+}
+
+/* Skeleton Loading - Shimmer (Apple style) */
+.apple-table__skeleton {
+  height: 12px;
+  background-color: var(--gray-100);
+  border-radius: var(--radius-sm);
+}
+
+.apple-table__skeleton--sm {
+  width: 16px;
+  height: 12px;
+  margin: 0 auto;
+}
+
+/* Empty States */
+.apple-table-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  padding: var(--space-8);
+  text-align: center;
+}
+
+.apple-table-empty__icon {
+  font-size: 48px;
+  color: var(--gray-300);
+  margin-bottom: var(--space-4);
+  user-select: none;
+}
+
+.apple-table-empty__title {
+  font-size: var(--text-headline);
+  font-weight: var(--weight-medium);
+  color: var(--gray-900);
+  margin-bottom: var(--space-1);
+}
+
+.apple-table-empty__subtitle {
+  font-size: var(--text-body);
+  color: var(--gray-600);
+}
+
+/* Pagination */
+.apple-table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-2);
+}
+
+.apple-table-pagination__info {
+  font-size: var(--text-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.apple-table-pagination__range {
+  color: var(--black);
+  font-weight: var(--weight-medium);
+}
+
+.apple-table-pagination__total {
+  color: var(--gray-600);
+  font-weight: var(--weight-regular);
+}
+
+.apple-table-pagination__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Pagination Button */
+.apple-table-pagination__button {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-body);
+  color: var(--gray-600);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition-property: background-color, color;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--spring-medium);
+}
+
+.apple-table-pagination__button:hover:not(:disabled) {
+  background-color: var(--gray-100);
+  color: var(--black);
+}
+
+.apple-table-pagination__button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Page Numbers */
+.apple-table-pagination__page {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-small);
+  font-weight: var(--weight-regular);
+  color: var(--gray-600);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition-property: background-color, color;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--spring-medium);
+}
+
+.apple-table-pagination__page:hover {
+  background-color: var(--gray-100);
+  color: var(--black);
+}
+
+.apple-table-pagination__page--active {
+  background-color: var(--blue);
+  color: var(--white);
+  font-weight: var(--weight-medium);
+}
+
+.apple-table-pagination__page--active:hover {
+  background-color: var(--blue-dark);
+}
+
+.apple-table-pagination__ellipsis {
+  width: 28px;
+  text-align: center;
+  font-size: var(--text-small);
+  color: var(--gray-500);
+  user-select: none;
+}

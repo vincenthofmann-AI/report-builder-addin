@@ -1,16 +1,11 @@
+/**
+ * Apple-Level Report Table
+ * Jony Ive Principles: Content First, Invisible Structure, Data Hero
+ */
+
 import { useState, useMemo } from "react";
-import {
-  ArrowUp,
-  ArrowDown,
-  ArrowUpDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  Columns3,
-} from "lucide-react";
 import { type ColumnDef } from "../../services/geotab-mock";
-import { motion, AnimatePresence } from "motion/react";
+import "./report-table.css";
 
 interface ReportTableProps {
   data: Record<string, unknown>[];
@@ -80,9 +75,9 @@ export function ReportTable({
       if (values.length === 0) return;
       const sum = values.reduce((a, b) => a + b, 0);
       const avg = sum / values.length;
-      result[col.key] = `${avg.toLocaleString("en-US", {
+      result[col.key] = avg.toLocaleString("en-US", {
         maximumFractionDigits: 1,
-      })} avg`;
+      });
     });
     return result;
   }, [data, visibleColumns]);
@@ -98,7 +93,7 @@ export function ReportTable({
   };
 
   const formatValue = (value: unknown, type: string): string => {
-    if (value == null || value === "") return "\u2014";
+    if (value == null || value === "") return "—";
     if (type === "date") {
       try {
         return new Date(String(value)).toLocaleDateString("en-US", {
@@ -120,71 +115,58 @@ export function ReportTable({
     return String(value);
   };
 
+  // Empty states
   if (selectedColumns.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col items-center justify-center h-48 text-center"
-      >
-        <div className="w-10 h-10 rounded-xl bg-[#f1f5f9] flex items-center justify-center mb-3">
-          <Columns3 className="w-5 h-5 text-[#94a3b8]" />
-        </div>
-        <p className="text-[13px] text-[#64748b]" style={{ fontWeight: 500 }}>No columns selected</p>
-        <p className="text-[12px] text-[#94a3b8] mt-1">Toggle columns from the outline panel to see data</p>
-      </motion.div>
+      <div className="apple-table-empty">
+        <span className="apple-table-empty__icon">▦</span>
+        <p className="apple-table-empty__title">No columns selected</p>
+        <p className="apple-table-empty__subtitle">
+          Toggle columns from the outline panel
+        </p>
+      </div>
     );
   }
 
   if (data.length === 0 && !isLoading) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col items-center justify-center h-48 text-center"
-      >
-        <div className="w-10 h-10 rounded-xl bg-[#fef2f2] flex items-center justify-center mb-3">
-          <svg className="w-5 h-5 text-[#f87171]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-          </svg>
-        </div>
-        <p className="text-[13px] text-[#64748b]" style={{ fontWeight: 500 }}>No matching records</p>
-        <p className="text-[12px] text-[#94a3b8] mt-1">Try adjusting or clearing your filters</p>
-      </motion.div>
+      <div className="apple-table-empty">
+        <span className="apple-table-empty__icon">○</span>
+        <p className="apple-table-empty__title">No matching records</p>
+        <p className="apple-table-empty__subtitle">
+          Try adjusting or clearing your filters
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="apple-table-container">
       {/* Table */}
-      <div className="overflow-x-auto border border-[#e2e8f0] rounded-xl bg-white shadow-sm shadow-[#003a63]/[0.03]">
-        <table className="w-full text-[13px]">
-          <thead>
-            <tr className="border-b border-[#e2e8f0] bg-[#f8fafc]/60">
-              <th className="w-10 px-3 py-2.5 text-center text-[11px] text-[#94a3b8]" style={{ fontWeight: 500 }}>
-                #
-              </th>
+      <div className="apple-table-wrapper">
+        <table className="apple-table">
+          <thead className="apple-table__head">
+            <tr>
+              <th className="apple-table__cell apple-table__cell--number">#</th>
               {visibleColumns.map((col) => (
                 <th
                   key={col.key}
-                  className="text-left px-3 py-2.5 text-[11px] text-[#475569] uppercase tracking-wider whitespace-nowrap select-none"
-                  style={{ fontWeight: 600 }}
+                  className={`apple-table__cell apple-table__cell--header ${
+                    col.type === "number" ? "apple-table__cell--number" : ""
+                  }`}
                 >
                   {col.sortable ? (
                     <button
                       onClick={() => handleSort(col.key)}
-                      className="flex items-center gap-1 hover:text-[#003a63] transition-colors group"
+                      className={`apple-table__sort ${
+                        sortKey === col.key ? "apple-table__sort--active" : ""
+                      } ${
+                        sortKey === col.key && sortDir === "desc"
+                          ? "apple-table__sort--desc"
+                          : ""
+                      }`}
                     >
                       {col.label}
-                      {sortKey === col.key ? (
-                        sortDir === "asc" ? (
-                          <ArrowUp className="w-3 h-3 text-[#003a63]" />
-                        ) : (
-                          <ArrowDown className="w-3 h-3 text-[#003a63]" />
-                        )
-                      ) : (
-                        <ArrowUpDown className="w-3 h-3 opacity-0 group-hover:opacity-30 transition-opacity" />
-                      )}
                     </button>
                   ) : (
                     col.label
@@ -193,24 +175,26 @@ export function ReportTable({
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="apple-table__body">
             {isLoading
-              ? // Skeleton loading rows
+              ? // Shimmer skeleton
                 Array.from({ length: 8 }).map((_, idx) => (
-                  <tr
-                    key={`skeleton-${idx}`}
-                    className="border-b border-[#f1f5f9] last:border-b-0"
-                  >
-                    <td className="w-10 px-3 py-2.5">
-                      <div className="h-3 w-4 bg-[#f1f5f9] rounded animate-pulse mx-auto" />
+                  <tr key={`skeleton-${idx}`} className="apple-table__row">
+                    <td className="apple-table__cell apple-table__cell--number">
+                      <div className="apple-table__skeleton apple-table__skeleton--sm" />
                     </td>
                     {visibleColumns.map((col) => (
-                      <td key={col.key} className="px-3 py-2.5">
+                      <td
+                        key={col.key}
+                        className={`apple-table__cell ${
+                          col.type === "number" ? "apple-table__cell--number" : ""
+                        }`}
+                      >
                         <div
-                          className="h-3 bg-[#f1f5f9] rounded animate-pulse"
+                          className="apple-table__skeleton shimmer"
                           style={{
                             width: `${Math.random() * 40 + 40}%`,
-                            animationDelay: `${idx * 50}ms`,
+                            animationDelay: `${idx * 100}ms`,
                           }}
                         />
                       </td>
@@ -220,75 +204,59 @@ export function ReportTable({
               : pagedData.map((row, idx) => {
                   const rowNum = safePage * PAGE_SIZE + idx + 1;
                   return (
-                    <motion.tr
-                      key={`row-${safePage}-${idx}`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.15, delay: idx * 0.01 }}
-                      className="border-b border-[#f1f5f9] last:border-b-0 hover:bg-[#003a63]/[0.015] transition-colors group"
-                    >
-                      <td className="w-10 px-3 py-2 text-center text-[11px] text-[#cbd5e1] group-hover:text-[#94a3b8] tabular-nums transition-colors">
+                    <tr key={`row-${safePage}-${idx}`} className="apple-table__row">
+                      <td className="apple-table__cell apple-table__cell--number apple-table__cell--row-num">
                         {rowNum}
                       </td>
                       {visibleColumns.map((col) => {
                         const val = row[col.key];
                         const isEnum = col.type === "enum";
                         return (
-                          <td key={col.key} className="px-3 py-2 whitespace-nowrap">
+                          <td
+                            key={col.key}
+                            className={`apple-table__cell ${
+                              col.type === "number" ? "apple-table__cell--number" : ""
+                            }`}
+                          >
                             {isEnum ? (
                               <span
-                                className={`inline-flex items-center px-1.5 py-0.5 rounded text-[11px] ${
-                                  val === "Critical" || val === "Overdue"
-                                    ? "bg-[#fef2f2] text-[#dc2626]"
-                                    : val === "High"
-                                    ? "bg-[#fff7ed] text-[#ea580c]"
-                                    : val === "Medium" ||
-                                      val === "Pending" ||
-                                      val === "Scheduled"
-                                    ? "bg-[#fffbeb] text-[#d97706]"
-                                    : val === "Active"
-                                    ? "bg-[#eff6ff] text-[#2563eb]"
-                                    : val === "Completed" || val === "Resolved"
-                                    ? "bg-[#f0fdf4] text-[#16a34a]"
-                                    : "bg-[#f8fafc] text-[#475569]"
-                                }`}
-                                style={{ fontWeight: 500 }}
+                                className={`apple-table__badge ${getBadgeClass(val)}`}
                               >
                                 {String(val)}
                               </span>
                             ) : (
-                              <span
-                                className={
-                                  col.type === "number"
-                                    ? "tabular-nums text-[#1e293b]"
-                                    : "text-[#334155]"
-                                }
-                              >
-                                {formatValue(val, col.type)}
-                              </span>
+                              formatValue(val, col.type)
                             )}
                           </td>
                         );
                       })}
-                    </motion.tr>
+                    </tr>
                   );
                 })}
           </tbody>
 
           {/* Summary footer */}
           {Object.keys(summaryValues).length > 0 && !isLoading && (
-            <tfoot>
-              <tr className="bg-[#f8fafc] border-t border-[#e2e8f0]">
-                <td className="px-3 py-2 text-[11px] text-[#64748b]" style={{ fontWeight: 600 }}>
-                  &Sigma;
-                </td>
+            <tfoot className="apple-table__footer">
+              <tr>
+                <td className="apple-table__cell apple-table__cell--number">Σ</td>
                 {visibleColumns.map((col) => (
                   <td
                     key={col.key}
-                    className="px-3 py-2 text-[11px] text-[#475569] tabular-nums"
-                    style={{ fontWeight: 500 }}
+                    className={`apple-table__cell ${
+                      col.type === "number" ? "apple-table__cell--number" : ""
+                    }`}
                   >
-                    {summaryValues[col.key] || ""}
+                    {summaryValues[col.key] ? (
+                      <>
+                        <span className="apple-table__summary-value">
+                          {summaryValues[col.key]}
+                        </span>
+                        <span className="apple-table__summary-label"> avg</span>
+                      </>
+                    ) : (
+                      ""
+                    )}
                   </td>
                 ))}
               </tr>
@@ -299,55 +267,45 @@ export function ReportTable({
 
       {/* Pagination */}
       {totalPages > 1 && !isLoading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="flex items-center justify-between mt-3 px-1"
-        >
-          <span className="text-[12px] text-[#64748b] tabular-nums">
-            <span style={{ fontWeight: 500 }}>
-              {safePage * PAGE_SIZE + 1}&ndash;
+        <div className="apple-table-pagination">
+          <span className="apple-table-pagination__info">
+            <span className="apple-table-pagination__range">
+              {safePage * PAGE_SIZE + 1}–
               {Math.min((safePage + 1) * PAGE_SIZE, sortedData.length)}
             </span>
-            <span className="text-[#94a3b8]">
-              {" "}of {sortedData.length.toLocaleString()}
+            <span className="apple-table-pagination__total">
+              {" "}
+              of {sortedData.length.toLocaleString()}
             </span>
           </span>
-          <div className="flex items-center gap-0.5">
+          <div className="apple-table-pagination__controls">
             <PaginationButton
               disabled={safePage === 0}
               onClick={() => setPage(0)}
-              title="First page"
+              title="First"
             >
-              <ChevronsLeft className="w-3.5 h-3.5" />
+              ‹‹
             </PaginationButton>
             <PaginationButton
               disabled={safePage === 0}
               onClick={() => setPage(safePage - 1)}
-              title="Previous page"
+              title="Previous"
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              ‹
             </PaginationButton>
 
             {getPageNumbers(safePage, totalPages).map((pageNum, i) =>
               pageNum === -1 ? (
-                <span
-                  key={`ellipsis-${i}`}
-                  className="w-7 text-center text-[#94a3b8] text-[12px]"
-                >
+                <span key={`ellipsis-${i}`} className="apple-table-pagination__ellipsis">
                   ...
                 </span>
               ) : (
                 <button
                   key={pageNum}
                   onClick={() => setPage(pageNum)}
-                  className={`w-7 h-7 rounded-md text-[12px] transition-all duration-150 ${
-                    safePage === pageNum
-                      ? "bg-[#003a63] text-white shadow-sm"
-                      : "text-[#475569] hover:bg-[#f1f5f9]"
+                  className={`apple-table-pagination__page ${
+                    safePage === pageNum ? "apple-table-pagination__page--active" : ""
                   }`}
-                  style={{ fontWeight: safePage === pageNum ? 600 : 400 }}
                 >
                   {pageNum + 1}
                 </button>
@@ -357,19 +315,19 @@ export function ReportTable({
             <PaginationButton
               disabled={safePage >= totalPages - 1}
               onClick={() => setPage(safePage + 1)}
-              title="Next page"
+              title="Next"
             >
-              <ChevronRight className="w-3.5 h-3.5" />
+              ›
             </PaginationButton>
             <PaginationButton
               disabled={safePage >= totalPages - 1}
               onClick={() => setPage(totalPages - 1)}
-              title="Last page"
+              title="Last"
             >
-              <ChevronsRight className="w-3.5 h-3.5" />
+              ››
             </PaginationButton>
           </div>
-        </motion.div>
+        </div>
       )}
     </div>
   );
@@ -391,7 +349,7 @@ function PaginationButton({
       disabled={disabled}
       onClick={onClick}
       title={title}
-      className="w-7 h-7 flex items-center justify-center rounded-md text-[#475569] hover:bg-[#f1f5f9] disabled:opacity-30 disabled:pointer-events-none transition-colors"
+      className="apple-table-pagination__button"
     >
       {children}
     </button>
@@ -414,4 +372,15 @@ function getPageNumbers(current: number, total: number): number[] {
 
   pages.push(total - 1);
   return pages;
+}
+
+function getBadgeClass(value: unknown): string {
+  const val = String(value);
+  if (val === "Critical" || val === "Overdue") return "apple-table__badge--red";
+  if (val === "High") return "apple-table__badge--orange";
+  if (val === "Medium" || val === "Pending" || val === "Scheduled")
+    return "apple-table__badge--yellow";
+  if (val === "Active") return "apple-table__badge--blue";
+  if (val === "Completed" || val === "Resolved") return "apple-table__badge--green";
+  return "apple-table__badge--gray";
 }
