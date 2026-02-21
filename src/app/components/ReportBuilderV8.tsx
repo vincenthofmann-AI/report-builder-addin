@@ -155,8 +155,12 @@ export function ReportBuilderV8() {
 
   // Run Query
   const runQuery = (preview = false) => {
-    if (!query.dataSource) return;
+    if (!query.dataSource) {
+      console.log("No data source selected");
+      return;
+    }
 
+    console.log("Running query for:", query.dataSource.id);
     setIsLoading(true);
     setIsPreview(preview);
     const startTime = performance.now();
@@ -164,13 +168,16 @@ export function ReportBuilderV8() {
     dataFetcher
       .fetchDataSource(query.dataSource.id)
       .then((data) => {
+        console.log("Fetched data:", data.length, "rows");
         const endTime = performance.now();
         // Apply filters
         let filteredData = applyFilters(data);
+        console.log("After filters:", filteredData.length, "rows");
 
         // Apply grouping and aggregation if configured
         if (query.groupBy.length > 0 || query.metrics.length > 0) {
           filteredData = applyGrouping(filteredData);
+          console.log("After grouping:", filteredData.length, "rows");
         }
 
         // Limit for preview
@@ -180,6 +187,7 @@ export function ReportBuilderV8() {
           filteredData = filteredData.slice(0, query.limit);
         }
 
+        console.log("Final data:", filteredData.length, "rows", filteredData);
         setRawData(filteredData);
         setLastRunTime(Math.round(endTime - startTime));
         setIsLoading(false);
@@ -296,6 +304,8 @@ export function ReportBuilderV8() {
     const columnsToShow = query.groupBy.length > 0 || query.metrics.length > 0
       ? [...query.groupBy, ...query.metrics.map((m) => m.label)]
       : fieldsToShow;
+
+    console.log("Building columns for fields:", columnsToShow);
 
     return query.dataSource.columns
       .filter((col) => columnsToShow.includes(col.key) || columnsToShow.includes(col.label))
