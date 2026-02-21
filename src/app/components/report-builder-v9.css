@@ -299,12 +299,13 @@
 .rb9__tabs {
   display: flex;
   gap: 0;
-  border-bottom: 2px solid #e0e0e0;
-  padding: 0 20px;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0 16px;
+  background-color: #fafafa;
 }
 
 .rb9__tab {
-  padding: 14px 20px;
+  padding: 12px 16px;
   font-size: 14px;
   font-weight: 600;
   color: #757575;
@@ -313,25 +314,42 @@
   border-bottom: 3px solid transparent;
   cursor: pointer;
   transition: all 150ms;
-  margin-bottom: -2px;
+  margin-bottom: -1px;
+  position: relative;
 }
 
 .rb9__tab:hover {
   color: #1a1a1a;
-  background-color: #fafafa;
 }
 
 .rb9__tab--active {
   color: #1976d2;
   border-bottom-color: #1976d2;
+  background-color: #fff;
 }
 
 .rb9__results-content {
   flex: 1;
-  padding: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  background-color: #fff;
+}
+
+/* Table and Chart Containers - Full Bleed */
+.rb9__table-container {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.rb9__chart-container {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
 }
 
 /* Empty State */

@@ -13,7 +13,6 @@ import {
   Table,
   type IListColumn,
   type ITable,
-  Card,
   Button,
   SearchInput,
   Divider,
@@ -212,6 +211,9 @@ export function ReportBuilderV9() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Search State
+  const [fieldSearch, setFieldSearch] = useState("");
+
   // Load saved reports on mount
   useEffect(() => {
     const loadSavedReports = async () => {
@@ -403,6 +405,18 @@ export function ReportBuilderV9() {
       height: "100%",
     };
   }, [entities, tableColumns, isLoading]);
+
+  // Filtered fields for search
+  const filteredFields = useMemo(() => {
+    if (!query.dataSource) return [];
+    if (!fieldSearch.trim()) return query.dataSource.columns;
+
+    const searchLower = fieldSearch.toLowerCase();
+    return query.dataSource.columns.filter(col =>
+      col.label.toLowerCase().includes(searchLower) ||
+      col.key.toLowerCase().includes(searchLower)
+    );
+  }, [query.dataSource, fieldSearch]);
 
   // Chart data
   const chartData = useMemo(() => {
@@ -647,10 +661,22 @@ export function ReportBuilderV9() {
               <div className="rb9__section-header">
                 <span className="rb9__section-title">Available Fields</span>
               </div>
+              <SearchInput
+                value={fieldSearch}
+                onChange={(e) => setFieldSearch(e.target.value)}
+                placeholder="Search fields..."
+                style={{ marginBottom: "12px" }}
+              />
               <div className="rb9__fields">
-                {query.dataSource?.columns.map((col) => (
-                  <DraggableField key={col.key} field={col} type="dimension" />
-                ))}
+                {filteredFields.length > 0 ? (
+                  filteredFields.map((col) => (
+                    <DraggableField key={col.key} field={col} type="dimension" />
+                  ))
+                ) : (
+                  <div style={{ padding: "12px", textAlign: "center", color: "#9e9e9e", fontSize: "13px" }}>
+                    No fields match "{fieldSearch}"
+                  </div>
+                )}
               </div>
             </div>
           </aside>
@@ -821,17 +847,17 @@ export function ReportBuilderV9() {
                       </div>
                     </div>
                   ) : (
-                    <Card style={{ height: "100%", padding: 0, overflow: "hidden" }}>
+                    <div className="rb9__table-container">
                       <Table {...tableConfig}>
                         <Table.Pagination rowsPerPage={50} />
                       </Table>
-                    </Card>
+                    </div>
                   )}
                 </>
               )}
 
               {activeTab === "chart" && query.chartType !== "table" && (
-                <Card style={{ height: "100%", padding: 16 }}>
+                <div className="rb9__chart-container">
                   {chartData.length === 0 ? (
                     <div className="rb9__empty">
                       <div className="rb9__empty-title">No chart data</div>
@@ -864,7 +890,7 @@ export function ReportBuilderV9() {
                       )}
                     </ResponsiveContainer>
                   )}
-                </Card>
+                </div>
               )}
             </div>
           </aside>
