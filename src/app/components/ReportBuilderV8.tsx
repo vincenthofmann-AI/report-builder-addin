@@ -72,11 +72,11 @@ const PREVIEW_ROWS = 10;
 export function ReportBuilderV8() {
   const { api, isLive, isReady } = useGeotab();
   const dataFetcher = useDataFetcher();
-  const dataSources = dataFetcher.getDataSources();
+  const dataSources = dataFetcher.getDataSources() || [];
 
   // Query State
   const [query, setQuery] = useState<ReportQuery>({
-    dataSource: dataSources[0] || null,
+    dataSource: dataSources.length > 0 ? dataSources[0] : null,
     selectedFields: [],
     timeFilter: null,
     filters: [],
@@ -390,26 +390,30 @@ export function ReportBuilderV8() {
               <span className="rb8__section-icon">📊</span>
               <span className="rb8__section-title">Data Source</span>
             </div>
-            <Select
-              value={query.dataSource?.id || ""}
-              onChange={(e) => {
-                const ds = dataSources.find((d) => d.id === e.target.value);
-                setQuery((prev) => ({
-                  ...prev,
-                  dataSource: ds || null,
-                  selectedFields: [],
-                  groupBy: [],
-                  metrics: [],
-                }));
-              }}
-              className="rb8__select"
-            >
-              {dataSources.map((ds) => (
-                <option key={ds.id} value={ds.id}>
-                  {ds.name}
-                </option>
-              ))}
-            </Select>
+            {dataSources.length > 0 ? (
+              <Select
+                value={query.dataSource?.id || ""}
+                onChange={(e) => {
+                  const ds = dataSources.find((d) => d.id === e.target.value);
+                  setQuery((prev) => ({
+                    ...prev,
+                    dataSource: ds || null,
+                    selectedFields: [],
+                    groupBy: [],
+                    metrics: [],
+                  }));
+                }}
+                className="rb8__select"
+              >
+                {dataSources.map((ds) => (
+                  <option key={ds.id} value={ds.id}>
+                    {ds.name}
+                  </option>
+                ))}
+              </Select>
+            ) : (
+              <div className="rb8__empty-subtitle">No data sources available</div>
+            )}
           </div>
 
           <Divider />
