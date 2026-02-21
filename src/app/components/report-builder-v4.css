@@ -1,0 +1,436 @@
+/**
+ * Report Builder V4 - Zenith Design System Styling
+ * Uses Zenith design tokens and patterns
+ */
+
+.zenith-report-builder {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #fafafa;
+}
+
+/* Header */
+.zenith-report-builder__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+  height: 60px;
+  flex-shrink: 0;
+}
+
+.zenith-report-builder__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+  flex: 1;
+}
+
+.zenith-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.zenith-badge--live {
+  color: #34c759;
+  background-color: rgba(52, 199, 89, 0.1);
+}
+
+.zenith-badge--demo {
+  color: #8e8e93;
+  background-color: #f2f2f7;
+}
+
+.zenith-select {
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid #d1d1d6;
+  border-radius: 6px;
+  background-color: #ffffff;
+  cursor: pointer;
+  outline: none;
+  transition: all 150ms ease;
+}
+
+.zenith-select:hover {
+  border-color: #007aff;
+}
+
+.zenith-select:focus {
+  border-color: #007aff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+/* Body */
+.zenith-report-builder__body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Field Palette */
+.zenith-field-palette {
+  width: 280px;
+  background-color: #ffffff;
+  border-right: 1px solid #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.zenith-field-palette__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.zenith-field-palette__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.zenith-field-palette__count {
+  font-size: 13px;
+  color: #8e8e93;
+}
+
+/* Field Groups */
+.zenith-field-group {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f2f2f7;
+}
+
+.zenith-field-group__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.zenith-field-group__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8e8e93;
+  font-family: ui-monospace, monospace;
+}
+
+.zenith-field-group__label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.zenith-field-group__count {
+  font-size: 13px;
+  color: #8e8e93;
+}
+
+.zenith-field-group__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Field Pills - Draggable */
+.zenith-field-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: grab;
+  user-select: none;
+  transition: all 150ms ease;
+}
+
+.zenith-field-pill--dimension {
+  background-color: #007aff;
+  color: #ffffff;
+}
+
+.zenith-field-pill--measure {
+  background-color: #34c759;
+  color: #ffffff;
+}
+
+.zenith-field-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.zenith-field-pill:active {
+  cursor: grabbing;
+  transform: scale(0.98);
+}
+
+.zenith-field-pill--dragging {
+  opacity: 0.5;
+}
+
+.zenith-field-pill__icon {
+  font-size: 11px;
+  font-weight: 600;
+  font-family: ui-monospace, monospace;
+  opacity: 0.9;
+}
+
+.zenith-field-pill__label {
+  line-height: 1;
+}
+
+/* Dropped Pills - With Controls */
+.zenith-dropped-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 8px 0 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  position: relative;
+}
+
+.zenith-dropped-pill--dimension {
+  background-color: #007aff;
+  color: #ffffff;
+}
+
+.zenith-dropped-pill--measure {
+  background-color: #34c759;
+  color: #ffffff;
+}
+
+.zenith-dropped-pill__icon {
+  font-size: 11px;
+  font-weight: 600;
+  font-family: ui-monospace, monospace;
+  opacity: 0.9;
+}
+
+.zenith-dropped-pill__agg {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.8;
+  text-transform: uppercase;
+}
+
+.zenith-dropped-pill__label {
+  line-height: 1;
+}
+
+.zenith-dropped-pill__menu-container {
+  position: relative;
+}
+
+.zenith-dropped-pill__menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 10px;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.zenith-dropped-pill__menu-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.zenith-dropped-pill__menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  min-width: 100px;
+  background-color: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  padding: 4px;
+}
+
+.zenith-dropped-pill__menu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a1a;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 150ms ease;
+}
+
+.zenith-dropped-pill__menu-item:hover {
+  background-color: #f2f2f7;
+}
+
+.zenith-dropped-pill__menu-item--active {
+  background-color: #007aff;
+  color: #ffffff;
+}
+
+.zenith-dropped-pill__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.zenith-dropped-pill__remove:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Canvas */
+.zenith-canvas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Shelves / Drop Zones */
+.zenith-shelves {
+  padding: 20px;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-bottom: 1px solid #e5e5e5;
+  flex-shrink: 0;
+}
+
+.zenith-drop-zone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+}
+
+.zenith-drop-zone__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8e8e93;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 80px;
+}
+
+.zenith-drop-zone__content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: 40px;
+  padding: 8px;
+  background-color: #fafafa;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  transition: all 150ms ease;
+}
+
+.zenith-drop-zone__content--hover {
+  background-color: #f0f9ff;
+  border-color: #007aff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.zenith-drop-zone__content--invalid {
+  background-color: #fff5f5;
+  border-color: #ff3b30;
+}
+
+.zenith-drop-zone__placeholder {
+  font-size: 13px;
+  color: #c7c7cc;
+  font-weight: 500;
+}
+
+/* Table Container */
+.zenith-table-container {
+  flex: 1;
+  padding: 20px;
+  overflow: hidden;
+  background-color: #fafafa;
+}
+
+/* Empty State */
+.zenith-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 48px;
+}
+
+.zenith-empty-state__icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+  opacity: 0.3;
+}
+
+.zenith-empty-state__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.zenith-empty-state__subtitle {
+  font-size: 14px;
+  color: #8e8e93;
+  margin: 0;
+}

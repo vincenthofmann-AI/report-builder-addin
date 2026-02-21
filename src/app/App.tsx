@@ -2,7 +2,7 @@
 // before MyGeotab checks for geotab.addin.reportBuilder on the window.
 import "./services/addin-lifecycle";
 
-import { ReportBuilderV2 } from "./components/ReportBuilderV2";
+import { ReportBuilderV4 } from "./components/ReportBuilderV4";
 import { GeotabProvider } from "./services/geotab-context";
 import { ToastProvider } from "./services/ToastProvider";
 
@@ -10,7 +10,7 @@ export default function App() {
   return (
     <GeotabProvider>
       <ToastProvider>
-        <ReportBuilderV2 />
+        <ReportBuilderV4 />
       </ToastProvider>
     </GeotabProvider>
   );
