@@ -1,0 +1,376 @@
+/**
+ * Report Builder V8 - Clear Query Architecture
+ * Fixed terminology: Fields, Filters, Group By, Metrics (not Rows/Columns/Values)
+ */
+
+.rb8 {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f8f9fa;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Header */
+.rb8__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 56px;
+  background-color: #fff;
+  border-bottom: 1px solid #dadce0;
+  flex-shrink: 0;
+}
+
+.rb8__header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.rb8__header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rb8__run-time {
+  font-size: 12px;
+  color: #5f6368;
+  font-weight: 400;
+}
+
+.rb8__title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #202124;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.rb8__badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.rb8__badge--live {
+  color: #137333;
+  background-color: #e6f4ea;
+}
+
+.rb8__badge--demo {
+  color: #5f6368;
+  background-color: #f1f3f4;
+}
+
+/* Three-Panel Body */
+.rb8__body {
+  display: grid;
+  grid-template-columns: 280px 360px 1fr;
+  gap: 0;
+  flex: 1;
+  overflow: hidden;
+  background-color: #f8f9fa;
+}
+
+/* Panel 1: Sidebar (Data Source & Fields) */
+.rb8__sidebar {
+  background-color: #fff;
+  border-right: 1px solid #dadce0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* Panel 2: Config (Query Configuration) */
+.rb8__config {
+  background-color: #fff;
+  border-right: 1px solid #dadce0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.rb8__config-scroll {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Panel 3: Results */
+.rb8__results {
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rb8__results-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #dadce0;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rb8__results-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #202124;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rb8__results-count {
+  font-size: 12px;
+  color: #5f6368;
+  font-weight: 400;
+}
+
+.rb8__results-content {
+  flex: 1;
+  padding: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Section (Reusable) */
+.rb8__section {
+  padding: 16px 20px;
+}
+
+.rb8__section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.rb8__section-icon {
+  font-size: 16px;
+}
+
+.rb8__section-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex: 1;
+}
+
+.rb8__section-count {
+  font-size: 11px;
+  color: #80868b;
+  font-weight: 400;
+}
+
+.rb8__section-hint {
+  font-size: 12px;
+  color: #80868b;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+/* Select */
+.rb8__select {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #202124;
+  background-color: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+
+.rb8__select:hover {
+  border-color: #80868b;
+}
+
+.rb8__select:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 1px #1a73e8;
+}
+
+.rb8__select--small {
+  font-size: 13px;
+  padding: 6px 10px;
+}
+
+/* Field Selection */
+.rb8__field-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.rb8__field-action {
+  flex: 1;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #1a73e8;
+  background: none;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 120ms;
+}
+
+.rb8__field-action:hover {
+  background-color: #f8f9fa;
+  border-color: #1a73e8;
+}
+
+.rb8__field-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.rb8__field-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 120ms;
+}
+
+.rb8__field-checkbox:hover {
+  background-color: #f8f9fa;
+  border-color: #80868b;
+}
+
+.rb8__field-checkbox input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.rb8__field-label {
+  flex: 1;
+  font-size: 13px;
+  color: #202124;
+  font-weight: 400;
+}
+
+.rb8__field-type {
+  font-size: 11px;
+  color: #80868b;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Form Groups */
+.rb8__form-group {
+  margin-bottom: 16px;
+}
+
+.rb8__form-group:last-child {
+  margin-bottom: 0;
+}
+
+.rb8__label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #5f6368;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Metrics */
+.rb8__metric {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  background-color: #f8f9fa;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.rb8__metric-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  color: #5f6368;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 120ms;
+}
+
+.rb8__metric-remove:hover {
+  background-color: #fff;
+  color: #202124;
+}
+
+/* Empty State */
+.rb8__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.rb8__empty-title {
+  font-size: 16px;
+  font-weight: 400;
+  color: #5f6368;
+  margin-bottom: 8px;
+}
+
+.rb8__empty-subtitle {
+  font-size: 14px;
+  color: #80868b;
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+  .rb8__body {
+    grid-template-columns: 260px 320px 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .rb8__body {
+    grid-template-columns: 240px 1fr;
+  }
+
+  .rb8__config {
+    display: none;
+  }
+}
