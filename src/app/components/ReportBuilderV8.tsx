@@ -1,6 +1,7 @@
 /**
  * Report Builder V8 - Proper Query Builder Architecture
  * Following Superset patterns with clear terminology
+ * Version: 8.0.1
  */
 
 import { useState, useMemo } from "react";
@@ -341,18 +342,22 @@ export function ReportBuilderV8() {
       }));
   }, [query, rawData]);
 
-  const tableConfig: ITable<ReportRow> = {
-    entities,
-    columns: tableColumns,
-    isLoading,
-    sortable: {
-      defaultSort: {
-        column: tableColumns[0]?.id || "id",
-        direction: "asc" as const,
+  const tableConfig: ITable<ReportRow> | null = useMemo(() => {
+    if (tableColumns.length === 0) return null;
+
+    return {
+      entities,
+      columns: tableColumns,
+      isLoading,
+      sortable: {
+        defaultSort: {
+          column: tableColumns[0].id,
+          direction: "asc" as const,
+        },
       },
-    },
-    height: "100%",
-  };
+      height: "100%",
+    };
+  }, [entities, tableColumns, isLoading]);
 
   return (
     <div className="rb8">
@@ -658,7 +663,7 @@ export function ReportBuilderV8() {
           </div>
 
           <div className="rb8__results-content">
-            {entities.length === 0 || tableColumns.length === 0 ? (
+            {!tableConfig || entities.length === 0 ? (
               <div className="rb8__empty">
                 <div className="rb8__empty-title">No results</div>
                 <div className="rb8__empty-subtitle">
