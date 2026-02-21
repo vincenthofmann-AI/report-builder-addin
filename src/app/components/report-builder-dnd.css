@@ -1,0 +1,169 @@
+/**
+ * Minimal Drag-and-Drop Report Builder Styles
+ * Tableau + Apple: Field palette, drop zones, clean layout
+ */
+
+.report-builder-dnd {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--gray-50);
+}
+
+/* Header */
+.report-builder-dnd__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--white);
+  border-bottom: var(--hairline) solid var(--gray-200);
+  height: 48px;
+  shrink: 0;
+}
+
+.report-builder-dnd__title {
+  font-size: var(--text-headline);
+  font-weight: var(--weight-semibold);
+  color: var(--black);
+  margin: 0;
+}
+
+.report-builder-dnd__source-select {
+  width: 200px;
+  height: 32px;
+  padding: 0 var(--space-3);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: var(--text-body);
+  font-weight: var(--weight-regular);
+  color: var(--black);
+  background-color: var(--gray-50);
+  border: var(--hairline) solid transparent;
+  border-radius: var(--radius-md);
+  outline: none;
+  cursor: pointer;
+  transition-property: background-color, border-color, box-shadow;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--spring-medium);
+}
+
+.report-builder-dnd__source-select:hover {
+  background-color: var(--white);
+  border-color: var(--gray-200);
+}
+
+.report-builder-dnd__source-select:focus {
+  background-color: var(--white);
+  border-color: var(--blue);
+  box-shadow: 0 0 0 var(--thin) var(--blue);
+}
+
+/* Body */
+.report-builder-dnd__body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Left: Field Palette */
+.report-builder-dnd__palette {
+  width: 240px;
+  background-color: var(--white);
+  border-right: var(--hairline) solid var(--gray-200);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  shrink: 0;
+}
+
+.report-builder-dnd__palette-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: var(--hairline) solid var(--gray-200);
+}
+
+.report-builder-dnd__palette-title {
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  color: var(--gray-900);
+}
+
+.report-builder-dnd__palette-count {
+  font-size: var(--text-small);
+  color: var(--gray-500);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Field Groups */
+.report-builder-dnd__field-group {
+  padding: var(--space-4);
+  border-bottom: var(--hairline) solid var(--gray-100);
+}
+
+.report-builder-dnd__field-group-label {
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+.report-builder-dnd__field-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Right: Canvas */
+.report-builder-dnd__canvas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Drop Zones / Shelves */
+.report-builder-dnd__shelves {
+  padding: var(--space-4);
+  background-color: var(--gray-50);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  border-bottom: var(--hairline) solid var(--gray-200);
+  shrink: 0;
+}
+
+/* Table View */
+.report-builder-dnd__view {
+  flex: 1;
+  overflow: auto;
+  padding: var(--space-4);
+  background-color: var(--gray-50);
+}
+
+/* Empty State */
+.report-builder-dnd__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  padding: var(--space-8);
+}
+
+.report-builder-dnd__empty-title {
+  font-size: var(--text-headline);
+  font-weight: var(--weight-medium);
+  color: var(--gray-900);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.report-builder-dnd__empty-subtitle {
+  font-size: var(--text-body);
+  color: var(--gray-600);
+  margin: 0;
+}
