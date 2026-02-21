@@ -34,7 +34,7 @@ import {
   AlertCircle,
   CheckCircle2,
 } from "lucide-react";
-import { SearchInput, Checkbox, Tooltip } from "../services/zenith-adapter";
+import { SearchInput, Checkbox, Tooltip, TooltipTrigger, TooltipContent } from "../services/zenith-adapter";
 import { motion, AnimatePresence } from "motion/react";
 import { LeafletMap } from "./LeafletMap";
 
@@ -513,27 +513,4 @@ export function FleetMap() {
       </div>
     </div>
   );
-}
-
-// Missing TooltipTrigger and TooltipContent - add to zenith-adapter
-import type { ComponentPropsWithoutRef } from "react";
-
-function TooltipTrigger({
-  children,
-  asChild,
-  ...props
-}: ComponentPropsWithoutRef<"div"> & { asChild?: boolean }) {
-  return <div {...props}>{children}</div>;
-}
-
-function TooltipContent({
-  children,
-  side,
-  align,
-}: {
-  children: React.ReactNode;
-  side?: "top" | "right" | "bottom" | "left";
-  align?: "start" | "center" | "end";
-}) {
-  return <div className="tooltip-content">{children}</div>;
 }

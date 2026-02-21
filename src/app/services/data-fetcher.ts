@@ -16,8 +16,7 @@
 import type { GeotabApi } from "./geotab-context";
 import {
   fetchData as fetchMockData,
-  type GeotabTrip,
-  type GeotabFuelTransaction,
+  getDevices as getMockDevices,
   type GeotabFault,
   type GeotabDriverBehavior,
   type GeotabMaintenanceRecord,
@@ -326,7 +325,7 @@ export class DataFetcher {
         cost: wo.cost || 0,
         odometer: wo.odometer || 0,
         provider: wo.vendor || wo.provider || "Fleet Maintenance",
-        status: wo.status === "Closed" ? "Completed" : wo.status === "Open" ? "Scheduled" : "Pending",
+        status: wo.status === "Closed" ? "Completed" : wo.status === "Open" ? "Scheduled" : "Overdue",
       }));
     } catch (error) {
       // WorkOrder might not be available - return empty array
@@ -340,8 +339,7 @@ export class DataFetcher {
    */
   async fetchDevices(): Promise<any[]> {
     if (!this.isLive || !this.api) {
-      const { getDevices } = await import("./geotab-mock");
-      return getDevices();
+      return getMockDevices();
     }
 
     try {

@@ -39,7 +39,7 @@ import { CustomBuilderWizard, type CustomReportConfig } from "../modules/builder
 // Canvas Module - Report display (MYG Playbook: Report State visual treatment)
 import { ChartView, ReportPreview, ReportTable, type ChartType } from "../modules/canvas";
 import { useToast } from "../services/ToastProvider";
-import { Tooltip } from "../services/zenith-adapter";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../services/zenith-adapter";
 import { motion, AnimatePresence } from "motion/react";
 
 type AggregateFn = "sum" | "avg" | "count" | "min" | "max";

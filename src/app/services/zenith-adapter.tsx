@@ -9,6 +9,8 @@
  * Styles: Imported in src/main.tsx via "@geotab/zenith/dist/index.css"
  */
 
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
+
 // ============================================================================
 // Zenith Component Re-Exports
 // ============================================================================
@@ -223,3 +225,34 @@ export function registerAddIn(callbacks: ZenithAddInCallbacks): void {
 
 // Flag indicating this is using demo mode (not connected to real MyGeotab)
 export const ZENITH_IS_STUB = true;
+
+// ============================================================================
+// Tooltip Wrapper Components
+// ============================================================================
+
+/**
+ * TooltipTrigger - Wrapper for tooltip trigger element
+ * Use with asChild prop to pass props to child element
+ */
+export function TooltipTrigger({
+  children,
+  asChild,
+  ...props
+}: ComponentPropsWithoutRef<"div"> & { asChild?: boolean }) {
+  return <div {...props}>{children}</div>;
+}
+
+/**
+ * TooltipContent - Wrapper for tooltip content
+ */
+export function TooltipContent({
+  children,
+  side,
+  align,
+}: {
+  children: ReactNode;
+  side?: "top" | "right" | "bottom" | "left";
+  align?: "start" | "center" | "end";
+}) {
+  return <div className="tooltip-content">{children}</div>;
+}
