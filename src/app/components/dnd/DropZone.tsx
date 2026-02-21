@@ -4,18 +4,18 @@
  */
 
 import { useDrop } from "react-dnd";
-import { FieldPill, type Field } from "./FieldPill";
+import { FieldPillV2, type Field, type Aggregation } from "./FieldPillV2";
 import "./drop-zone.css";
 
 interface DroppedField {
   field: Field;
-  aggregation?: string;
+  aggregation?: Aggregation;
 }
 
 interface DropZoneProps {
   label: string;
   fields: DroppedField[];
-  onDrop: (field: Field, aggregation?: string) => void;
+  onDrop: (field: Field, aggregation?: Aggregation) => void;
   onRemove: (index: number) => void;
   acceptTypes?: string[];
 }
@@ -29,7 +29,7 @@ export function DropZone({
 }: DropZoneProps) {
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: "field",
-    drop: (item: { field: Field; aggregation?: string }) => {
+    drop: (item: { field: Field; aggregation?: Aggregation }) => {
       onDrop(item.field, item.aggregation);
     },
     canDrop: (item: { field: Field }) => {
@@ -59,10 +59,10 @@ export function DropZone({
           </div>
         ) : (
           fields.map((droppedField, index) => (
-            <FieldPill
+            <FieldPillV2
               key={`${droppedField.field.id}-${index}`}
               field={droppedField.field}
-              aggregation={droppedField.aggregation}
+              aggregation={droppedField.aggregation || "NONE"}
               onRemove={() => onRemove(index)}
             />
           ))
