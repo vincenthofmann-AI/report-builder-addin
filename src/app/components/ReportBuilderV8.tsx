@@ -13,7 +13,6 @@ import {
   SearchInput,
   Divider,
   Button,
-  Select,
 } from "@geotab/zenith";
 import {
   BarChart,
@@ -391,7 +390,7 @@ export function ReportBuilderV8() {
               <span className="rb8__section-title">Data Source</span>
             </div>
             {dataSources.length > 0 ? (
-              <Select
+              <select
                 value={query.dataSource?.id || ""}
                 onChange={(e) => {
                   const ds = dataSources.find((d) => d.id === e.target.value);
@@ -410,7 +409,7 @@ export function ReportBuilderV8() {
                     {ds.name}
                   </option>
                 ))}
-              </Select>
+              </select>
             ) : (
               <div className="rb8__empty-subtitle">No data sources available</div>
             )}
@@ -472,7 +471,7 @@ export function ReportBuilderV8() {
                   </div>
                   <div className="rb8__form-group">
                     <label className="rb8__label">Time Column</label>
-                    <Select
+                    <select
                       value={query.timeFilter?.column || ""}
                       onChange={(e) =>
                         setQuery((prev) => ({
@@ -490,12 +489,12 @@ export function ReportBuilderV8() {
                           {col.label}
                         </option>
                       ))}
-                    </Select>
+                    </select>
                   </div>
                   {query.timeFilter && (
                     <div className="rb8__form-group">
                       <label className="rb8__label">Time Range</label>
-                      <Select
+                      <select
                         value={query.timeFilter.range}
                         onChange={(e) =>
                           setQuery((prev) => ({
@@ -510,7 +509,7 @@ export function ReportBuilderV8() {
                         <option value="last_7_days">Last 7 days</option>
                         <option value="last_30_days">Last 30 days</option>
                         <option value="this_month">This month</option>
-                      </Select>
+                      </select>
                     </div>
                   )}
                 </div>
@@ -527,7 +526,7 @@ export function ReportBuilderV8() {
                     <span className="rb8__section-title">Group By</span>
                   </div>
                   <div className="rb8__form-group">
-                    <Select
+                    <select
                       value={query.groupBy[0] || ""}
                       onChange={(e) =>
                         setQuery((prev) => ({
@@ -543,7 +542,7 @@ export function ReportBuilderV8() {
                           {col.label}
                         </option>
                       ))}
-                    </Select>
+                    </select>
                   </div>
                 </div>
                 <Divider />
@@ -583,7 +582,7 @@ export function ReportBuilderV8() {
                   </Button>
                   {query.metrics.map((metric, idx) => (
                     <div key={idx} className="rb8__metric">
-                      <Select
+                      <select
                         value={metric.aggregation}
                         onChange={(e) => {
                           const newMetrics = [...query.metrics];
@@ -598,8 +597,8 @@ export function ReportBuilderV8() {
                         <option value="COUNT">COUNT</option>
                         <option value="MIN">MIN</option>
                         <option value="MAX">MAX</option>
-                      </Select>
-                      <Select
+                      </select>
+                      <select
                         value={metric.field}
                         onChange={(e) => {
                           const newMetrics = [...query.metrics];
@@ -614,7 +613,7 @@ export function ReportBuilderV8() {
                             {f.label}
                           </option>
                         ))}
-                      </Select>
+                      </select>
                       <button
                         onClick={() => {
                           setQuery((prev) => ({
@@ -639,7 +638,7 @@ export function ReportBuilderV8() {
                 <span className="rb8__section-icon">📉</span>
                 <span className="rb8__section-title">Visualization</span>
               </div>
-              <Select
+              <select
                 value={query.chartType}
                 onChange={(e) =>
                   setQuery((prev) => ({ ...prev, chartType: e.target.value as ChartType }))
@@ -649,7 +648,7 @@ export function ReportBuilderV8() {
                 <option value="table">Table</option>
                 <option value="bar">Bar Chart</option>
                 <option value="line">Line Chart</option>
-              </Select>
+              </select>
             </div>
           </div>
         </main>
