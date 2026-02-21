@@ -1,0 +1,129 @@
+/**
+ * Apple Filter Pill Styles
+ * Jony Ive Level: Plain English, invisible container, edit on tap
+ */
+
+.apple-filter-pill {
+  /* Base */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 28px;
+  padding: 0 var(--space-3);
+  background-color: var(--gray-100);
+  border-radius: var(--radius-full);
+  font-size: var(--text-small);
+  line-height: 1;
+  cursor: pointer;
+
+  /* Motion */
+  transition-property: background-color, transform, box-shadow;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--spring-medium);
+
+  /* Hover - Lift */
+  &:hover {
+    background-color: var(--gray-200);
+  }
+
+  /* Active - Spring back */
+  &:active {
+    transform: scale(0.98);
+    transition-duration: 50ms;
+  }
+}
+
+.apple-filter-pill__text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+
+.apple-filter-pill__label {
+  color: var(--gray-600);
+  font-weight: var(--weight-regular);
+}
+
+.apple-filter-pill__separator {
+  color: var(--gray-500);
+}
+
+.apple-filter-pill__value {
+  color: var(--black);
+  font-weight: var(--weight-medium);
+}
+
+/* Remove Button - Invisible until hover */
+.apple-filter-pill__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  border-radius: var(--radius-full);
+  color: var(--gray-600);
+  cursor: pointer;
+  opacity: 0;
+
+  /* Motion */
+  transition-property: opacity, background-color, color;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--spring-medium);
+
+  /* Show on pill hover */
+  .apple-filter-pill:hover & {
+    opacity: 1;
+  }
+
+  /* Hover state */
+  &:hover {
+    background-color: var(--gray-400);
+    color: var(--white);
+  }
+
+  /* Active state */
+  &:active {
+    transform: scale(0.9);
+    transition-duration: 50ms;
+  }
+}
+
+/* Filter Pill Group */
+.apple-filter-pill-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Clear All Button - Text style, invisible until needed */
+.apple-filter-pill-group__clear {
+  height: 28px;
+  padding: 0 var(--space-3);
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  color: var(--blue);
+  background: none;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+
+  /* Motion */
+  transition-property: background-color, color;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--spring-medium);
+
+  /* Hover */
+  &:hover {
+    background-color: var(--gray-50);
+  }
+
+  /* Active */
+  &:active {
+    background-color: var(--gray-100);
+  }
+}

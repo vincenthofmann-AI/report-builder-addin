@@ -1,0 +1,122 @@
+/**
+ * Apple Filter Bar Styles
+ * Jony Ive Level: Invisible container, plain English, content first
+ */
+
+.apple-filter-bar {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  min-height: 44px;
+
+  /* Background - Subtle */
+  background-color: var(--white);
+  border-bottom: var(--hairline) solid var(--gray-200);
+
+  /* Overflow */
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Empty State */
+.apple-filter-bar__empty {
+  font-size: var(--text-small);
+  color: var(--gray-500);
+  font-weight: var(--weight-regular);
+}
+
+/* Record Count - Right side */
+.apple-filter-bar__count {
+  margin-left: auto;
+  font-size: var(--text-small);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.apple-filter-bar__count-value {
+  color: var(--black);
+  font-weight: var(--weight-medium);
+}
+
+.apple-filter-bar__count-total {
+  color: var(--gray-600);
+  font-weight: var(--weight-regular);
+}
+
+/* Filter Editor Popover */
+.apple-filter-editor {
+  width: 280px;
+  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: var(--hairline) solid var(--gray-200);
+  overflow: hidden;
+}
+
+.apple-filter-editor__content {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Field */
+.apple-filter-editor__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.apple-filter-editor__label {
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  color: var(--gray-900);
+  padding-left: var(--space-1);
+}
+
+/* Select (Apple style) */
+.apple-filter-editor__select {
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--space-3);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: var(--text-body);
+  font-weight: var(--weight-regular);
+  color: var(--black);
+  background-color: var(--gray-50);
+  border: var(--hairline) solid transparent;
+  border-radius: var(--radius-md);
+  outline: none;
+  cursor: pointer;
+
+  /* Motion */
+  transition-property: background-color, border-color, box-shadow;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--spring-medium);
+
+  /* Hover */
+  &:hover {
+    background-color: var(--white);
+    border-color: var(--gray-200);
+  }
+
+  /* Focus */
+  &:focus {
+    background-color: var(--white);
+    border-color: var(--blue);
+    box-shadow: 0 0 0 var(--thin) var(--blue);
+  }
+}
+
+/* Actions */
+.apple-filter-editor__actions {
+  display: flex;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+}
+
+.apple-filter-editor__actions > button {
+  flex: 1;
+}

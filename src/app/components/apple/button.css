@@ -1,0 +1,110 @@
+/**
+ * Apple Button Styles
+ * Jony Ive Level: Invisible until needed, spring physics, precision
+ */
+
+.apple-button {
+  /* Base */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+
+  /* Motion */
+  transition-property: background-color, color, transform, box-shadow;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--spring-medium);
+
+  /* Active state - Spring back */
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+    transition-duration: 50ms;
+  }
+
+  /* Focus state */
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 var(--medium) var(--blue);
+  }
+}
+
+/* Size Variants - 8pt Grid */
+.apple-button--small {
+  height: 28px;
+  padding: 0 var(--space-3);
+  font-size: var(--text-small);
+  border-radius: var(--radius-sm);
+  gap: var(--space-1);
+}
+
+.apple-button--medium {
+  height: 36px;
+  padding: 0 var(--space-4);
+  font-size: var(--text-body);
+  border-radius: var(--radius-md);
+  gap: var(--space-2);
+}
+
+.apple-button--large {
+  height: 44px;
+  padding: 0 var(--space-6);
+  font-size: var(--text-headline);
+  border-radius: var(--radius-lg);
+  gap: var(--space-2);
+}
+
+/* Primary - Blue, high contrast */
+.apple-button--primary {
+  background-color: var(--blue);
+  color: var(--white);
+
+  &:hover:not(:disabled) {
+    background-color: var(--blue-dark);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--blue-dark);
+  }
+}
+
+/* Secondary - Gray, subtle */
+.apple-button--secondary {
+  background-color: var(--gray-100);
+  color: var(--black);
+
+  &:hover:not(:disabled) {
+    background-color: var(--gray-200);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--gray-200);
+  }
+}
+
+/* Text - Invisible until hover */
+.apple-button--text {
+  background-color: transparent;
+  color: var(--blue);
+  padding: 0 var(--space-2);
+
+  &:hover:not(:disabled) {
+    background-color: var(--gray-50);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--gray-100);
+  }
+}
+
+/* Disabled State - Low opacity, no interaction */
+.apple-button--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}

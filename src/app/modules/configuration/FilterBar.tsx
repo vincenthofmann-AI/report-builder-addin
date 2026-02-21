@@ -1,8 +1,14 @@
-import { useState, useEffect, useMemo, useRef } from "react";
-import { X, Plus, Filter, Sparkles } from "lucide-react";
+/**
+ * Apple-Level Filter Bar
+ * Jony Ive Principles: Plain English, Invisible UI, Content First
+ */
+
+import { useState, useRef } from "react";
 import { type ColumnDef } from "../../services/geotab-mock";
 import { ControlledPopup } from "../../services/zenith-adapter";
-import { motion, AnimatePresence } from "motion/react";
+import { FilterPill, FilterPillGroup } from "../../components/apple";
+import { Button, Input } from "../../components/apple";
+import "./filter-bar.css";
 
 export interface FilterRule {
   id: string;
@@ -22,9 +28,9 @@ interface FilterBarProps {
 const operatorsByType: Record<string, { value: string; label: string }[]> = {
   string: [
     { value: "contains", label: "contains" },
-    { value: "equals", label: "equals" },
+    { value: "equals", label: "is" },
     { value: "startsWith", label: "starts with" },
-    { value: "notEquals", label: "does not equal" },
+    { value: "notEquals", label: "is not" },
   ],
   number: [
     { value: "equals", label: "=" },
@@ -35,9 +41,9 @@ const operatorsByType: Record<string, { value: string; label: string }[]> = {
     { value: "notEquals", label: "!=" },
   ],
   date: [
-    { value: "after", label: "is after" },
-    { value: "before", label: "is before" },
-    { value: "equals", label: "is on" },
+    { value: "after", label: "after" },
+    { value: "before", label: "before" },
+    { value: "equals", label: "on" },
   ],
   enum: [
     { value: "equals", label: "is" },
@@ -45,9 +51,26 @@ const operatorsByType: Record<string, { value: string; label: string }[]> = {
   ],
 };
 
-function operatorLabel(type: string, operator: string): string {
-  const ops = operatorsByType[type] || operatorsByType.string;
-  return ops.find((o) => o.value === operator)?.label || operator;
+function formatFilterValue(
+  column: ColumnDef,
+  operator: string,
+  value: string
+): string {
+  const ops = operatorsByType[column.type] || operatorsByType.string;
+  const opLabel = ops.find((o) => o.value === operator)?.label || operator;
+
+  // For string "contains", don't show operator
+  if (column.type === "string" && operator === "contains") {
+    return value;
+  }
+
+  // For equals, just show value
+  if (operator === "equals" && column.type !== "date") {
+    return value;
+  }
+
+  // Otherwise show operator + value
+  return `${opLabel} ${value}`;
 }
 
 export function FilterBar({
@@ -57,23 +80,14 @@ export function FilterBar({
   totalRecords,
   filteredRecords,
 }: FilterBarProps) {
-  const [addingFilter, setAddingFilter] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const addFilterButtonRef = useRef<HTMLButtonElement>(null);
-  const filterButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const [addingFilter, setAddingFilter] = useState(false);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
+  const filterRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const filterableColumns = columns.filter((c) => c.filterable);
   const hasFilters = filters.length > 0;
   const isFiltered = filteredRecords !== totalRecords;
-
-  // Smart suggestions: suggest popular filter columns
-  const suggestions = useMemo(() => {
-    if (filters.length > 0) return [];
-    // Suggest up to 2 filterable columns that make sense
-    return filterableColumns
-      .filter((c) => c.type === "string" || c.type === "enum")
-      .slice(0, 2);
-  }, [filterableColumns, filters.length]);
 
   const removeFilter = (id: string) => {
     onFiltersChange(filters.filter((f) => f.id !== id));
@@ -84,65 +98,40 @@ export function FilterBar({
   };
 
   return (
-    <div className="flex items-center gap-2 px-4 py-2 bg-white border-b border-[#e2e8f0] min-h-[44px] overflow-x-auto">
-      <div className="flex items-center gap-1.5 text-[#64748b] shrink-0">
-        <Filter className="w-3.5 h-3.5" />
-        <span className="text-[12px]" style={{ fontWeight: 500 }}>
-          Filters
-        </span>
-      </div>
-
-      {/* Filter pills */}
-      <div className="flex items-center gap-1.5 flex-wrap">
-        <AnimatePresence mode="popLayout">
+    <div className="apple-filter-bar">
+      {/* Filter Pills */}
+      {hasFilters ? (
+        <FilterPillGroup onClearAll={clearAll}>
           {filters.map((filter) => {
             const col = columns.find((c) => c.key === filter.column);
             if (!col) return null;
-            const opLabel = operatorLabel(col.type, filter.operator);
-            const displayValue =
-              filter.value.length > 20
-                ? filter.value.slice(0, 20) + "..."
-                : filter.value;
 
             return (
-              <motion.div
+              <div
                 key={filter.id}
-                layout
-                initial={{ opacity: 0, scale: 0.85 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.85 }}
-                transition={{ duration: 0.15 }}
+                ref={(el) => {
+                  if (el) filterRefs.current.set(filter.id, el);
+                  else filterRefs.current.delete(filter.id);
+                }}
               >
-                <button
-                  ref={(el) => {
-                    if (el) filterButtonRefs.current.set(filter.id, el);
-                    else filterButtonRefs.current.delete(filter.id);
-                  }}
-                  onClick={() => setEditingId(editingId === filter.id ? null : filter.id)}
-                  className="flex items-center gap-1 px-2 py-1 rounded-md bg-[#003a63]/[0.06] text-[#003a63] text-[12px] hover:bg-[#003a63]/[0.10] transition-all duration-150 group border border-transparent hover:border-[#003a63]/10"
-                  style={{ fontWeight: 450 }}
-                >
-                  <span className="text-[#64748b]">{col.label}</span>
-                  <span className="text-[#94a3b8]">{opLabel}</span>
-                  <span style={{ fontWeight: 500 }}>
-                    {displayValue || "(empty)"}
-                  </span>
-                  <X
-                    className="w-3 h-3 ml-0.5 text-[#94a3b8] hover:text-[#dc2626] transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeFilter(filter.id);
-                    }}
-                  />
-                </button>
+                <FilterPill
+                  label={col.label}
+                  value={formatFilterValue(col, filter.operator, filter.value)}
+                  onRemove={() => removeFilter(filter.id)}
+                  onEdit={() =>
+                    setEditingId(editingId === filter.id ? null : filter.id)
+                  }
+                />
 
-                {filterButtonRefs.current.get(filter.id) && editingId === filter.id && (
+                {filterRefs.current.get(filter.id) && editingId === filter.id && (
                   <ControlledPopup
-                    triggerRef={{ current: filterButtonRefs.current.get(filter.id) || null }}
+                    triggerRef={{
+                      current: filterRefs.current.get(filter.id) || null,
+                    }}
                     isOpen={editingId === filter.id}
                     onOpenChange={(open) => setEditingId(open ? filter.id : null)}
                     alignment="bottom-left"
-                    className="w-72 p-3 bg-white rounded-lg shadow-lg border border-[#e2e8f0]"
+                    className="apple-filter-editor"
                   >
                     <FilterEditor
                       filter={filter}
@@ -157,110 +146,60 @@ export function FilterBar({
                     />
                   </ControlledPopup>
                 )}
-              </motion.div>
+              </div>
             );
           })}
-        </AnimatePresence>
+        </FilterPillGroup>
+      ) : (
+        <span className="apple-filter-bar__empty">No filters</span>
+      )}
 
-        {/* Smart filter suggestions (when no filters yet) */}
-        <AnimatePresence>
-          {suggestions.length > 0 && !addingFilter && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex items-center gap-1.5"
-            >
-              {suggestions.map((col) => (
-                <button
-                  key={col.key}
-                  onClick={() => {
-                    const ops = operatorsByType[col.type] || operatorsByType.string;
-                    onFiltersChange([
-                      ...filters,
-                      {
-                        id: `filter-${Date.now()}-${col.key}`,
-                        column: col.key,
-                        operator: ops[0].value,
-                        value: "",
-                      },
-                    ]);
-                  }}
-                  className="flex items-center gap-1 px-2 py-1 rounded-md border border-dashed border-[#e2e8f0] text-[11px] text-[#94a3b8] hover:text-[#64748b] hover:border-[#cbd5e1] transition-all duration-150"
-                >
-                  <Sparkles className="w-2.5 h-2.5" />
-                  {col.label}
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+      {/* Add Filter Button */}
+      <Button
+        ref={addButtonRef}
+        variant="text"
+        size="small"
+        onClick={() => setAddingFilter(!addingFilter)}
+      >
+        Add filter
+      </Button>
 
-        {/* Add filter button */}
-        <button
-          ref={addFilterButtonRef}
-          onClick={() => setAddingFilter(!addingFilter)}
-          className="flex items-center gap-1 px-2 py-1 rounded-md border border-dashed border-[#cbd5e1] text-[12px] text-[#64748b] hover:border-[#003a63]/30 hover:text-[#003a63] hover:bg-[#003a63]/[0.02] transition-all duration-150"
+      {addButtonRef.current && (
+        <ControlledPopup
+          triggerRef={addButtonRef}
+          isOpen={addingFilter}
+          onOpenChange={setAddingFilter}
+          alignment="bottom-left"
+          className="apple-filter-editor"
         >
-          <Plus className="w-3 h-3" />
-          <span className="hidden sm:inline">Add filter</span>
-        </button>
+          <FilterEditor
+            columns={filterableColumns}
+            onSave={(newFilter) => {
+              onFiltersChange([...filters, newFilter]);
+              setAddingFilter(false);
+            }}
+            onCancel={() => setAddingFilter(false)}
+          />
+        </ControlledPopup>
+      )}
 
-        {addFilterButtonRef.current && (
-          <ControlledPopup
-            triggerRef={addFilterButtonRef}
-            isOpen={addingFilter}
-            onOpenChange={setAddingFilter}
-            alignment="bottom-left"
-            className="w-72 p-3 bg-white rounded-lg shadow-lg border border-[#e2e8f0]"
-          >
-            <FilterEditor
-              columns={filterableColumns}
-              onSave={(newFilter) => {
-                onFiltersChange([...filters, newFilter]);
-                setAddingFilter(false);
-              }}
-              onCancel={() => setAddingFilter(false)}
-            />
-          </ControlledPopup>
-        )}
-      </div>
-
-      {/* Right side: record count + clear */}
-      <div className="ml-auto flex items-center gap-3 shrink-0">
-        <AnimatePresence>
-          {isFiltered && (
-            <motion.span
-              initial={{ opacity: 0, x: 4 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 4 }}
-              className="text-[11px] text-[#64748b] tabular-nums"
-            >
-              <span style={{ fontWeight: 500 }}>{filteredRecords.toLocaleString()}</span>
-              <span className="text-[#94a3b8]"> of {totalRecords.toLocaleString()}</span>
-            </motion.span>
-          )}
-        </AnimatePresence>
-        <AnimatePresence>
-          {hasFilters && (
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={clearAll}
-              className="text-[11px] text-[#dc2626]/70 hover:text-[#dc2626] transition-colors"
-              style={{ fontWeight: 500 }}
-            >
-              Clear all
-            </motion.button>
-          )}
-        </AnimatePresence>
-      </div>
+      {/* Record Count - Right side */}
+      {isFiltered && (
+        <div className="apple-filter-bar__count">
+          <span className="apple-filter-bar__count-value">
+            {filteredRecords.toLocaleString()}
+          </span>
+          <span className="apple-filter-bar__count-total">
+            {" "}
+            of {totalRecords.toLocaleString()}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
 
-// ------- Filter Editor (used in popover) -------
+// ------- Filter Editor (Apple-level) -------
 
 function FilterEditor({
   filter,
@@ -278,24 +217,15 @@ function FilterEditor({
   const [value, setValue] = useState(filter?.value || "");
 
   const selectedCol = columns.find((c) => c.key === column);
-  const operators = operatorsByType[selectedCol?.type || "string"] || operatorsByType.string;
-
-  // Reset operator when column changes
-  useEffect(() => {
-    if (!filter) {
-      const col = columns.find((c) => c.key === column);
-      const ops = operatorsByType[col?.type || "string"] || operatorsByType.string;
-      setOperator(ops[0].value);
-      setValue("");
-    }
-  }, [column, columns, filter]);
+  const operators =
+    operatorsByType[selectedCol?.type || "string"] || operatorsByType.string;
 
   // Set initial operator
-  useEffect(() => {
+  useState(() => {
     if (!operator && operators.length > 0) {
       setOperator(operators[0].value);
     }
-  }, [operator, operators]);
+  });
 
   const handleSave = () => {
     onSave({
@@ -306,16 +236,23 @@ function FilterEditor({
     });
   };
 
+  const handleColumnChange = (newColumn: string) => {
+    setColumn(newColumn);
+    const col = columns.find((c) => c.key === newColumn);
+    const ops = operatorsByType[col?.type || "string"] || operatorsByType.string;
+    setOperator(ops[0].value);
+    setValue("");
+  };
+
   return (
-    <div className="space-y-3">
-      <div>
-        <label className="text-[11px] text-[#64748b] block mb-1" style={{ fontWeight: 500 }}>
-          Column
-        </label>
+    <div className="apple-filter-editor__content">
+      {/* Column */}
+      <div className="apple-filter-editor__field">
+        <label className="apple-filter-editor__label">Column</label>
         <select
-          className="w-full px-2.5 py-1.5 text-[13px] bg-white border border-[#e2e8f0] rounded-md focus:outline-none focus:border-[#003a63] transition-colors"
+          className="apple-filter-editor__select"
           value={column}
-          onChange={(e) => setColumn(e.target.value)}
+          onChange={(e) => handleColumnChange(e.target.value)}
         >
           {columns.map((c) => (
             <option key={c.key} value={c.key}>
@@ -324,12 +261,12 @@ function FilterEditor({
           ))}
         </select>
       </div>
-      <div>
-        <label className="text-[11px] text-[#64748b] block mb-1" style={{ fontWeight: 500 }}>
-          Condition
-        </label>
+
+      {/* Operator */}
+      <div className="apple-filter-editor__field">
+        <label className="apple-filter-editor__label">Condition</label>
         <select
-          className="w-full px-2.5 py-1.5 text-[13px] bg-white border border-[#e2e8f0] rounded-md focus:outline-none focus:border-[#003a63] transition-colors"
+          className="apple-filter-editor__select"
           value={operator}
           onChange={(e) => setOperator(e.target.value)}
         >
@@ -340,13 +277,13 @@ function FilterEditor({
           ))}
         </select>
       </div>
-      <div>
-        <label className="text-[11px] text-[#64748b] block mb-1" style={{ fontWeight: 500 }}>
-          Value
-        </label>
+
+      {/* Value */}
+      <div className="apple-filter-editor__field">
+        <label className="apple-filter-editor__label">Value</label>
         {selectedCol?.type === "enum" && selectedCol.enumValues ? (
           <select
-            className="w-full px-2.5 py-1.5 text-[13px] bg-white border border-[#e2e8f0] rounded-md focus:outline-none focus:border-[#003a63] transition-colors"
+            className="apple-filter-editor__select"
             value={value}
             onChange={(e) => setValue(e.target.value)}
           >
@@ -358,7 +295,7 @@ function FilterEditor({
             ))}
           </select>
         ) : (
-          <input
+          <Input
             type={
               selectedCol?.type === "number"
                 ? "number"
@@ -371,33 +308,27 @@ function FilterEditor({
                 ? "Enter number..."
                 : selectedCol?.type === "date"
                 ? ""
-                : "Enter value..."
+                : "Type to filter..."
             }
-            className="w-full px-2.5 py-1.5 text-[13px] bg-white border border-[#e2e8f0] rounded-md focus:outline-none focus:border-[#003a63] transition-colors"
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSave();
+              if (e.key === "Escape") onCancel();
             }}
             autoFocus
           />
         )}
       </div>
-      <div className="flex items-center gap-2 pt-1">
-        <button
-          onClick={handleSave}
-          className="flex-1 px-3 py-1.5 text-[12px] bg-[#003a63] text-white rounded-md hover:bg-[#002d4e] transition-colors"
-          style={{ fontWeight: 500 }}
-        >
+
+      {/* Actions */}
+      <div className="apple-filter-editor__actions">
+        <Button onClick={handleSave} variant="primary" size="small">
           Apply
-        </button>
-        <button
-          onClick={onCancel}
-          className="flex-1 px-3 py-1.5 text-[12px] bg-[#f1f5f9] text-[#475569] rounded-md hover:bg-[#e2e8f0] transition-colors"
-          style={{ fontWeight: 500 }}
-        >
+        </Button>
+        <Button onClick={onCancel} variant="secondary" size="small">
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   );
