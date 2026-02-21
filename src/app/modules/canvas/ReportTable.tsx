@@ -5,6 +5,7 @@
 
 import { useState, useMemo } from "react";
 import { type ColumnDef } from "../../services/geotab-mock";
+import { groupAndAggregate, calculateSubtotals } from "../../../core/report-generator";
 import "./report-table.css";
 
 interface ReportTableProps {
@@ -39,6 +40,18 @@ export function ReportTable({
         .filter(Boolean),
     [selectedColumns, columns]
   );
+
+  // Compute grouped data if groupByColumn is provided
+  const groupedData = useMemo(() => {
+    if (!groupByColumn || !aggregateColumn) return null;
+    return groupAndAggregate(data, groupByColumn, aggregateColumn, aggregateFn);
+  }, [data, groupByColumn, aggregateColumn, aggregateFn]);
+
+  // Calculate subtotals and grand total for grouped data
+  const { grandTotal, subtotals } = useMemo(() => {
+    if (!groupedData) return { grandTotal: 0, subtotals: new Map() };
+    return calculateSubtotals(groupedData, aggregateFn);
+  }, [groupedData, aggregateFn]);
 
   const sortedData = useMemo(() => {
     if (!sortKey) return data;
@@ -201,7 +214,81 @@ export function ReportTable({
                     ))}
                   </tr>
                 ))
-              : pagedData.map((row, idx) => {
+              : groupedData && groupByColumn
+              ? // Render grouped data with subtotals
+                groupedData.flatMap((group, groupIdx) => {
+                  const rows = [];
+
+                  // Group header
+                  rows.push(
+                    <tr key={`group-${groupIdx}`} className="apple-table__row apple-table__row--group-header">
+                      <td className="apple-table__cell" colSpan={1 + visibleColumns.length} style={{ fontWeight: 600, background: '#f1f5f9', padding: '12px 16px' }}>
+                        {group.groupName}
+                      </td>
+                    </tr>
+                  );
+
+                  // Group records
+                  group.records.forEach((row, idx) => {
+                    rows.push(
+                      <tr key={`group-${groupIdx}-row-${idx}`} className="apple-table__row">
+                        <td className="apple-table__cell apple-table__cell--number apple-table__cell--row-num">
+                          {idx + 1}
+                        </td>
+                        {visibleColumns.map((col) => {
+                          const val = row[col.key];
+                          const isEnum = col.type === "enum";
+                          return (
+                            <td
+                              key={col.key}
+                              className={`apple-table__cell ${
+                                col.type === "number" ? "apple-table__cell--number" : ""
+                              }`}
+                            >
+                              {isEnum ? (
+                                <span className={`apple-table__badge ${getBadgeClass(val)}`}>
+                                  {String(val)}
+                                </span>
+                              ) : (
+                                formatValue(val, col.type)
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  });
+
+                  // Subtotal row
+                  rows.push(
+                    <tr key={`group-${groupIdx}-subtotal`} className="apple-table__row" style={{ fontWeight: 600, background: '#f8fafc' }}>
+                      <td className="apple-table__cell apple-table__cell--number">Σ</td>
+                      {visibleColumns.map((col, colIdx) => {
+                        const isAggregateCol = col.key === aggregateColumn;
+                        return (
+                          <td
+                            key={col.key}
+                            className={`apple-table__cell ${
+                              col.type === "number" ? "apple-table__cell--number" : ""
+                            }`}
+                          >
+                            {colIdx === 0 ? (
+                              <>Subtotal: ({group.count} records)</>
+                            ) : isAggregateCol ? (
+                              group.value.toLocaleString("en-US", { maximumFractionDigits: 1 })
+                            ) : (
+                              ""
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+
+                  return rows;
+                })
+              : // Render flat data
+                pagedData.map((row, idx) => {
                   const rowNum = safePage * PAGE_SIZE + idx + 1;
                   return (
                     <tr key={`row-${safePage}-${idx}`} className="apple-table__row">
@@ -236,30 +323,57 @@ export function ReportTable({
           </tbody>
 
           {/* Summary footer */}
-          {Object.keys(summaryValues).length > 0 && !isLoading && (
+          {!isLoading && (
             <tfoot className="apple-table__footer">
-              <tr>
-                <td className="apple-table__cell apple-table__cell--number">Σ</td>
-                {visibleColumns.map((col) => (
-                  <td
-                    key={col.key}
-                    className={`apple-table__cell ${
-                      col.type === "number" ? "apple-table__cell--number" : ""
-                    }`}
-                  >
-                    {summaryValues[col.key] ? (
-                      <>
-                        <span className="apple-table__summary-value">
-                          {summaryValues[col.key]}
-                        </span>
-                        <span className="apple-table__summary-label"> avg</span>
-                      </>
-                    ) : (
-                      ""
-                    )}
-                  </td>
-                ))}
-              </tr>
+              {groupedData && groupByColumn ? (
+                // Grand total for grouped data
+                <tr style={{ fontWeight: 700, background: '#e2e8f0' }}>
+                  <td className="apple-table__cell apple-table__cell--number">Σ</td>
+                  {visibleColumns.map((col, colIdx) => {
+                    const isAggregateCol = col.key === aggregateColumn;
+                    return (
+                      <td
+                        key={col.key}
+                        className={`apple-table__cell ${
+                          col.type === "number" ? "apple-table__cell--number" : ""
+                        }`}
+                      >
+                        {colIdx === 0 ? (
+                          <>GRAND TOTAL: ({data.length} records)</>
+                        ) : isAggregateCol ? (
+                          grandTotal.toLocaleString("en-US", { maximumFractionDigits: 1 })
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ) : Object.keys(summaryValues).length > 0 ? (
+                // Average summary for flat data
+                <tr>
+                  <td className="apple-table__cell apple-table__cell--number">Σ</td>
+                  {visibleColumns.map((col) => (
+                    <td
+                      key={col.key}
+                      className={`apple-table__cell ${
+                        col.type === "number" ? "apple-table__cell--number" : ""
+                      }`}
+                    >
+                      {summaryValues[col.key] ? (
+                        <>
+                          <span className="apple-table__summary-value">
+                            {summaryValues[col.key]}
+                          </span>
+                          <span className="apple-table__summary-label"> avg</span>
+                        </>
+                      ) : (
+                        ""
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ) : null}
             </tfoot>
           )}
         </table>

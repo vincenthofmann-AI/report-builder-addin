@@ -68,6 +68,7 @@ export function ReportPreview({
   const [dateRange, setDateRange] = useState(template.defaults.dateRange);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [selectedDrivers, setSelectedDrivers] = useState<string[]>([]);
+  const [groupBy, setGroupBy] = useState<string | null>(template.defaults.chart?.groupBy || null);
 
   // Fetch data on mount
   useEffect(() => {
@@ -291,6 +292,27 @@ export function ReportPreview({
                   </div>
                 )}
 
+                {/* Group By */}
+                <div>
+                  <label className="block text-[13px] text-[#64748b] mb-2" style={{ fontWeight: 500 }}>
+                    Group By
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 rounded-lg border border-[#e2e8f0] bg-white text-[13px] text-[#1e293b]"
+                    value={groupBy || ""}
+                    onChange={(e) => setGroupBy(e.target.value || null)}
+                  >
+                    <option value="">No grouping</option>
+                    {dataSource.columns
+                      .filter((col) => col.type === "enum" || col.type === "string")
+                      .map((col) => (
+                        <option key={col.key} value={col.key}>
+                          {col.label}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
                 {/* Groups (if refinable) */}
                 {template.refinableFields.includes("groups") && (
                   <div>
@@ -358,7 +380,7 @@ export function ReportPreview({
             data={filteredData}
             columns={dataSource.columns}
             selectedColumns={template.defaults.columns}
-            groupByColumn={template.defaults.chart?.groupBy || null}
+            groupByColumn={groupBy}
             aggregateColumn={template.defaults.chart?.yAxis || null}
             aggregateFn={template.defaults.chart?.aggregate || "sum"}
             isLoading={isLoading}
