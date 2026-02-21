@@ -4,14 +4,14 @@ import "./services/addin-lifecycle";
 
 import { ReportBuilderV7 } from "./components/ReportBuilderV7";
 import { GeotabProvider } from "./services/geotab-context";
-import { ToastProvider } from "./services/ToastProvider";
+import { FeedbackProvider } from "@geotab/zenith";
 
 export default function App() {
   return (
     <GeotabProvider>
-      <ToastProvider>
+      <FeedbackProvider>
         <ReportBuilderV7 />
-      </ToastProvider>
+      </FeedbackProvider>
     </GeotabProvider>
   );
 }
