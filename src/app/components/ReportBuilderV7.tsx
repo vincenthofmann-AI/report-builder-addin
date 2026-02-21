@@ -17,9 +17,26 @@ import {
   Button,
   Select,
 } from "@geotab/zenith";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import { useGeotab } from "../services/geotab-context";
 import { useDataFetcher } from "../services/data-fetcher";
 import type { DataSourceDef } from "../services/geotab-mock";
+import {
+  objectHierarchy,
+  getAIInsightsForDataSource,
+  type ObjectCategory,
+  type ReportType,
+  type AIInsight,
+} from "../services/geotab-hierarchy";
 import "./report-builder-v7.css";
 
 // Types
@@ -151,24 +168,186 @@ function DropZone({
   );
 }
 
-// Simple Bar Chart Component
-function SimpleBarChart({ data }: { data: Array<{ label: string; value: number }> }) {
-  const maxValue = Math.max(...data.map((d) => d.value));
+// Professional Bar Chart using Recharts (Zenith-compatible)
+function ProfessionalBarChart({ data }: { data: Array<{ label: string; value: number }> }) {
+  // Transform data for Recharts format
+  const chartData = data.map(item => ({
+    name: item.label,
+    value: item.value,
+  }));
 
   return (
-    <div className="simple-chart">
-      {data.map((item, i) => (
-        <div key={i} className="simple-chart__bar-container">
-          <div className="simple-chart__label">{item.label}</div>
-          <div className="simple-chart__bar-wrapper">
-            <div
-              className="simple-chart__bar"
-              style={{ width: `${(item.value / maxValue) * 100}%` }}
-            />
-            <div className="simple-chart__value">{item.value.toLocaleString()}</div>
+    <ResponsiveContainer width="100%" height={300}>
+      <BarChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#dadce0" />
+        <XAxis
+          dataKey="name"
+          tick={{ fill: '#5f6368', fontSize: 12 }}
+          stroke="#dadce0"
+        />
+        <YAxis
+          tick={{ fill: '#5f6368', fontSize: 12 }}
+          stroke="#dadce0"
+        />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: '#fff',
+            border: '1px solid #dadce0',
+            borderRadius: '4px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          }}
+          labelStyle={{ color: '#202124', fontWeight: 500 }}
+          itemStyle={{ color: '#5f6368' }}
+        />
+        <Legend
+          wrapperStyle={{ color: '#5f6368', fontSize: 12 }}
+        />
+        <Bar
+          dataKey="value"
+          fill="#1a73e8"
+          radius={[4, 4, 0, 0]}
+          name="Value"
+        />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+// Object Browser - Hierarchical Tree Component
+function ObjectBrowser({
+  selectedSource,
+  onSelectSource,
+}: {
+  selectedSource: DataSourceDef | null;
+  onSelectSource: (source: DataSourceDef) => void;
+}) {
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    new Set(["fleet-operations"])
+  );
+  const [expandedReportTypes, setExpandedReportTypes] = useState<Set<string>>(
+    new Set()
+  );
+
+  const toggleCategory = (categoryId: string) => {
+    const next = new Set(expandedCategories);
+    if (next.has(categoryId)) {
+      next.delete(categoryId);
+    } else {
+      next.add(categoryId);
+    }
+    setExpandedCategories(next);
+  };
+
+  const toggleReportType = (reportTypeId: string) => {
+    const next = new Set(expandedReportTypes);
+    if (next.has(reportTypeId)) {
+      next.delete(reportTypeId);
+    } else {
+      next.add(reportTypeId);
+    }
+    setExpandedReportTypes(next);
+  };
+
+  return (
+    <div className="object-browser">
+      {objectHierarchy.map((category) => {
+        const isExpanded = expandedCategories.has(category.id);
+        return (
+          <div key={category.id} className="object-browser__category">
+            <button
+              className="object-browser__category-header"
+              onClick={() => toggleCategory(category.id)}
+            >
+              <span className="object-browser__expand-icon">
+                {isExpanded ? "▼" : "▶"}
+              </span>
+              <span className="object-browser__category-name">{category.name}</span>
+            </button>
+
+            {isExpanded && (
+              <div className="object-browser__report-types">
+                {category.reportTypes.map((reportType) => {
+                  const isReportExpanded = expandedReportTypes.has(reportType.id);
+                  return (
+                    <div key={reportType.id} className="object-browser__report-type">
+                      <button
+                        className="object-browser__report-type-header"
+                        onClick={() => toggleReportType(reportType.id)}
+                      >
+                        <span className="object-browser__expand-icon">
+                          {isReportExpanded ? "▼" : "▶"}
+                        </span>
+                        <span className="object-browser__report-type-name">
+                          {reportType.name}
+                        </span>
+                      </button>
+
+                      {isReportExpanded && (
+                        <div className="object-browser__data-sources">
+                          {reportType.dataSources.map((dataSource) => {
+                            const isSelected = selectedSource?.id === dataSource.id;
+                            return (
+                              <button
+                                key={dataSource.id}
+                                className={`object-browser__data-source ${
+                                  isSelected ? "object-browser__data-source--selected" : ""
+                                }`}
+                                onClick={() => onSelectSource(dataSource)}
+                              >
+                                <span className="object-browser__data-source-name">
+                                  {dataSource.name}
+                                </span>
+                                {isSelected && (
+                                  <span className="object-browser__selected-indicator">✓</span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
+    </div>
+  );
+}
+
+// AI Insights Panel Component
+function AIInsightsPanel({
+  dataSourceId,
+  onAddInsight,
+}: {
+  dataSourceId: string | null;
+  onAddInsight: (insight: AIInsight) => void;
+}) {
+  if (!dataSourceId) return null;
+
+  const insights = getAIInsightsForDataSource(dataSourceId);
+  if (insights.length === 0) return null;
+
+  return (
+    <div className="ai-insights-panel">
+      <div className="ai-insights-panel__header">
+        <span className="ai-insights-panel__title">💡 AI Insights</span>
+      </div>
+      <div className="ai-insights-panel__list">
+        {insights.map((insight) => (
+          <button
+            key={insight.id}
+            className="ai-insights-panel__insight"
+            onClick={() => onAddInsight(insight)}
+            title={insight.description}
+          >
+            <span className="ai-insights-panel__insight-name">{insight.name}</span>
+            <span className="ai-insights-panel__add-icon">+</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -194,6 +373,8 @@ export function ReportBuilderV7() {
   const [rawData, setRawData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [needsRefresh, setNeedsRefresh] = useState(true);
+  const [lastRunTime, setLastRunTime] = useState<number | null>(null);
 
   // Available fields
   const availableFields = useMemo(() => {
@@ -220,19 +401,23 @@ export function ReportBuilderV7() {
     return { dimensions, metrics };
   }, [selectedSource]);
 
-  // Fetch data
-  useEffect(() => {
+  // Run Report - Superset pattern: manual execution
+  const runReport = () => {
     if (!selectedSource) {
       setRawData([]);
       return;
     }
 
     setIsLoading(true);
+    setNeedsRefresh(false);
+    const startTime = performance.now();
 
     dataFetcher
       .fetchDataSource(selectedSource.id)
       .then((data) => {
+        const endTime = performance.now();
         setRawData(data);
+        setLastRunTime(Math.round(endTime - startTime));
         setIsLoading(false);
       })
       .catch((error) => {
@@ -240,7 +425,22 @@ export function ReportBuilderV7() {
         setRawData([]);
         setIsLoading(false);
       });
-  }, [selectedSource, dataFetcher]);
+  };
+
+  // Auto-run on initial data source selection for immediate feedback
+  useEffect(() => {
+    if (selectedSource && rawData.length === 0 && !isLoading) {
+      runReport();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSource]);
+
+  // Mark as needing refresh when configuration changes
+  useEffect(() => {
+    if (rawData.length > 0) {
+      setNeedsRefresh(true);
+    }
+  }, [rows, columns, values, filters, rawData.length]);
 
   // Apply filters
   const filteredData = useMemo(() => {
@@ -488,6 +688,19 @@ export function ReportBuilderV7() {
               <option value="none">No Chart</option>
               <option value="bar">Bar Chart</option>
             </select>
+            <Button
+              variant="primary"
+              onClick={runReport}
+              disabled={!selectedSource || isLoading}
+            >
+              {isLoading ? "⟳ Running..." : needsRefresh ? "⚡ Run Report" : "✓ Run Report"}
+            </Button>
+            {lastRunTime !== null && !isLoading && (
+              <span className="ga__run-time">{lastRunTime}ms</span>
+            )}
+            {needsRefresh && !isLoading && rawData.length > 0 && (
+              <span className="ga__needs-refresh">Configuration changed</span>
+            )}
           </div>
         </div>
 
@@ -496,31 +709,33 @@ export function ReportBuilderV7() {
           {/* Panel 1: Variables */}
           <aside className="ga__variables">
             <div className="ga__panel-header">
-              <h2 className="ga__panel-title">Variables</h2>
+              <h2 className="ga__panel-title">Data Sources</h2>
             </div>
 
-            {/* Data Source */}
+            {/* Hierarchical Object Browser */}
             <div className="ga__section">
-              <div className="ga__section-label">Data Source</div>
-              <select
-                value={selectedSource?.id || ""}
-                onChange={(e) => {
-                  const source = dataSources.find((ds) => ds.id === e.target.value);
-                  setSelectedSource(source || null);
+              <ObjectBrowser
+                selectedSource={selectedSource}
+                onSelectSource={(source) => {
+                  setSelectedSource(source);
                   setRows([]);
                   setColumns([]);
                   setValues([]);
                   setFilters([]);
                 }}
-                className="ga__select"
-              >
-                {dataSources.map((source) => (
-                  <option key={source.id} value={source.id}>
-                    {source.name}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
+
+            <Divider />
+
+            {/* AI Insights */}
+            <AIInsightsPanel
+              dataSourceId={selectedSource?.id || null}
+              onAddInsight={(insight) => {
+                // TODO: Add AI insight as calculated field
+                console.log("Add AI insight:", insight);
+              }}
+            />
 
             <Divider />
 
@@ -686,7 +901,7 @@ export function ReportBuilderV7() {
                       <h3 className="ga__chart-title">
                         {values[0]?.field.name} by {rows[0]?.field.name}
                       </h3>
-                      <SimpleBarChart data={chartData} />
+                      <ProfessionalBarChart data={chartData} />
                     </Card>
                   )}
 
