@@ -658,11 +658,13 @@ export function ReportBuilderV8() {
           </div>
 
           <div className="rb8__results-content">
-            {entities.length === 0 ? (
+            {entities.length === 0 || tableColumns.length === 0 ? (
               <div className="rb8__empty">
                 <div className="rb8__empty-title">No results</div>
                 <div className="rb8__empty-subtitle">
-                  Click "Run Query" to see data
+                  {!query.dataSource
+                    ? "Select a data source to get started"
+                    : "Click \"Run Query\" to see data"}
                 </div>
               </div>
             ) : (
