@@ -1,0 +1,287 @@
+{
+  "id": "safety-scorecard",
+  "name": "Safety Scorecard",
+  "description": "Monitor fleet safety performance with collision risk, exceptions, and driver rankings",
+  "category": "safety",
+  "icon": "IconShield",
+  "estimatedUsers": 53334,
+  "tags": ["safety", "risk", "exceptions", "drivers", "AI"],
+  "requiredPermissions": [
+    "ViewCollisionRisk",
+    "ViewExceptions",
+    "ViewDrivers"
+  ],
+  "defaultModules": [
+    {
+      "id": "collision-risk-overview",
+      "type": "overview-card",
+      "title": "Average Collision Risk Score",
+      "description": "Fleet-wide collision risk based on AI model",
+      "icon": "IconAlert",
+      "dataSource": {
+        "apiEntity": "CollisionRiskAnalytics",
+        "aggregationParams": {
+          "groupBy": ["database"],
+          "aggregations": [
+            { "op": "avg", "field": "score", "alias": "avgScore" }
+          ]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true
+      },
+      "defaultPosition": {
+        "row": 0,
+        "column": 0,
+        "width": 4
+      },
+      "configurable": false,
+      "required": true,
+      "options": {
+        "trendConfig": {
+          "comparisonPeriod": "7d",
+          "showPercentage": true,
+          "showArrow": true
+        }
+      }
+    },
+    {
+      "id": "safety-alerts",
+      "type": "immediate-actions",
+      "title": "Safety Alerts",
+      "description": "Critical safety items requiring attention",
+      "icon": "IconWarning",
+      "dataSource": {
+        "apiEntity": "ExceptionEvent",
+        "filters": [
+          {
+            "field": "severity",
+            "operator": "IN",
+            "value": ["Critical", "High"]
+          }
+        ],
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true,
+        "resultsLimit": 100
+      },
+      "defaultPosition": {
+        "row": 1,
+        "column": 0,
+        "width": 12
+      },
+      "configurable": false,
+      "required": true,
+      "options": {
+        "navigationConfig": [
+          {
+            "id": "critical-exceptions",
+            "label": "Critical Exceptions",
+            "pageName": "exception",
+            "pageState": {
+              "severity": ["Critical"]
+            }
+          },
+          {
+            "id": "high-risk-drivers",
+            "label": "High-Risk Drivers",
+            "pageName": "riskManagement",
+            "pageState": {
+              "sortBy": "riskScore",
+              "sortDirection": "desc"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "collision-risk-benchmark",
+      "type": "benchmark-bar",
+      "title": "Collision Risk vs Industry",
+      "description": "Compare your fleet's risk score to industry average",
+      "icon": "IconTrendingUp",
+      "dataSource": {
+        "apiEntity": "CollisionRiskAnalytics",
+        "aggregationParams": {
+          "aggregations": [
+            { "op": "avg", "field": "score" }
+          ]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true
+      },
+      "defaultPosition": {
+        "row": 0,
+        "column": 4,
+        "width": 4
+      },
+      "configurable": false,
+      "options": {
+        "benchmarkValue": 65
+      }
+    },
+    {
+      "id": "safety-metrics-trend",
+      "type": "metric-chart",
+      "title": "Safety Metrics",
+      "description": "Track safety performance over time",
+      "icon": "IconChartLine",
+      "dataSource": {
+        "apiEntity": "ExceptionEvent",
+        "aggregationParams": {
+          "groupBy": ["statusDate"],
+          "aggregations": [
+            { "op": "count", "field": "*", "alias": "exceptionCount" }
+          ]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true,
+        "sort": {
+          "sortBy": "statusDate",
+          "sortDirection": "asc"
+        }
+      },
+      "defaultPosition": {
+        "row": 2,
+        "column": 0,
+        "width": 12
+      },
+      "configurable": true,
+      "options": {
+        "availableMetrics": [
+          {
+            "id": "exception-count",
+            "label": "Exception Count",
+            "dataSource": {
+              "apiEntity": "ExceptionEvent",
+              "aggregationParams": {
+                "groupBy": ["statusDate"],
+                "aggregations": [{ "op": "count", "field": "*" }]
+              },
+              "dateRangeEnabled": true,
+              "groupFilterEnabled": true
+            }
+          },
+          {
+            "id": "harsh-events",
+            "label": "Harsh Events",
+            "dataSource": {
+              "apiEntity": "ExceptionEvent",
+              "aggregationParams": {
+                "groupBy": ["statusDate"],
+                "aggregations": [{ "op": "count", "field": "*" }]
+              },
+              "filters": [
+                {
+                  "field": "rule.name",
+                  "operator": "IN",
+                  "value": ["Harsh Braking", "Harsh Acceleration", "Harsh Cornering"]
+                }
+              ],
+              "dateRangeEnabled": true,
+              "groupFilterEnabled": true
+            }
+          },
+          {
+            "id": "collision-risk-score",
+            "label": "Collision Risk Score",
+            "dataSource": {
+              "apiEntity": "CollisionRiskAnalytics",
+              "aggregationParams": {
+                "groupBy": ["dateCalculated"],
+                "aggregations": [{ "op": "avg", "field": "score" }]
+              },
+              "dateRangeEnabled": true,
+              "groupFilterEnabled": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "highest-risk-drivers",
+      "type": "performance-rankings",
+      "title": "Highest Risk Drivers",
+      "description": "Drivers with most safety exceptions",
+      "icon": "IconUser",
+      "dataSource": {
+        "apiEntity": "ExceptionEvent",
+        "aggregationParams": {
+          "groupBy": ["driver"],
+          "aggregations": [
+            { "op": "count", "field": "*", "alias": "exceptionCount" },
+            { "op": "sum", "field": "severity", "alias": "totalSeverity" }
+          ]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true,
+        "sort": {
+          "sortBy": "totalSeverity",
+          "sortDirection": "desc"
+        },
+        "resultsLimit": 10
+      },
+      "defaultPosition": {
+        "row": 0,
+        "column": 8,
+        "width": 4
+      },
+      "configurable": true,
+      "options": {
+        "rankingLimit": 10
+      }
+    }
+  ],
+  "availableModules": [
+    {
+      "id": "exception-types-breakdown",
+      "type": "overview-card",
+      "title": "Exception Types",
+      "description": "Breakdown of exceptions by type",
+      "icon": "IconPieChart",
+      "dataSource": {
+        "apiEntity": "ExceptionEvent",
+        "aggregationParams": {
+          "groupBy": ["rule.name"],
+          "aggregations": [{ "op": "count", "field": "*" }]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true
+      },
+      "defaultPosition": {
+        "row": 3,
+        "column": 0,
+        "width": 6
+      },
+      "configurable": true
+    },
+    {
+      "id": "safest-drivers",
+      "type": "performance-rankings",
+      "title": "Safest Drivers",
+      "description": "Drivers with fewest exceptions",
+      "icon": "IconTrophy",
+      "dataSource": {
+        "apiEntity": "ExceptionEvent",
+        "aggregationParams": {
+          "groupBy": ["driver"],
+          "aggregations": [{ "op": "count", "field": "*", "alias": "exceptionCount" }]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true,
+        "sort": {
+          "sortBy": "exceptionCount",
+          "sortDirection": "asc"
+        },
+        "resultsLimit": 10
+      },
+      "defaultPosition": {
+        "row": 3,
+        "column": 6,
+        "width": 6
+      },
+      "configurable": true,
+      "options": {
+        "rankingLimit": 10
+      }
+    }
+  ]
+}

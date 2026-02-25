@@ -1,0 +1,386 @@
+{
+  "id": "compliance-dashboard",
+  "name": "Compliance Dashboard",
+  "description": "Monitor HOS compliance, manage violations, and track driver availability",
+  "category": "compliance",
+  "icon": "IconShieldCheck",
+  "estimatedUsers": 133722,
+  "tags": ["HOS", "compliance", "violations", "drivers", "IFTA", "ELD"],
+  "requiredPermissions": [
+    "ViewHoSLogs",
+    "ViewDutyStatusViolations",
+    "ViewIftaMiles"
+  ],
+  "defaultModules": [
+    {
+      "id": "compliance-status",
+      "type": "overview-card",
+      "title": "Active Violations",
+      "description": "Drivers with current HOS violations",
+      "icon": "IconAlertTriangle",
+      "dataSource": {
+        "apiEntity": "DutyStatusViolation",
+        "aggregationParams": {
+          "groupBy": ["database"],
+          "aggregations": [
+            { "op": "count", "field": "*", "alias": "violationCount" }
+          ]
+        },
+        "filters": [
+          {
+            "field": "isActive",
+            "operator": "=",
+            "value": true
+          }
+        ],
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true
+      },
+      "defaultPosition": {
+        "row": 0,
+        "column": 0,
+        "width": 4
+      },
+      "configurable": false,
+      "required": true,
+      "options": {
+        "trendConfig": {
+          "comparisonPeriod": "7d",
+          "showPercentage": true,
+          "showArrow": true
+        }
+      }
+    },
+    {
+      "id": "driver-availability",
+      "type": "overview-card",
+      "title": "Available Drivers",
+      "description": "Drivers with sufficient hours remaining",
+      "icon": "IconUsers",
+      "dataSource": {
+        "apiEntity": "DutyStatusAvailability",
+        "aggregationParams": {
+          "groupBy": ["database"],
+          "aggregations": [
+            { "op": "count", "field": "*", "alias": "availableCount" }
+          ]
+        },
+        "filters": [
+          {
+            "field": "drivingHoursRemaining",
+            "operator": ">=",
+            "value": 4
+          }
+        ],
+        "dateRangeEnabled": false,
+        "groupFilterEnabled": true
+      },
+      "defaultPosition": {
+        "row": 0,
+        "column": 4,
+        "width": 4
+      },
+      "configurable": false,
+      "required": true,
+      "options": {
+        "trendConfig": {
+          "comparisonPeriod": "7d",
+          "showPercentage": true,
+          "showArrow": true
+        }
+      }
+    },
+    {
+      "id": "ifta-summary",
+      "type": "overview-card",
+      "title": "IFTA Miles (Current Quarter)",
+      "description": "Total miles by jurisdiction",
+      "icon": "IconMap",
+      "dataSource": {
+        "apiEntity": "IftaDetail",
+        "aggregationParams": {
+          "groupBy": ["database"],
+          "aggregations": [
+            { "op": "sum", "field": "totalMiles", "alias": "totalMiles" },
+            { "op": "sum", "field": "fuelConsumed", "alias": "totalFuel" }
+          ]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true
+      },
+      "defaultPosition": {
+        "row": 0,
+        "column": 8,
+        "width": 4
+      },
+      "configurable": true,
+      "options": {
+        "trendConfig": {
+          "comparisonPeriod": "90d",
+          "showPercentage": true,
+          "showArrow": false
+        }
+      }
+    },
+    {
+      "id": "critical-violations",
+      "type": "immediate-actions",
+      "title": "Critical Violations",
+      "description": "HOS violations requiring immediate attention",
+      "icon": "IconAlert",
+      "dataSource": {
+        "apiEntity": "DutyStatusViolation",
+        "filters": [
+          {
+            "field": "isActive",
+            "operator": "=",
+            "value": true
+          },
+          {
+            "field": "severity",
+            "operator": "IN",
+            "value": ["Critical", "High"]
+          }
+        ],
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true,
+        "resultsLimit": 100
+      },
+      "defaultPosition": {
+        "row": 1,
+        "column": 0,
+        "width": 12
+      },
+      "configurable": false,
+      "required": true,
+      "options": {
+        "navigationConfig": [
+          {
+            "id": "active-violations",
+            "label": "Active Violations",
+            "pageName": "hosViolations",
+            "pageState": {
+              "isActive": true,
+              "severity": ["Critical", "High"]
+            }
+          },
+          {
+            "id": "approaching-limits",
+            "label": "Drivers Approaching Limits",
+            "pageName": "hosAvailability",
+            "pageState": {
+              "hoursRemaining": {
+                "max": 2
+              }
+            }
+          },
+          {
+            "id": "missing-logs",
+            "label": "Missing Logs",
+            "pageName": "hosLogs",
+            "pageState": {
+              "hasCertified": false,
+              "daysBack": 7
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "violation-trend",
+      "type": "metric-chart",
+      "title": "Compliance Metrics",
+      "description": "Track compliance performance over time",
+      "icon": "IconChartLine",
+      "dataSource": {
+        "apiEntity": "DutyStatusViolation",
+        "aggregationParams": {
+          "groupBy": ["date"],
+          "aggregations": [
+            { "op": "count", "field": "*", "alias": "violationCount" }
+          ]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true,
+        "sort": {
+          "sortBy": "date",
+          "sortDirection": "asc"
+        }
+      },
+      "defaultPosition": {
+        "row": 2,
+        "column": 0,
+        "width": 12
+      },
+      "configurable": true,
+      "options": {
+        "availableMetrics": [
+          {
+            "id": "violation-count",
+            "label": "Violation Count",
+            "dataSource": {
+              "apiEntity": "DutyStatusViolation",
+              "aggregationParams": {
+                "groupBy": ["date"],
+                "aggregations": [{ "op": "count", "field": "*" }]
+              },
+              "dateRangeEnabled": true,
+              "groupFilterEnabled": true
+            }
+          },
+          {
+            "id": "available-hours",
+            "label": "Average Available Hours",
+            "dataSource": {
+              "apiEntity": "DutyStatusAvailability",
+              "aggregationParams": {
+                "groupBy": ["date"],
+                "aggregations": [{ "op": "avg", "field": "drivingHoursRemaining" }]
+              },
+              "dateRangeEnabled": true,
+              "groupFilterEnabled": true
+            }
+          },
+          {
+            "id": "log-completeness",
+            "label": "Log Completeness %",
+            "dataSource": {
+              "apiEntity": "DutyStatusLog",
+              "aggregationParams": {
+                "groupBy": ["date"],
+                "aggregations": [
+                  { "op": "count", "field": "*", "alias": "totalLogs" },
+                  { "op": "count", "field": "hasCertified", "alias": "certifiedLogs", "where": "hasCertified = true" }
+                ]
+              },
+              "dateRangeEnabled": true,
+              "groupFilterEnabled": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "top-violators",
+      "type": "performance-rankings",
+      "title": "Top Violators",
+      "description": "Drivers with most violations",
+      "icon": "IconUser",
+      "dataSource": {
+        "apiEntity": "DutyStatusViolation",
+        "aggregationParams": {
+          "groupBy": ["driver"],
+          "aggregations": [
+            { "op": "count", "field": "*", "alias": "violationCount" },
+            { "op": "count", "field": "severity", "alias": "criticalCount", "where": "severity = 'Critical'" }
+          ]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true,
+        "sort": {
+          "sortBy": "violationCount",
+          "sortDirection": "desc"
+        },
+        "resultsLimit": 10
+      },
+      "defaultPosition": {
+        "row": 3,
+        "column": 0,
+        "width": 6
+      },
+      "configurable": true,
+      "options": {
+        "rankingLimit": 10
+      }
+    }
+  ],
+  "availableModules": [
+    {
+      "id": "compliant-drivers",
+      "type": "performance-rankings",
+      "title": "Most Compliant Drivers",
+      "description": "Drivers with fewest violations",
+      "icon": "IconTrophy",
+      "dataSource": {
+        "apiEntity": "DutyStatusViolation",
+        "aggregationParams": {
+          "groupBy": ["driver"],
+          "aggregations": [
+            { "op": "count", "field": "*", "alias": "violationCount" }
+          ]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true,
+        "sort": {
+          "sortBy": "violationCount",
+          "sortDirection": "asc"
+        },
+        "resultsLimit": 10
+      },
+      "defaultPosition": {
+        "row": 3,
+        "column": 6,
+        "width": 6
+      },
+      "configurable": true,
+      "options": {
+        "rankingLimit": 10
+      }
+    },
+    {
+      "id": "violation-types",
+      "type": "overview-card",
+      "title": "Violation Types Breakdown",
+      "description": "Distribution of violations by type",
+      "icon": "IconPieChart",
+      "dataSource": {
+        "apiEntity": "DutyStatusViolation",
+        "aggregationParams": {
+          "groupBy": ["violationType"],
+          "aggregations": [{ "op": "count", "field": "*" }]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true
+      },
+      "defaultPosition": {
+        "row": 4,
+        "column": 0,
+        "width": 6
+      },
+      "configurable": true
+    },
+    {
+      "id": "jurisdiction-miles",
+      "type": "performance-rankings",
+      "title": "Miles by Jurisdiction",
+      "description": "IFTA miles breakdown by state/province",
+      "icon": "IconMap",
+      "dataSource": {
+        "apiEntity": "IftaDetail",
+        "aggregationParams": {
+          "groupBy": ["jurisdiction"],
+          "aggregations": [
+            { "op": "sum", "field": "totalMiles", "alias": "miles" },
+            { "op": "sum", "field": "fuelConsumed", "alias": "fuel" }
+          ]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true,
+        "sort": {
+          "sortBy": "miles",
+          "sortDirection": "desc"
+        },
+        "resultsLimit": 15
+      },
+      "defaultPosition": {
+        "row": 4,
+        "column": 6,
+        "width": 6
+      },
+      "configurable": true,
+      "options": {
+        "rankingLimit": 15
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "overview-builder",
+  "supportEmail": "design@geotab.com",
+  "version": "1.0.0",
+  "items": [
+    {
+      "page": "overview-builder",
+      "click": "OverviewBuilder.initialize",
+      "path": "addin/OverviewBuilder/",
+      "menuName": {
+        "en": "Create Dashboard",
+        "fr": "Créer un tableau de bord",
+        "es": "Crear panel",
+        "de": "Dashboard erstellen"
+      },
+      "icon": "IconDashboard",
+      "menuId": "dashboardMenu"
+    }
+  ],
+  "isSigned": false
+}

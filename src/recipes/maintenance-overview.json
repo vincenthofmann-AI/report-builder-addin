@@ -1,0 +1,314 @@
+{
+  "id": "maintenance-overview",
+  "name": "Maintenance Overview",
+  "description": "Track maintenance operations, predict breakdowns, and manage work orders",
+  "category": "maintenance",
+  "icon": "IconTool",
+  "estimatedUsers": 68977,
+  "tags": ["maintenance", "work orders", "faults", "downtime", "predictive"],
+  "requiredPermissions": [
+    "ViewMaintenanceWorkOrders",
+    "ViewMaintenanceWorkRequests",
+    "ViewFaults",
+    "ViewMaintenanceOverview"
+  ],
+  "defaultModules": [
+    {
+      "id": "immediate-actions",
+      "type": "immediate-actions",
+      "title": "Immediate Actions",
+      "description": "Critical maintenance items requiring attention",
+      "icon": "IconAlert",
+      "dataSource": {
+        "apiEntity": "MaintenanceWorkRequestEntity",
+        "filters": [],
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true,
+        "resultsLimit": 100
+      },
+      "defaultPosition": {
+        "row": 0,
+        "column": 0,
+        "width": 12
+      },
+      "configurable": false,
+      "required": true,
+      "options": {
+        "navigationConfig": [
+          {
+            "id": "severe-work-requests",
+            "label": "Severe Work Requests",
+            "pageName": "maintenanceWorkRequests",
+            "pageState": {
+              "severities": ["Critical", "High"],
+              "isReviewed": false
+            }
+          },
+          {
+            "id": "severe-faults",
+            "label": "Severe Faults (Last 7 Days)",
+            "pageName": "faults",
+            "pageState": {
+              "severities": ["Critical", "High"],
+              "daysBack": 7
+            }
+          },
+          {
+            "id": "extended-downtime",
+            "label": "Vehicles with Extended Downtime",
+            "pageName": "vehicleDowntime",
+            "pageState": {
+              "minDays": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "maintenance-metrics",
+      "type": "metric-chart",
+      "title": "Maintenance Metrics",
+      "description": "Track maintenance performance over time",
+      "icon": "IconChartLine",
+      "dataSource": {
+        "apiEntity": "MaintenanceWorkOrderEntity",
+        "aggregationParams": {
+          "groupBy": ["completedDate"],
+          "aggregations": [
+            { "op": "count", "field": "*", "alias": "workOrderCount" }
+          ]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true,
+        "sort": {
+          "sortBy": "completedDate",
+          "sortDirection": "asc"
+        }
+      },
+      "defaultPosition": {
+        "row": 1,
+        "column": 0,
+        "width": 12
+      },
+      "configurable": true,
+      "options": {
+        "availableMetrics": [
+          {
+            "id": "work-orders-completed",
+            "label": "Work Orders Completed",
+            "dataSource": {
+              "apiEntity": "MaintenanceWorkOrderEntity",
+              "aggregationParams": {
+                "groupBy": ["completedDate"],
+                "aggregations": [{ "op": "count", "field": "*" }]
+              },
+              "filters": [
+                {
+                  "field": "status",
+                  "operator": "IN",
+                  "value": ["Closed", "Completed"]
+                }
+              ],
+              "dateRangeEnabled": true,
+              "groupFilterEnabled": true
+            }
+          },
+          {
+            "id": "work-requests-created",
+            "label": "Work Requests Created",
+            "dataSource": {
+              "apiEntity": "MaintenanceWorkRequestEntity",
+              "aggregationParams": {
+                "groupBy": ["statusDate"],
+                "aggregations": [{ "op": "count", "field": "*" }]
+              },
+              "dateRangeEnabled": true,
+              "groupFilterEnabled": true
+            }
+          },
+          {
+            "id": "breakdown-rate",
+            "label": "Breakdown Rate",
+            "dataSource": {
+              "apiEntity": "VehicleDowntimeEntity",
+              "aggregationParams": {
+                "groupBy": ["date"],
+                "aggregations": [{ "op": "count", "field": "*" }]
+              },
+              "dateRangeEnabled": true,
+              "groupFilterEnabled": true
+            }
+          },
+          {
+            "id": "downtime-hours",
+            "label": "Downtime Hours",
+            "dataSource": {
+              "apiEntity": "VehicleDowntimeEntity",
+              "aggregationParams": {
+                "groupBy": ["date"],
+                "aggregations": [{ "op": "sum", "field": "downtimeSeconds" }]
+              },
+              "dateRangeEnabled": true,
+              "groupFilterEnabled": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "highest-risk-breakdown",
+      "type": "performance-rankings",
+      "title": "Highest Risk of Breakdown",
+      "description": "Assets most likely to break down",
+      "icon": "IconWarning",
+      "dataSource": {
+        "apiEntity": "VehicleDowntimeEntity",
+        "aggregationParams": {
+          "groupBy": ["device"],
+          "aggregations": [
+            { "op": "count", "field": "*", "alias": "breakdownCount" },
+            { "op": "sum", "field": "downtimeSeconds", "alias": "totalDowntime" }
+          ]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true,
+        "sort": {
+          "sortBy": "breakdownCount",
+          "sortDirection": "desc"
+        },
+        "resultsLimit": 10
+      },
+      "defaultPosition": {
+        "row": 2,
+        "column": 0,
+        "width": 6
+      },
+      "configurable": true,
+      "options": {
+        "rankingLimit": 10
+      }
+    },
+    {
+      "id": "performance-insights",
+      "type": "performance-rankings",
+      "title": "Performance Insights",
+      "description": "Asset and group maintenance performance",
+      "icon": "IconChartBar",
+      "dataSource": {
+        "apiEntity": "MaintenanceWorkOrderEntity",
+        "aggregationParams": {
+          "groupBy": ["device"],
+          "aggregations": [
+            { "op": "count", "field": "*", "alias": "workOrderCount" },
+            { "op": "sum", "field": "totalCosts", "alias": "totalCost" }
+          ]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true,
+        "sort": {
+          "sortBy": "workOrderCount",
+          "sortDirection": "desc"
+        },
+        "resultsLimit": 10
+      },
+      "defaultPosition": {
+        "row": 2,
+        "column": 6,
+        "width": 6
+      },
+      "configurable": true,
+      "options": {
+        "rankingLimit": 10
+      }
+    }
+  ],
+  "availableModules": [
+    {
+      "id": "total-work-orders",
+      "type": "overview-card",
+      "title": "Total Work Orders",
+      "description": "Work orders completed this period",
+      "icon": "IconClipboard",
+      "dataSource": {
+        "apiEntity": "MaintenanceWorkOrderEntity",
+        "aggregationParams": {
+          "groupBy": ["database"],
+          "aggregations": [{ "op": "count", "field": "*", "alias": "totalCount" }]
+        },
+        "filters": [
+          {
+            "field": "status",
+            "operator": "IN",
+            "value": ["Closed", "Completed"]
+          }
+        ],
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true
+      },
+      "defaultPosition": {
+        "row": 0,
+        "column": 0,
+        "width": 4
+      },
+      "configurable": true,
+      "options": {
+        "trendConfig": {
+          "comparisonPeriod": "30d",
+          "showPercentage": true,
+          "showArrow": true
+        }
+      }
+    },
+    {
+      "id": "average-downtime",
+      "type": "overview-card",
+      "title": "Average Downtime",
+      "description": "Average downtime per vehicle",
+      "icon": "IconClock",
+      "dataSource": {
+        "apiEntity": "VehicleDowntimeEntity",
+        "aggregationParams": {
+          "groupBy": ["database"],
+          "aggregations": [{ "op": "avg", "field": "downtimeSeconds", "alias": "avgDowntime" }]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true
+      },
+      "defaultPosition": {
+        "row": 0,
+        "column": 4,
+        "width": 4
+      },
+      "configurable": true,
+      "options": {
+        "trendConfig": {
+          "comparisonPeriod": "30d",
+          "showPercentage": true,
+          "showArrow": true
+        }
+      }
+    },
+    {
+      "id": "fault-breakdown",
+      "type": "overview-card",
+      "title": "Fault Types",
+      "description": "Breakdown of faults by severity",
+      "icon": "IconPieChart",
+      "dataSource": {
+        "apiEntity": "FaultDataEntity",
+        "aggregationParams": {
+          "groupBy": ["severity"],
+          "aggregations": [{ "op": "count", "field": "*" }]
+        },
+        "dateRangeEnabled": true,
+        "groupFilterEnabled": true
+      },
+      "defaultPosition": {
+        "row": 3,
+        "column": 0,
+        "width": 6
+      },
+      "configurable": true
+    }
+  ]
+}
