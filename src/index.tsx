@@ -64,10 +64,12 @@ const queryClient = new QueryClient({
   }
 };
 
-// For local development
-if (process.env.NODE_ENV === 'development') {
+// Auto-initialize for standalone/demo mode
+// This runs when viewing the page directly (not inside MyGeotab)
+const initializeStandalone = () => {
   const container = document.getElementById('overview-builder-root');
-  if (container) {
+  if (container && !container.hasChildNodes()) {
+    console.log('Initializing in standalone mode');
     const root = ReactDOM.createRoot(container);
     root.render(
       <React.StrictMode>
@@ -77,4 +79,12 @@ if (process.env.NODE_ENV === 'development') {
       </React.StrictMode>
     );
   }
+};
+
+// Try to initialize after DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeStandalone);
+} else {
+  // DOM is already ready
+  initializeStandalone();
 }
