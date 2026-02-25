@@ -209,7 +209,7 @@ All failures were due to GitHub Pages looking for missing `/docs` directory. Iss
 ## Repository Links
 
 - **GitHub:** https://github.com/vincenthofmann-AI/report-builder-addin
-- **GitHub Pages:** Disabled (was: https://vincenthofmann-ai.github.io/report-builder-addin/)
+- **GitHub Pages:** ✅ https://vincenthofmann-ai.github.io/report-builder-addin/
 - **Actions:** https://github.com/vincenthofmann-AI/report-builder-addin/actions
 
 ---

@@ -325,6 +325,7 @@ All code is complete and ready for testing. See `CONTEXT.md` for project status 
 ## Links
 
 - **GitHub Repo:** https://github.com/vincenthofmann-AI/report-builder-addin
+- **Live Demo:** https://vincenthofmann-ai.github.io/report-builder-addin/
 - **Project Brain:** `CONTEXT.md`
 - **Architecture:** `artifacts/add-in-architecture.md`
 - **Wireframes:** `artifacts/conversational-flow-wireframes.md`
