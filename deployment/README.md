@@ -11,24 +11,25 @@ GitHub Pages doesn't send the required `Access-Control-Allow-Origin` header, so 
 
 ## Register in MyGeotab (3 methods)
 
-### Method 1: Embedded Configuration (Recommended - Bypasses CORS)
+### Method 1: Page-Based Add-In (Recommended - Simplest)
 
-**This method works immediately without any CORS issues.**
+**This is the simplest approach - creates a custom page directly in MyGeotab.**
 
-Use the file: `deployment/embedded-config.json` (249 KB)
+Use the file: `deployment/page-addin-config.json` (250 KB)
 
 1. Log into MyGeotab as **Administrator**
 2. Go to **Administration** → **System** → **Add-Ins**
 3. Click **"Add"** or **"Add New Add-In"**
-4. **Upload or paste the contents** of `embedded-config.json`
+4. **Upload or paste the contents** of `page-addin-config.json`
 5. **Save** and assign to users/groups
-6. Look for **"Create Dashboard"** in your Activities menu
+6. **Navigate to the new page** - MyGeotab will create a custom page accessible from the menu
 
 **What this does:**
-- Embeds all HTML, CSS, and JavaScript directly in the configuration
-- No external file loading, so CORS is not an issue
-- File size: 249 KB (well within MyGeotab limits)
-- Fully self-contained
+- Creates a custom page directly in MyGeotab (no external URL needed)
+- All code is embedded in the configuration file
+- MyGeotab serves the page content directly
+- No CORS issues
+- File size: 250 KB (well within MyGeotab limits)
 
 ### Method 2: Administration UI (GitHub Pages - Has CORS Issues)
 
