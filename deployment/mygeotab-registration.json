@@ -1,0 +1,21 @@
+{
+  "name": "Overview Builder",
+  "supportEmail": "vincenthofmann@geotab.com",
+  "version": "1.0.0",
+  "isSigned": false,
+  "items": [
+    {
+      "page": "overviewBuilder",
+      "click": "OverviewBuilder.initialize",
+      "menuName": {
+        "en": "Create Dashboard",
+        "fr": "Créer un tableau de bord",
+        "es": "Crear panel",
+        "de": "Dashboard erstellen"
+      },
+      "url": "{{URL_PLACEHOLDER}}",
+      "icon": "https://cdn.geotab.com/resources/images/icons/dashboard.svg",
+      "menuId": "dashboardMenu"
+    }
+  ]
+}
