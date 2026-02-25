@@ -13,7 +13,7 @@
         "es": "Crear panel",
         "de": "Dashboard erstellen"
       },
-      "url": "{{URL_PLACEHOLDER}}",
+      "url": "https://vincenthofmann-ai.github.io/report-builder-addin/",
       "icon": "https://cdn.geotab.com/resources/images/icons/dashboard.svg",
       "menuId": "dashboardMenu"
     }
