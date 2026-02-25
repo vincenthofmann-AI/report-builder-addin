@@ -11,6 +11,7 @@
 | Target Launch | [TBD] |
 | Confluence/Wiki | [TBD] |
 | Google Drive | [TBD] |
+| GitHub Repo | https://github.com/vincenthofmann-AI/report-builder-addin |
 | GitLab Source | Development repo: `apps/MyGeotab/src/pages/maintenance/overview/` |
 
 ## Problem Statement
