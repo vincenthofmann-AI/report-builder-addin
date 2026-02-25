@@ -2,20 +2,18 @@
   "name": "Overview Builder",
   "supportEmail": "vincenthofmann@geotab.com",
   "version": "1.0.0",
-  "isSigned": false,
   "items": [
     {
-      "page": "overviewBuilder",
-      "click": "OverviewBuilder.initialize",
+      "url": "https://vincenthofmann-ai.github.io/report-builder-addin/",
+      "path": "ActivityLink/",
       "menuName": {
         "en": "Create Dashboard",
         "fr": "Créer un tableau de bord",
         "es": "Crear panel",
         "de": "Dashboard erstellen"
       },
-      "url": "https://vincenthofmann-ai.github.io/report-builder-addin/",
-      "icon": "https://cdn.geotab.com/resources/images/icons/dashboard.svg",
-      "menuId": "dashboardMenu"
+      "svgIcon": "https://www.geotab.com/geoimages/home/icon-solutions.svg"
     }
-  ]
+  ],
+  "files": {}
 }
