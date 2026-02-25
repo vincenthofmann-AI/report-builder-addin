@@ -5,9 +5,32 @@
 Your Overview Builder is live at:
 **https://vincenthofmann-ai.github.io/report-builder-addin/**
 
-## Register in MyGeotab (2 methods)
+## ⚠️ CORS Issue with GitHub Pages
 
-### Method 1: Administration UI (Easiest)
+GitHub Pages doesn't send the required `Access-Control-Allow-Origin` header, so MyGeotab cannot load the add-in directly from the hosted URL. Use the **Embedded Configuration** method below instead.
+
+## Register in MyGeotab (3 methods)
+
+### Method 1: Embedded Configuration (Recommended - Bypasses CORS)
+
+**This method works immediately without any CORS issues.**
+
+Use the file: `deployment/embedded-config.json` (249 KB)
+
+1. Log into MyGeotab as **Administrator**
+2. Go to **Administration** → **System** → **Add-Ins**
+3. Click **"Add"** or **"Add New Add-In"**
+4. **Upload or paste the contents** of `embedded-config.json`
+5. **Save** and assign to users/groups
+6. Look for **"Create Dashboard"** in your Activities menu
+
+**What this does:**
+- Embeds all HTML, CSS, and JavaScript directly in the configuration
+- No external file loading, so CORS is not an issue
+- File size: 249 KB (well within MyGeotab limits)
+- Fully self-contained
+
+### Method 2: Administration UI (GitHub Pages - Has CORS Issues)
 
 1. Log into MyGeotab as **Administrator**
 2. Go to **Administration** → **System** → **Add-Ins**
@@ -29,7 +52,7 @@ Your Overview Builder is live at:
 5. **Save** and assign to users/groups
 6. Look for **"Create Dashboard"** in your Dashboard menu
 
-### Method 2: Copy/Paste JSON
+### Method 3: Copy/Paste JSON (GitHub Pages - Has CORS Issues)
 
 Use the file: `deployment/mygeotab-registration.json`
 
