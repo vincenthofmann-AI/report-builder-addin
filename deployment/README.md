@@ -9,27 +9,28 @@ Your Overview Builder is live at:
 
 GitHub Pages doesn't send the required `Access-Control-Allow-Origin` header, so MyGeotab cannot load the add-in directly from the hosted URL. Use the **Embedded Configuration** method below instead.
 
-## Register in MyGeotab (3 methods)
+## Register in MyGeotab
 
-### Method 1: Page-Based Add-In (Recommended - Simplest)
-
-**This is the simplest approach - creates a custom page directly in MyGeotab.**
-
-Use the file: `deployment/page-addin-config.json` (250 KB)
+**Use the file: `deployment/correct-addin-config.json` (250 KB)**
 
 1. Log into MyGeotab as **Administrator**
 2. Go to **Administration** → **System** → **Add-Ins**
 3. Click **"Add"** or **"Add New Add-In"**
-4. **Upload or paste the contents** of `page-addin-config.json`
+4. **Upload or paste the contents** of `correct-addin-config.json`
 5. **Save** and assign to users/groups
-6. **Navigate to the new page** - MyGeotab will create a custom page accessible from the menu
+6. Look for **"Create Dashboard"** in the Activities menu
 
 **What this does:**
-- Creates a custom page directly in MyGeotab (no external URL needed)
+- Creates a custom page in MyGeotab Activities menu
 - All code is embedded in the configuration file
-- MyGeotab serves the page content directly
-- No CORS issues
+- MyGeotab serves the HTML from the "files" object
+- No external URLs, no CORS issues
 - File size: 250 KB (well within MyGeotab limits)
+
+**Configuration format:**
+- `items[0].url = "index.html"` (references file in "files" object)
+- `items[0].path = "ActivityLink/"` (menu location)
+- `files["index.html"] = embedded HTML` (all CSS/JS inline)
 
 ### Method 2: Administration UI (GitHub Pages - Has CORS Issues)
 
